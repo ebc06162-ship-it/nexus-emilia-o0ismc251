@@ -32,48 +32,7 @@ migrate(
     )
     oportunidades.fields.add(new TextField({ name: 'tipo_evento', max: 100 }))
     oportunidades.fields.add(new TextField({ name: 'descricao_outro_evento' }))
-    oportunidades.fields.add(
-      new RelationField({
-        name: 'cerimonialista_id',
-        collectionId: 'cerimonialistas',
-        maxSelect: 1,
-      }),
-    )
-    oportunidades.fields.add(
-      new RelationField({
-        name: 'contato_cerimonialista_id',
-        collectionId: 'contatos_cerimonialistas',
-        maxSelect: 1,
-      }),
-    )
-    oportunidades.fields.add(
-      new RelationField({
-        name: 'grupo_parceiro_id',
-        collectionId: 'grupos_parceiros',
-        maxSelect: 1,
-      }),
-    )
-    oportunidades.fields.add(
-      new RelationField({
-        name: 'empresa_parceiro_id',
-        collectionId: 'empresas_parceiros',
-        maxSelect: 1,
-      }),
-    )
-    oportunidades.fields.add(
-      new RelationField({
-        name: 'unidade_parceiro_id',
-        collectionId: 'unidades_parceiros',
-        maxSelect: 1,
-      }),
-    )
-    oportunidades.fields.add(
-      new RelationField({
-        name: 'contato_parceiro_id',
-        collectionId: 'contatos_parceiros',
-        maxSelect: 1,
-      }),
-    )
+
     app.save(oportunidades)
 
     const baseRules = {

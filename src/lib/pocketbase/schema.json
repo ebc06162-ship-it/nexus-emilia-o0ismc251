@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T14:34:02.676Z",
+  "generatedAt": "2026-08-25T18:55:11.307Z",
   "collections": [
     {
       "name": "users",
@@ -29,14 +29,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": [
@@ -64,7 +69,7 @@
         {
           "name": "telefone_principal",
           "type": "text",
-          "required": false,
+          "required": true,
           "system": false
         },
         {
@@ -84,7 +89,17 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["noiva", "cerimonialista", "corporativo", "outro"]
+          "selectValues": [
+            "casamento_noiva",
+            "eventos_sociais",
+            "maternidade",
+            "corporativo",
+            "cerimonialista",
+            "revenda_parceiros",
+            "presentes",
+            "consumo_proprio",
+            "outros"
+          ]
         },
         {
           "name": "cpf_cnpj",
@@ -109,12 +124,6 @@
           ]
         },
         {
-          "name": "nome_noivos",
-          "type": "text",
-          "required": false,
-          "system": false
-        },
-        {
           "name": "source_ref",
           "type": "text",
           "required": false,
@@ -131,14 +140,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": [
@@ -205,17 +219,24 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_participantes_cliente ON participantes (cliente_id)"]
+      "indexes": [
+        "CREATE INDEX idx_participantes_cliente ON participantes (cliente_id)"
+      ]
     },
     {
       "name": "oportunidades",
@@ -257,12 +278,8 @@
           "system": false,
           "selectValues": [
             "novo",
-            "em_briefing",
-            "aguardando_dados",
-            "em_proposta",
-            "fechado",
-            "perdido",
-            "cancelado"
+            "diagnosticando",
+            "aguardando_dados"
           ]
         },
         {
@@ -331,14 +348,84 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        },
+        {
+          "name": "origem_tipo",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "direto",
+            "cerimonialista",
+            "grupo_parceiro"
+          ]
+        },
+        {
+          "name": "tipo_evento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "descricao_outro_evento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cerimonialista_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "cerimonialistas"
+        },
+        {
+          "name": "contato_cerimonialista_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "contatos_cerimonialistas"
+        },
+        {
+          "name": "grupo_parceiro_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "grupos_parceiros"
+        },
+        {
+          "name": "empresa_parceiro_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "empresas_parceiros"
+        },
+        {
+          "name": "unidade_parceiro_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "unidades_parceiros"
+        },
+        {
+          "name": "contato_parceiro_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "contatos_parceiros"
         }
       ],
       "indexes": [
@@ -409,21 +496,29 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["aberta", "resolvida"]
+          "selectValues": [
+            "aberta",
+            "resolvida"
+          ]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": [
@@ -461,7 +556,14 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["criacao", "atualizacao", "transicao_status", "contato", "nota", "erro"]
+          "selectValues": [
+            "criacao",
+            "atualizacao",
+            "transicao_status",
+            "contato",
+            "nota",
+            "erro"
+          ]
         },
         {
           "name": "autor",
@@ -475,10 +577,14 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_historico_oportunidade ON historico_eventos (oportunidade_id)"]
+      "indexes": [
+        "CREATE INDEX idx_historico_oportunidade ON historico_eventos (oportunidade_id)"
+      ]
     },
     {
       "name": "dados_entrega",
@@ -575,17 +681,543 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_dados_entrega_oportunidade ON dados_entrega (oportunidade_id)"]
+      "indexes": [
+        "CREATE INDEX idx_dados_entrega_oportunidade ON dados_entrega (oportunidade_id)"
+      ]
+    },
+    {
+      "name": "cerimonialistas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "nome_empresa",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "endereco",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_cerimonialistas_empresa ON cerimonialistas (nome_empresa)"
+      ]
+    },
+    {
+      "name": "contatos_cerimonialistas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "cerimonialista_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "cerimonialistas"
+        },
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_contatos_cerimonialista ON contatos_cerimonialistas (cerimonialista_id)"
+      ]
+    },
+    {
+      "name": "grupos_parceiros",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "nome_grupo",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_grupos_parceiros_nome ON grupos_parceiros (nome_grupo)"
+      ]
+    },
+    {
+      "name": "empresas_parceiros",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "grupo_parceiro_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "grupos_parceiros"
+        },
+        {
+          "name": "razao_social",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "nome_fantasia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cnpj",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "inscricao_estadual",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "inscricao_estadual_isenta",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "inscricao_municipal",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "inscricao_suframa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_empresas_parceiros_grupo ON empresas_parceiros (grupo_parceiro_id)",
+        "CREATE INDEX idx_empresas_parceiros_cnpj ON empresas_parceiros (cnpj)"
+      ]
+    },
+    {
+      "name": "contatos_parceiros",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "grupo_parceiro_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "grupos_parceiros"
+        },
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_contatos_parceiros_grupo ON contatos_parceiros (grupo_parceiro_id)"
+      ]
+    },
+    {
+      "name": "unidades_parceiros",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "empresa_parceiro_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "empresas_parceiros"
+        },
+        {
+          "name": "nome_unidade",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "endereco",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "complemento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bairro",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cep",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cnpj_unidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_unidades_parceiros_empresa ON unidades_parceiros (empresa_parceiro_id)"
+      ]
+    },
+    {
+      "name": "contatos_unidades_parceiros",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "contato_parceiro_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "contatos_parceiros"
+        },
+        {
+          "name": "unidade_parceiro_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "unidades_parceiros"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX idx_contatos_unidades_unico ON contatos_unidades_parceiros (contato_parceiro_id, unidade_parceiro_id)"
+      ]
+    },
+    {
+      "name": "eventos",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "oportunidade_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "oportunidades"
+        },
+        {
+          "name": "tipo_evento",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "casamento",
+            "aniversario",
+            "cha_bebe",
+            "revelacao",
+            "bodas",
+            "batizado",
+            "outro"
+          ]
+        },
+        {
+          "name": "nome_noivos",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_aniversariante",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_casal",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_bebe",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "descricao_outro",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_eventos_oportunidade ON eventos (oportunidade_id)"
+      ]
     }
   ]
 }

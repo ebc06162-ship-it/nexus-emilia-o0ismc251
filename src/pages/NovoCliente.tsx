@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,6 +27,13 @@ const SEGMENTS = [
   ['outros', 'Outros'],
 ]
 
+const formatPhone = (value) => {
+  const digits = value.replace(/\D/g, '').slice(0, 11)
+  if (digits.length <= 10)
+    return digits.replace(/(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '')
+  return digits.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '')
+}
+
 const NovoCliente = () => {
   const [formData, setFormData] = useState({
     nome: '',
@@ -39,6 +46,7 @@ const NovoCliente = () => {
     empresa_nome: '',
     contato_nome: '',
     contato_telefone: '',
+    nome_noivos: '',
     nome_aniversariante: '',
     nome_casal: '',
     nome_bebe: '',
@@ -52,7 +60,22 @@ const NovoCliente = () => {
   const { toast } = useToast()
   const segment = formData.tipo_cliente
 
-  const handleChange = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }))
+  const handleChange = (field, value) => {
+    if (
+      field === 'telefone_principal' ||
+      field === 'telefone_secundario' ||
+      field === 'contato_telefone'
+    ) {
+      value = formatPhone(value)
+    }
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value }
+      if (field === 'nome' && segment === 'cerimonialista' && !prev.empresa_nome) {
+        next.empresa_nome = value
+      }
+      return next
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -132,6 +155,7 @@ const NovoCliente = () => {
             label="Telefone do Contato Principal"
             value={formData.contato_telefone}
             onChange={handleChange}
+            phone
           />
         </>
       )
@@ -143,21 +167,20 @@ const NovoCliente = () => {
             label="Nome da Empresa"
             value={formData.empresa_nome}
             onChange={handleChange}
-            required
+            help="Preenchido automaticamente com o Nome do Cliente"
           />
           <Field
             id="contato_nome"
             label="Nome do Contato"
             value={formData.contato_nome}
             onChange={handleChange}
-            required
           />
           <Field
             id="contato_telefone"
             label="Telefone do Contato"
             value={formData.contato_telefone}
             onChange={handleChange}
-            required
+            phone
           />
         </>
       )
@@ -187,14 +210,12 @@ const NovoCliente = () => {
             label="Tipo de Evento"
             value={formData.tipo_outro}
             onChange={handleChange}
-            required
           />
           <Field
             id="descricao_outro"
             label="Descrição do Caso"
             value={formData.descricao_outro}
             onChange={handleChange}
-            required
           />
         </>
       )
@@ -229,6 +250,7 @@ const NovoCliente = () => {
                   value={formData.telefone_principal}
                   onChange={handleChange}
                   required
+                  phone
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -316,16 +338,27 @@ const NovoCliente = () => {
   )
 }
 
-const Field = ({ id, label, value, onChange, type = 'text', required = false }) => (
+const Field = ({
+  id,
+  label,
+  value,
+  onChange,
+  type = 'text',
+  required = false,
+  phone = false,
+  help = '',
+}) => (
   <div className="space-y-2">
     <Label htmlFor={id}>{label}</Label>
     <Input
       id={id}
-      type={type}
+      type={phone ? 'tel' : type}
       value={value}
       onChange={(e) => onChange(id, e.target.value)}
       required={required}
+      placeholder={phone ? '(XX) XXXXX-XXXX' : ''}
     />
+    {help && <p className="text-xs text-muted-foreground">{help}</p>}
   </div>
 )
 

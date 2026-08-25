@@ -96,6 +96,16 @@ const NovoCliente = () => {
       return
     }
 
+    if (!pb.authStore.isValid || !pb.authStore.record?.id) {
+      toast({
+        title: 'Sessão expirada',
+        description: 'Entre novamente para salvar o cliente',
+        variant: 'destructive',
+      })
+      window.location.assign('/login')
+      return
+    }
+
     setLoading(true)
     try {
       const data = {

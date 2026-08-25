@@ -25,7 +25,7 @@ const Login = () => {
         title: 'Login realizado com sucesso!',
         description: 'Bem-vinda ao Nexus Emília',
       })
-      navigate('/')
+      window.location.assign('/')
     } catch (error) {
       toast({
         title: 'Erro no login',

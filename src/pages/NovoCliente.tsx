@@ -15,6 +15,18 @@ import pb from '@/lib/pocketbase/client'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/hooks/use-toast'
 
+const SEGMENTS = [
+  ['casamento_noiva', 'Casamento / Noiva'],
+  ['eventos_sociais', 'Eventos sociais'],
+  ['maternidade', 'Maternidade'],
+  ['corporativo', 'Corporativo'],
+  ['cerimonialista', 'Cerimonialista'],
+  ['revenda_parceiros', 'Revenda / Parceiros comerciais'],
+  ['presentes', 'Presentes'],
+  ['consumo_proprio', 'Consumo próprio'],
+  ['outros', 'Outros'],
+]
+
 const NovoCliente = () => {
   const [formData, setFormData] = useState({
     nome: '',
@@ -24,25 +36,29 @@ const NovoCliente = () => {
     tipo_cliente: '',
     cpf_cnpj: '',
     origem_contato: '',
-    nome_noivos: '',
+    empresa_nome: '',
+    contato_nome: '',
+    contato_telefone: '',
+    nome_aniversariante: '',
+    nome_casal: '',
+    nome_bebe: '',
+    nome_presenteado: '',
+    tipo_outro: '',
+    descricao_outro: '',
     observacoes: '',
   })
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { toast } = useToast()
+  const segment = formData.tipo_cliente
 
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+  const handleChange = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }))
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-
     try {
-      // Filtrar campos vazios
       const dataToSend = Object.fromEntries(Object.entries(formData).filter(([_, v]) => v !== ''))
-
       await pb.collection('clientes').create(dataToSend)
       toast({
         title: 'Cliente criado com sucesso!',
@@ -60,6 +76,131 @@ const NovoCliente = () => {
     }
   }
 
+  const conditionalFields = () => {
+    if (segment === 'casamento_noiva')
+      return (
+        <Field
+          id="nome_noivos"
+          label="Nome dos Noivos"
+          value={formData.nome_noivos}
+          onChange={handleChange}
+        />
+      )
+    if (segment === 'eventos_sociais')
+      return (
+        <>
+          <Field
+            id="nome_aniversariante"
+            label="Nome do Aniversariante (opcional)"
+            value={formData.nome_aniversariante}
+            onChange={handleChange}
+          />
+          <Field
+            id="nome_casal"
+            label="Nome do Casal (opcional)"
+            value={formData.nome_casal}
+            onChange={handleChange}
+          />
+        </>
+      )
+    if (segment === 'maternidade')
+      return (
+        <Field
+          id="nome_bebe"
+          label="Nome do Bebê (opcional)"
+          value={formData.nome_bebe}
+          onChange={handleChange}
+        />
+      )
+    if (segment === 'corporativo')
+      return (
+        <>
+          <Field
+            id="empresa_nome"
+            label="Nome da Empresa"
+            value={formData.empresa_nome}
+            onChange={handleChange}
+          />
+          <Field
+            id="contato_nome"
+            label="Nome do Contato Principal"
+            value={formData.contato_nome}
+            onChange={handleChange}
+          />
+          <Field
+            id="contato_telefone"
+            label="Telefone do Contato Principal"
+            value={formData.contato_telefone}
+            onChange={handleChange}
+          />
+        </>
+      )
+    if (segment === 'cerimonialista')
+      return (
+        <>
+          <Field
+            id="empresa_nome"
+            label="Nome da Empresa"
+            value={formData.empresa_nome}
+            onChange={handleChange}
+            required
+          />
+          <Field
+            id="contato_nome"
+            label="Nome do Contato"
+            value={formData.contato_nome}
+            onChange={handleChange}
+            required
+          />
+          <Field
+            id="contato_telefone"
+            label="Telefone do Contato"
+            value={formData.contato_telefone}
+            onChange={handleChange}
+            required
+          />
+        </>
+      )
+    if (segment === 'revenda_parceiros')
+      return (
+        <Field
+          id="empresa_nome"
+          label="Nome do Grupo ou Empresa"
+          value={formData.empresa_nome}
+          onChange={handleChange}
+        />
+      )
+    if (segment === 'presentes')
+      return (
+        <Field
+          id="nome_presenteado"
+          label="Nome da Pessoa Presenteada"
+          value={formData.nome_presenteado}
+          onChange={handleChange}
+        />
+      )
+    if (segment === 'outros')
+      return (
+        <>
+          <Field
+            id="tipo_outro"
+            label="Tipo de Evento"
+            value={formData.tipo_outro}
+            onChange={handleChange}
+            required
+          />
+          <Field
+            id="descricao_outro"
+            label="Descrição do Caso"
+            value={formData.descricao_outro}
+            onChange={handleChange}
+            required
+          />
+        </>
+      )
+    return null
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <header className="bg-[#3D2314] text-white p-4">
@@ -67,7 +208,6 @@ const NovoCliente = () => {
           <h1 className="text-xl font-bold">Novo Cliente</h1>
         </div>
       </header>
-
       <main className="container mx-auto py-8 px-4">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
@@ -76,98 +216,85 @@ const NovoCliente = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nome">Nome *</Label>
-                  <Input
-                    id="nome"
-                    value={formData.nome}
-                    onChange={(e) => handleChange('nome', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="telefone_principal">Telefone Principal</Label>
-                  <Input
-                    id="telefone_principal"
-                    value={formData.telefone_principal}
-                    onChange={(e) => handleChange('telefone_principal', e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tipo_cliente">Tipo de Cliente</Label>
-                  <Select onValueChange={(v) => handleChange('tipo_cliente', v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="noiva">Noiva</SelectItem>
-                      <SelectItem value="cerimonialista">Cerimonialista</SelectItem>
-                      <SelectItem value="corporativo">Corporativo</SelectItem>
-                      <SelectItem value="outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="cpf_cnpj">CPF/CNPJ</Label>
-                  <Input
-                    id="cpf_cnpj"
-                    value={formData.cpf_cnpj}
-                    onChange={(e) => handleChange('cpf_cnpj', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="origem_contato">Origem do Contato</Label>
-                  <Select onValueChange={(v) => handleChange('origem_contato', v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                      <SelectItem value="telefone">Telefone</SelectItem>
-                      <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="presencial">Presencial</SelectItem>
-                      <SelectItem value="indicacao">Indicação</SelectItem>
-                      <SelectItem value="instagram">Instagram</SelectItem>
-                      <SelectItem value="site">Site</SelectItem>
-                      <SelectItem value="outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="nome_noivos">Nome dos Noivos</Label>
-                <Input
-                  id="nome_noivos"
-                  value={formData.nome_noivos}
-                  onChange={(e) => handleChange('nome_noivos', e.target.value)}
+                <Field
+                  id="nome"
+                  label="Nome *"
+                  value={formData.nome}
+                  onChange={handleChange}
+                  required
+                />
+                <Field
+                  id="telefone_principal"
+                  label="Telefone Principal *"
+                  value={formData.telefone_principal}
+                  onChange={handleChange}
+                  required
                 />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="observacoes">Observações</Label>
-                <Input
-                  id="observacoes"
-                  value={formData.observacoes}
-                  onChange={(e) => handleChange('observacoes', e.target.value)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field
+                  id="email"
+                  label="Email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <Field
+                  id="cpf_cnpj"
+                  label="CPF/CNPJ"
+                  value={formData.cpf_cnpj}
+                  onChange={handleChange}
                 />
               </div>
-
+              <div className="space-y-2">
+                <Label htmlFor="tipo_cliente">Segmento *</Label>
+                <Select value={segment} onValueChange={(v) => handleChange('tipo_cliente', v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o segmento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SEGMENTS.map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="origem_contato">Origem do Contato</Label>
+                <Select
+                  value={formData.origem_contato}
+                  onValueChange={(v) => handleChange('origem_contato', v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[
+                      'whatsapp',
+                      'telefone',
+                      'email',
+                      'presencial',
+                      'indicacao',
+                      'instagram',
+                      'site',
+                      'outro',
+                    ].map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {conditionalFields()}
+              <Field
+                id="observacoes"
+                label="Observações"
+                value={formData.observacoes}
+                onChange={handleChange}
+              />
               <div className="flex gap-4">
                 <Button
                   type="submit"
@@ -184,10 +311,22 @@ const NovoCliente = () => {
           </CardContent>
         </Card>
       </main>
-
       <Toaster />
     </div>
   )
 }
+
+const Field = ({ id, label, value, onChange, type = 'text', required = false }) => (
+  <div className="space-y-2">
+    <Label htmlFor={id}>{label}</Label>
+    <Input
+      id={id}
+      type={type}
+      value={value}
+      onChange={(e) => onChange(id, e.target.value)}
+      required={required}
+    />
+  </div>
+)
 
 export default NovoCliente

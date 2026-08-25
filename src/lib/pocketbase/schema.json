@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T19:04:58.929Z",
+  "generatedAt": "2026-08-25T19:12:06.973Z",
   "collections": [
     {
       "name": "users",
@@ -153,6 +153,60 @@
             "onCreate",
             "onUpdate"
           ]
+        },
+        {
+          "name": "empresa_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contato_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contato_telefone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_aniversariante",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_casal",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_bebe",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_presenteado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_outro",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "descricao_outro",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

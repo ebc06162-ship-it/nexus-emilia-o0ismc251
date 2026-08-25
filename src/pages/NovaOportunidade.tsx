@@ -19,8 +19,15 @@ const NovaOportunidade = () => {
   const [clientes, setClientes] = useState([])
   const [formData, setFormData] = useState({
     cliente_id: '',
+    segmento: '',
     tipo_pedido: '',
     status: 'novo',
+    nome_noivos: '',
+    nome_aniversariante: '',
+    nome_casal: '',
+    nome_bebe: '',
+    tipo_outro: '',
+    descricao_outro_evento: '',
     responsavel_atual: '',
     proxima_acao: '',
     prazo_proxima_acao: '',
@@ -57,6 +64,11 @@ const NovaOportunidade = () => {
     setLoading(true)
 
     try {
+      if (!formData.segmento || !formData.tipo_pedido) {
+        toast({ title: 'Segmento e tipo de evento são obrigatórios', variant: 'destructive' })
+        setLoading(false)
+        return
+      }
       const dataToSend = {
         ...formData,
         responsavel_atual: pb.authStore.record.id,
@@ -123,7 +135,22 @@ const NovaOportunidade = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="tipo_pedido">Tipo de Pedido *</Label>
+                  <Label htmlFor="segmento">Segmento *</Label>
+                  <Select onValueChange={(v) => handleChange('segmento', v)} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o segmento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="casamento_noiva">Casamento / Noiva</SelectItem>
+                      <SelectItem value="eventos_sociais">Eventos sociais</SelectItem>
+                      <SelectItem value="maternidade">Maternidade</SelectItem>
+                      <SelectItem value="corporativo">Corporativo</SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tipo_pedido">Tipo de Evento *</Label>
                   <Select onValueChange={(v) => handleChange('tipo_pedido', v)} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione" />
@@ -141,6 +168,60 @@ const NovaOportunidade = () => {
                 </div>
               </div>
 
+              {formData.segmento === 'casamento_noiva' && (
+                <div className="space-y-2">
+                  <Label>Nome dos Noivos</Label>
+                  <Input
+                    value={formData.nome_noivos}
+                    onChange={(e) => handleChange('nome_noivos', e.target.value)}
+                  />
+                </div>
+              )}
+              {formData.segmento === 'eventos_sociais' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Nome do Aniversariante</Label>
+                    <Input
+                      value={formData.nome_aniversariante}
+                      onChange={(e) => handleChange('nome_aniversariante', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Nome do Casal</Label>
+                    <Input
+                      value={formData.nome_casal}
+                      onChange={(e) => handleChange('nome_casal', e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+              {formData.segmento === 'maternidade' && (
+                <div className="space-y-2">
+                  <Label>Nome do Bebê</Label>
+                  <Input
+                    value={formData.nome_bebe}
+                    onChange={(e) => handleChange('nome_bebe', e.target.value)}
+                  />
+                </div>
+              )}
+              {formData.segmento === 'outros' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Tipo de Evento</Label>
+                    <Input
+                      value={formData.tipo_outro}
+                      onChange={(e) => handleChange('tipo_outro', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Descrição</Label>
+                    <Input
+                      value={formData.descricao_outro_evento}
+                      onChange={(e) => handleChange('descricao_outro_evento', e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="valor_estimado">Valor Estimado (R$)</Label>

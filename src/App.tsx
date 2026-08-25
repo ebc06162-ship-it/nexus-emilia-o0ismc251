@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard'
 import NovoCliente from './pages/NovoCliente'
 import NovaOportunidade from './pages/NovaOportunidade'
 import Layout from './components/Layout'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 
 // Rota protegida: redireciona para login se não autenticado
 const ProtectedRoute = ({ children }) => {

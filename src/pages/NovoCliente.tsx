@@ -137,13 +137,11 @@ const NovoCliente = () => {
           .collection('cerimonialistas')
           .create({ nome_empresa: empresa })
         for (const contato of contatos.filter((c) => c.nome.trim() && c.telefone.trim())) {
-          await pb
-            .collection('contatos_cerimonialistas')
-            .create({
-              cerimonialista_id: cerimonialista.id,
-              nome: contato.nome.trim(),
-              telefone: contato.telefone.replace(/\D/g, ''),
-            })
+          await pb.collection('contatos_cerimonialistas').create({
+            cerimonialista_id: cerimonialista.id,
+            nome: contato.nome.trim(),
+            telefone: contato.telefone.replace(/\D/g, ''),
+          })
         }
       }
       toast({ title: 'Cliente criado com sucesso!' })

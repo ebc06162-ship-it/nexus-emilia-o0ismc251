@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T20:41:56.914Z",
+  "generatedAt": "2026-08-25T20:42:37.598Z",
   "collections": [
     {
       "name": "users",
@@ -87,7 +87,7 @@
         {
           "name": "tipo_cliente",
           "type": "select",
-          "required": false,
+          "required": true,
           "system": false,
           "selectValues": [
             "cliente_direto",

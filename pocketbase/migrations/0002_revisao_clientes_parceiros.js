@@ -291,6 +291,39 @@ migrate(
     })
     app.save(eventos)
 
+    // As coleções de destino já existem; agora adicionamos as relações à oportunidade.
+    oportunidades.fields.add(
+      new RelationField({
+        name: 'cerimonialista_id',
+        collectionId: cerimonialistas.id,
+        maxSelect: 1,
+      }),
+    )
+    oportunidades.fields.add(
+      new RelationField({
+        name: 'contato_cerimonialista_id',
+        collectionId: contatosCerimonialistas.id,
+        maxSelect: 1,
+      }),
+    )
+    oportunidades.fields.add(
+      new RelationField({ name: 'grupo_parceiro_id', collectionId: grupos.id, maxSelect: 1 }),
+    )
+    oportunidades.fields.add(
+      new RelationField({ name: 'empresa_parceiro_id', collectionId: empresas.id, maxSelect: 1 }),
+    )
+    oportunidades.fields.add(
+      new RelationField({ name: 'unidade_parceiro_id', collectionId: unidades.id, maxSelect: 1 }),
+    )
+    oportunidades.fields.add(
+      new RelationField({
+        name: 'contato_parceiro_id',
+        collectionId: contatosParceiros.id,
+        maxSelect: 1,
+      }),
+    )
+    app.save(oportunidades)
+
     console.log('Migration 0002 completed: revised customer model, partners, groups and event data')
   },
   (app) => {

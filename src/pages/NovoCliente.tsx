@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,132 +27,120 @@ const SEGMENTS = [
   ['outros', 'Outros'],
 ]
 
-const PHONE_COUNTRIES = [
-  ['br', 'Brasil (+55)'],
-  ['international', 'Outro país'],
+const ORIGINS = [
+  ['whatsapp', 'WhatsApp'],
+  ['telefone', 'Telefone'],
+  ['email', 'Email'],
+  ['presencial', 'Presencial'],
+  ['indicacao', 'Indicação'],
+  ['instagram', 'Instagram'],
+  ['site', 'Site'],
+  ['outro', 'Outro'],
 ]
 
-const formatBrazilPhone = (value) => {
-  const digits = value.replace(/\D/g, '').replace(/^55/, '').slice(0, 11)
-  if (digits.length <= 2) return digits.length ? `(${digits}` : ''
-  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
-  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+const formatPhone = (value) => {
+  const d = value.replace(/\D/g, '').replace(/^55/, '').slice(0, 11)
+  if (d.length <= 2) return d.length ? `(${d}` : ''
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
 }
-
-const normalizeInternationalPhone = (value) => {
-  const digits = value.replace(/[^\d+]/g, '')
-  return digits.startsWith('+')
-    ? `+${digits.slice(1).replace(/\D/g, '')}`
-    : `+${digits.replace(/\D/g, '')}`
-}
-
-const formatPhone = (value, country) =>
-  country === 'br' ? formatBrazilPhone(value) : normalizeInternationalPhone(value)
 
 const NovoCliente = () => {
-  const [formData, setFormData] = useState({
-    nome: '',
-    telefone_principal: '',
-    telefone_secundario: '',
-    email: '',
-    tipo_cliente: '',
-    cpf_cnpj: '',
-    origem_contato: '',
-    empresa_nome: '',
-    contato_nome: '',
-    contato_telefone: '',
-    nome_noivos: '',
-    nome_aniversariante: '',
-    nome_casal: '',
-    nome_bebe: '',
-    nome_presenteado: '',
-    tipo_outro: '',
-    descricao_outro: '',
-    observacoes: '',
-  })
-  const [phoneCountry, setPhoneCountry] = useState({
-    principal: 'br',
-    secundario: 'br',
-    contato: 'br',
-  })
+  const [segment, setSegment] = useState('')
+  const [nome, setNome] = useState('')
+  const [telPrincipal, setTelPrincipal] = useState('')
+  const [telSecundario, setTelSecundario] = useState('')
+  const [email, setEmail] = useState('')
+  const [cpfCnpj, setCpfCnpj] = useState('')
+  const [origem, setOrigem] = useState('')
+  const [empresaNome, setEmpresaNome] = useState('')
+  const [contatoNome, setContatoNome] = useState('')
+  const [contatoTel, setContatoTel] = useState('')
+  const [nomeNoivos, setNomeNoivos] = useState('')
+  const [nomeAniversariante, setNomeAniversariante] = useState('')
+  const [nomeCasal, setNomeCasal] = useState('')
+  const [nomeBebe, setNomeBebe] = useState('')
+  const [nomePresenteado, setNomePresenteado] = useState('')
+  const [tipoOutro, setTipoOutro] = useState('')
+  const [descOutro, setDescOutro] = useState('')
+  const [obs, setObs] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { toast } = useToast()
-  const segment = formData.tipo_cliente
 
-  const handleChange = (field, value) => {
-    if (field === 'telefone_principal') value = formatPhone(value, phoneCountry.principal)
-    if (field === 'telefone_secundario') value = formatPhone(value, phoneCountry.secundario)
-    if (field === 'contato_telefone') value = formatPhone(value, phoneCountry.contato)
-    setFormData((prev) => {
-      const next = { ...prev, [field]: value }
-      if (field === 'tipo_cliente' && value === 'cerimonialista') next.empresa_nome = prev.nome
-      if (field === 'nome' && prev.tipo_cliente === 'cerimonialista') next.empresa_nome = value
-      return next
-    })
-  }
-
-  const changePhoneCountry = (field, country) => {
-    setPhoneCountry((prev) => ({ ...prev, [field]: country }))
-    const dataField =
-      field === 'principal'
-        ? 'telefone_principal'
-        : field === 'secundario'
-          ? 'telefone_secundario'
-          : 'contato_telefone'
-    setFormData((prev) => ({ ...prev, [dataField]: formatPhone(prev[dataField], country) }))
-  }
+  useEffect(() => {
+    if (segment === 'cerimonialista' && nome) setEmpresaNome(nome)
+  }, [segment, nome])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!formData.nome.trim() || !formData.telefone_principal.trim() || !segment) {
-      toast({
-        title: 'Preencha os campos obrigatórios',
-        description: 'Nome, telefone principal e segmento são obrigatórios',
-        variant: 'destructive',
-      })
+    if (!nome.trim()) {
+      toast({ title: 'Nome obrigatório', variant: 'destructive' })
       return
     }
-    if (
-      segment === 'cerimonialista' &&
-      (!formData.contato_nome.trim() || !formData.contato_telefone.trim())
-    ) {
-      toast({
-        title: 'Contato obrigatório',
-        description: 'Informe o nome e o telefone do contato da cerimonialista',
-        variant: 'destructive',
-      })
+    if (!telPrincipal.trim()) {
+      toast({ title: 'Telefone principal obrigatório', variant: 'destructive' })
       return
     }
-    if (segment === 'outros' && (!formData.tipo_outro.trim() || !formData.descricao_outro.trim())) {
-      toast({
-        title: 'Detalhes obrigatórios',
-        description: 'Informe o tipo e a descrição do evento',
-        variant: 'destructive',
-      })
+    if (!segment) {
+      toast({ title: 'Selecione o tipo de cliente', variant: 'destructive' })
+      return
+    }
+    if (segment === 'cerimonialista' && (!contatoNome.trim() || !contatoTel.trim())) {
+      toast({ title: 'Contato obrigatório para cerimonialista', variant: 'destructive' })
+      return
+    }
+    if (segment === 'outros' && (!tipoOutro.trim() || !descOutro.trim())) {
+      toast({ title: 'Tipo e descrição obrigatórios para "Outros"', variant: 'destructive' })
       return
     }
 
     setLoading(true)
     try {
-      const dataToSend = { ...formData }
-      if (segment === 'cerimonialista') dataToSend.empresa_nome = formData.nome
-      Object.keys(dataToSend).forEach((key) => {
-        if (dataToSend[key] === '') delete dataToSend[key]
-      })
-      await pb.collection('clientes').create(dataToSend)
-      toast({
-        title: 'Cliente criado com sucesso!',
-        description: 'O registro foi salvo no sistema',
-      })
+      const data = {
+        nome: nome.trim(),
+        telefone_principal: telPrincipal.replace(/\D/g, ''),
+        tipo_cliente: segment,
+      }
+      if (telSecundario) data.telefone_secundario = telSecundario.replace(/\D/g, '')
+      if (email) data.email = email
+      if (cpfCnpj) data.cpf_cnpj = cpfCnpj
+      if (origem) data.origem_contato = origem
+      if (segment === 'cerimonialista') {
+        data.empresa_nome = empresaNome || nome.trim()
+        data.contato_nome = contatoNome
+        data.contato_telefone = contatoTel.replace(/\D/g, '')
+      }
+      if (segment === 'corporativo') {
+        if (empresaNome) data.empresa_nome = empresaNome
+        if (contatoNome) data.contato_nome = contatoNome
+        if (contatoTel) data.contato_telefone = contatoTel.replace(/\D/g, '')
+      }
+      if (segment === 'casamento_noiva' && nomeNoivos) data.nome_noivos = nomeNoivos
+      if (segment === 'eventos_sociais') {
+        if (nomeAniversariante) data.nome_aniversariante = nomeAniversariante
+        if (nomeCasal) data.nome_casal = nomeCasal
+      }
+      if (segment === 'maternidade' && nomeBebe) data.nome_bebe = nomeBebe
+      if (segment === 'revenda_parceiros' && empresaNome) data.empresa_nome = empresaNome
+      if (segment === 'presentes' && nomePresenteado) data.nome_presenteado = nomePresenteado
+      if (segment === 'outros') {
+        data.tipo_outro = tipoOutro
+        data.descricao_outro = descOutro
+      }
+      if (obs) data.observacoes = obs
+
+      await pb.collection('clientes').create(data)
+      toast({ title: 'Cliente criado com sucesso!' })
       navigate('/')
     } catch (error) {
-      toast({
-        title: 'Erro ao criar cliente',
-        description: error?.response?.message || error?.message || 'Tente novamente',
-        variant: 'destructive',
-      })
+      const msg =
+        error?.response?.data?.message ||
+        error?.data?.message ||
+        error?.message ||
+        'Erro desconhecido'
+      toast({ title: 'Erro ao criar cliente', description: msg, variant: 'destructive' })
     } finally {
       setLoading(false)
     }
@@ -161,61 +149,50 @@ const NovoCliente = () => {
   const conditionalFields = () => {
     if (segment === 'casamento_noiva')
       return (
-        <Field
-          id="nome_noivos"
-          label="Nome dos Noivos"
-          value={formData.nome_noivos}
-          onChange={handleChange}
-        />
+        <F id="nome_noivos" label="Nome dos Noivos" value={nomeNoivos} onChange={setNomeNoivos} />
       )
     if (segment === 'eventos_sociais')
       return (
         <>
-          <Field
+          <F
             id="nome_aniversariante"
             label="Nome do Aniversariante (opcional)"
-            value={formData.nome_aniversariante}
-            onChange={handleChange}
+            value={nomeAniversariante}
+            onChange={setNomeAniversariante}
           />
-          <Field
+          <F
             id="nome_casal"
             label="Nome do Casal (opcional)"
-            value={formData.nome_casal}
-            onChange={handleChange}
+            value={nomeCasal}
+            onChange={setNomeCasal}
           />
         </>
       )
     if (segment === 'maternidade')
       return (
-        <Field
-          id="nome_bebe"
-          label="Nome do Bebê (opcional)"
-          value={formData.nome_bebe}
-          onChange={handleChange}
-        />
+        <F id="nome_bebe" label="Nome do Bebê (opcional)" value={nomeBebe} onChange={setNomeBebe} />
       )
     if (segment === 'corporativo')
       return (
         <>
-          <Field
+          <F
             id="empresa_nome"
             label="Nome da Empresa"
-            value={formData.empresa_nome}
-            onChange={handleChange}
+            value={empresaNome}
+            onChange={setEmpresaNome}
           />
-          <Field
+          <F
             id="contato_nome"
             label="Nome do Contato Principal"
-            value={formData.contato_nome}
-            onChange={handleChange}
+            value={contatoNome}
+            onChange={setContatoNome}
           />
-          <PhoneField
+          <F
             id="contato_telefone"
             label="Telefone do Contato Principal"
-            value={formData.contato_telefone}
-            country={phoneCountry.contato}
-            onCountryChange={(v) => changePhoneCountry('contato', v)}
-            onChange={handleChange}
+            value={contatoTel}
+            onChange={(v) => setContatoTel(formatPhone(v))}
+            placeholder="(XX) XXXXX-XXXX"
           />
         </>
       )
@@ -223,60 +200,58 @@ const NovoCliente = () => {
       return (
         <>
           <p className="text-sm text-muted-foreground rounded-md bg-[#F5EEE7] p-3">
-            A empresa será cadastrada como{' '}
-            <strong>{formData.nome || 'o nome informado acima'}</strong>. Não é necessário repetir.
+            A empresa será cadastrada como <strong>{nome || 'o nome informado acima'}</strong>
           </p>
-          <Field
+          <F
             id="contato_nome"
-            label="Nome do Contato"
-            value={formData.contato_nome}
-            onChange={handleChange}
+            label="Nome do Contato *"
+            value={contatoNome}
+            onChange={setContatoNome}
             required
           />
-          <PhoneField
+          <F
             id="contato_telefone"
-            label="Telefone do Contato"
-            value={formData.contato_telefone}
-            country={phoneCountry.contato}
-            onCountryChange={(v) => changePhoneCountry('contato', v)}
-            onChange={handleChange}
+            label="Telefone do Contato *"
+            value={contatoTel}
+            onChange={(v) => setContatoTel(formatPhone(v))}
             required
+            placeholder="(XX) XXXXX-XXXX"
           />
         </>
       )
     if (segment === 'revenda_parceiros')
       return (
-        <Field
+        <F
           id="empresa_nome"
           label="Nome do Grupo ou Empresa"
-          value={formData.empresa_nome}
-          onChange={handleChange}
+          value={empresaNome}
+          onChange={setEmpresaNome}
         />
       )
     if (segment === 'presentes')
       return (
-        <Field
+        <F
           id="nome_presenteado"
           label="Nome da Pessoa Presenteada"
-          value={formData.nome_presenteado}
-          onChange={handleChange}
+          value={nomePresenteado}
+          onChange={setNomePresenteado}
         />
       )
     if (segment === 'outros')
       return (
         <>
-          <Field
+          <F
             id="tipo_outro"
             label="Tipo de Evento"
-            value={formData.tipo_outro}
-            onChange={handleChange}
+            value={tipoOutro}
+            onChange={setTipoOutro}
             required
           />
-          <Field
+          <F
             id="descricao_outro"
             label="Descrição do Caso"
-            value={formData.descricao_outro}
-            onChange={handleChange}
+            value={descOutro}
+            onChange={setDescOutro}
             required
           />
         </>
@@ -298,98 +273,62 @@ const NovoCliente = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label>Tipo de Cliente *</Label>
+                <Select value={segment} onValueChange={setSegment}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SEGMENTS.map(([v, l]) => (
+                      <SelectItem key={v} value={v}>
+                        {l}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field
-                  id="nome"
-                  label="Nome *"
-                  value={formData.nome}
-                  onChange={handleChange}
-                  required
-                />
-                <PhoneField
+                <F id="nome" label="Nome *" value={nome} onChange={setNome} required />
+                <F
                   id="telefone_principal"
                   label="Telefone Principal *"
-                  value={formData.telefone_principal}
-                  country={phoneCountry.principal}
-                  onCountryChange={(v) => changePhoneCountry('principal', v)}
-                  onChange={handleChange}
+                  value={telPrincipal}
+                  onChange={(v) => setTelPrincipal(formatPhone(v))}
                   required
+                  placeholder="(XX) XXXXX-XXXX"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <PhoneField
+                <F
                   id="telefone_secundario"
                   label="Telefone Secundário (opcional)"
-                  value={formData.telefone_secundario}
-                  country={phoneCountry.secundario}
-                  onCountryChange={(v) => changePhoneCountry('secundario', v)}
-                  onChange={handleChange}
+                  value={telSecundario}
+                  onChange={(v) => setTelSecundario(formatPhone(v))}
+                  placeholder="(XX) XXXXX-XXXX"
                 />
-                <Field
-                  id="email"
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
+                <F id="email" label="Email" type="email" value={email} onChange={setEmail} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field
-                  id="cpf_cnpj"
-                  label="CPF/CNPJ"
-                  value={formData.cpf_cnpj}
-                  onChange={handleChange}
-                />
+                <F id="cpf_cnpj" label="CPF/CNPJ" value={cpfCnpj} onChange={setCpfCnpj} />
                 <div className="space-y-2">
-                  <Label htmlFor="origem_contato">Origem do Contato</Label>
-                  <Select
-                    value={formData.origem_contato}
-                    onValueChange={(v) => handleChange('origem_contato', v)}
-                  >
+                  <Label>Origem do Contato</Label>
+                  <Select value={origem} onValueChange={setOrigem}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
-                      {[
-                        'whatsapp',
-                        'telefone',
-                        'email',
-                        'presencial',
-                        'indicacao',
-                        'instagram',
-                        'site',
-                        'outro',
-                      ].map((v) => (
+                      {ORIGINS.map(([v, l]) => (
                         <SelectItem key={v} value={v}>
-                          {v}
+                          {l}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="tipo_cliente">Segmento *</Label>
-                <Select value={segment} onValueChange={(v) => handleChange('tipo_cliente', v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o segmento" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SEGMENTS.map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
               {conditionalFields()}
-              <Field
-                id="observacoes"
-                label="Observações"
-                value={formData.observacoes}
-                onChange={handleChange}
-              />
+              <F id="observacoes" label="Observações" value={obs} onChange={setObs} />
               <div className="flex gap-4">
                 <Button
                   type="submit"
@@ -411,45 +350,17 @@ const NovoCliente = () => {
   )
 }
 
-const Field = ({ id, label, value, onChange, type = 'text', required = false }) => (
+const F = ({ id, label, value, onChange, type = 'text', required = false, placeholder = '' }) => (
   <div className="space-y-2">
     <Label htmlFor={id}>{label}</Label>
     <Input
       id={id}
       type={type}
       value={value}
-      onChange={(e) => onChange(id, e.target.value)}
+      onChange={(e) => onChange(e.target.value)}
       required={required}
+      placeholder={placeholder}
     />
-  </div>
-)
-
-const PhoneField = ({ id, label, value, country, onCountryChange, onChange, required = false }) => (
-  <div className="space-y-2">
-    <Label htmlFor={id}>{label}</Label>
-    <div className="flex gap-2">
-      <Select value={country} onValueChange={onCountryChange}>
-        <SelectTrigger className="w-[145px]">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {PHONE_COUNTRIES.map(([value, label]) => (
-            <SelectItem key={value} value={value}>
-              {label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Input
-        id={id}
-        type="tel"
-        inputMode="tel"
-        value={value}
-        onChange={(e) => onChange(id, e.target.value)}
-        required={required}
-        placeholder={country === 'br' ? '(11) 99999-9999' : '+ código do país e número'}
-      />
-    </div>
   </div>
 )
 

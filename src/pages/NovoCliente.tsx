@@ -172,20 +172,25 @@ const NovoCliente = () => {
         pessoa = resultadoBusca.items[0] || null
       }
       if (!pessoa) {
-        pessoa = await pb.collection('pessoas').create({
-          nome: nome.trim(),
-          telefone_principal: phone,
-          ...(email ? { email } : {}),
-          ...(cpf ? { cpf } : {}),
-        })
+        try {
+          pessoa = await pb.collection('pessoas').create({
+            nome: nome.trim(),
+            telefone_principal: phone,
+            ...(email ? { email } : {}),
+            ...(cpf ? { cpf } : {}),
+          })
+        } catch (pessoaError) {
+          console.warn('Pessoa não criada; salvando cliente com dados mínimos', pessoaError)
+          pessoa = null
+        }
       }
-      const cliente = await pb.collection('clientes').create({
+      const clienteData = {
         nome: nome.trim(),
         telefone_principal: phone,
         situacao: 'ativo',
         natureza_cadastral: natureza,
         classificacao_comercial: classificacao,
-        pessoa_id: pessoa.id,
+        ...(pessoa ? { pessoa_id: pessoa.id } : {}),
         ...(email ? { email } : {}),
         ...(cpf ? { cpf_cnpj: cpf } : {}),
         ...(cnpj ? { cpf_cnpj: cnpj } : {}),
@@ -194,7 +199,8 @@ const NovoCliente = () => {
         ...(referencia ? { referencia_origem: referencia } : {}),
         ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
         ...(observacoes ? { observacoes } : {}),
-      })
+      }
+      const cliente = await pb.collection('clientes').create(clienteData)
       await pb
         .collection('clientes_pessoas')
         .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
@@ -285,6 +291,7 @@ const NovoCliente = () => {
                   </Select>
                   <Input
                     id="telefone"
+                    type="tel"
                     className="min-w-0 w-full"
                     value={telefone}
                     onChange={(e) => setTelefone(formatPhone(e.target.value, paisTelefone))}

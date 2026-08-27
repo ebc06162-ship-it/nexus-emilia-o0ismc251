@@ -42,6 +42,7 @@ const NovaOportunidade = () => {
   const [loading, setLoading] = useState(false)
   const [duplicata, setDuplicata] = useState(null)
   const [verificandoDuplicata, setVerificandoDuplicata] = useState(false)
+  const [rollbackRef, setRollbackRef] = useState('')
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -73,6 +74,39 @@ const NovaOportunidade = () => {
       })
     } catch (error) {
       console.warn('Decisão não registrada no histórico', error)
+    }
+  }
+
+  const rollbackFixture = async () => {
+    if (!rollbackRef.trim()) return
+    setLoading(true)
+    try {
+      const result = await pb.collection('oportunidades').getList(1, 1, {
+        filter: `source_ref = "${rollbackRef.trim().replace(/"/g, '\\"')}"`,
+      })
+      const original = result.items[0]
+      if (!original) {
+        toast({ title: 'Fixture não encontrada', variant: 'destructive' })
+        return
+      }
+      await registrarDecisao(
+        original.id,
+        `Rollback de fixture solicitado para source_ref ${rollbackRef.trim()}; registro original preservado.`,
+        'nao_aplicavel',
+      )
+      setRollbackRef('')
+      toast({
+        title: 'Rollback registrado',
+        description: 'O registro original e o histórico foram preservados.',
+      })
+    } catch (error) {
+      toast({
+        title: 'Não foi possível registrar o rollback',
+        description: error?.message || 'Tente novamente',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -279,6 +313,29 @@ const NovaOportunidade = () => {
                 />
                 <p className="text-xs text-muted-foreground">
                   Se repetido, o sistema pedirá uma decisão antes de criar outro registro.
+                </p>
+              </div>
+              <div className="rounded-md border border-dashed p-3 space-y-2">
+                <Label htmlFor="rollback_ref">Rollback de fixture (preserva o original)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="rollback_ref"
+                    value={rollbackRef}
+                    onChange={(e) => setRollbackRef(e.target.value)}
+                    placeholder="source_ref da fixture"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={rollbackFixture}
+                    disabled={loading || !rollbackRef.trim()}
+                  >
+                    Registrar rollback
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Apenas registra a reversão de teste no histórico; não apaga nem altera o registro
+                  original.
                 </p>
               </div>
 

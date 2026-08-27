@@ -149,6 +149,35 @@ const NovoCliente = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    buscaTelefoneRef.current += 1
+=======
+<<<<<<< SEARCH
+      const pessoa =
+        usarPessoaExistente && pessoaExistente
+          ? pessoaExistente
+          : await pb.collection('pessoas').create({
+              nome: nome.trim(),
+              telefone_principal: phone,
+              ...(email ? { email } : {}),
+              ...(cpf ? { cpf } : {}),
+            })
+=======
+      let pessoa = usarPessoaExistente && pessoaExistente ? pessoaExistente : null
+      if (!pessoa) {
+        try {
+          pessoa = await pb.collection('pessoas').getFirstListItem(`telefone_principal = "${phone}"`)
+        } catch (lookupError) {
+          if (lookupError?.status !== 404) throw lookupError
+        }
+      }
+      if (!pessoa) {
+        pessoa = await pb.collection('pessoas').create({
+          nome: nome.trim(),
+          telefone_principal: phone,
+          ...(email ? { email } : {}),
+          ...(cpf ? { cpf } : {}),
+        })
+      }
     if (!pb.authStore.isValid || !pb.authStore.record?.id) {
       window.location.assign('/login')
       return
@@ -200,7 +229,10 @@ const NovoCliente = () => {
     } catch (error) {
       toast({
         title: 'Erro ao criar cliente',
-        description: error?.response?.data?.message || error?.message || 'Tente novamente',
+        description:
+          error?.response?.data?.message ||
+          error?.response?.data?.data?.message ||
+          JSON.stringify(error?.response?.data || error?.data || error?.message || 'Tente novamente'),
         variant: 'destructive',
       })
     } finally {
@@ -259,9 +291,9 @@ const NovoCliente = () => {
                   onChange={setNome}
                   required
                 />
-                <div className="space-y-2">
+                        <div className="space-y-2">
                   <Label htmlFor="telefone">Telefone principal *</Label>
-                  <div className="flex gap-2">
+                  <div className="flex min-w-0 gap-2">
                     <Select
                       value={paisTelefone}
                       onValueChange={(value) => {
@@ -279,6 +311,7 @@ const NovoCliente = () => {
                     </Select>
                     <Input
                       id="telefone"
+                      className="min-w-0 flex-1"
                       value={telefone}
                       onChange={(e) => setTelefone(formatPhone(e.target.value, paisTelefone))}
                       required
@@ -288,9 +321,7 @@ const NovoCliente = () => {
                           : '+ código do país e telefone'
                       }
                     />
-                    <span className="self-center text-xs text-muted-foreground whitespace-nowrap">
-                      {buscandoPessoa ? 'Verificando...' : 'Verificação automática'}
-                    </span>
+
                   </div>
                 </div>
               </div>

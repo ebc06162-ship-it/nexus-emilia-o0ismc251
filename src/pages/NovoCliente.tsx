@@ -221,30 +221,30 @@ export default function NovoCliente() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Natureza cadastral *</Label>
-                  <Select value={natureza} onValueChange={setNatureza}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pessoa_fisica">Pessoa Física</SelectItem>
-                      <SelectItem value="pessoa_juridica">Pessoa Jurídica</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <select
+                    id="natureza-cadastral"
+                    value={natureza}
+                    onChange={(e) => setNatureza(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="pessoa_fisica">Pessoa Física</option>
+                    <option value="pessoa_juridica">Pessoa Jurídica</option>
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <Label>Classificação comercial *</Label>
-                  <Select value={classificacao} onValueChange={setClassificacao}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CLASSIFICATIONS.map(([v, l]) => (
-                        <SelectItem key={v} value={v}>
-                          {l}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <select
+                    id="classificacao-comercial"
+                    value={classificacao}
+                    onChange={(e) => setClassificacao(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    {CLASSIFICATIONS.map(([v, l]) => (
+                      <option key={v} value={v}>
+                        {l}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <Field

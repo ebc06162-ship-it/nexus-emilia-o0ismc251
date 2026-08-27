@@ -40,7 +40,7 @@ const CLASSIFICATIONS = [
   ['parceiro_comercial', 'Parceiro Comercial'],
 ]
 const formatPhone = (value, country = 'brasil') => {
-  if (country === 'outro') return value.slice(0, 30)
+  if (country === 'outro') return value
   const d = value.replace(/\D/g, '').replace(/^55/, '').slice(0, 11)
   if (d.length <= 2) return d ? `(${d}` : ''
   if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
@@ -171,19 +171,6 @@ const NovoCliente = () => {
           .getList(1, 1, { filter: `telefone_principal = "${phone}"` })
         pessoa = resultadoBusca.items[0] || null
       }
-      if (!pessoa) {
-        try {
-          pessoa = await pb.collection('pessoas').create({
-            nome: nome.trim(),
-            telefone_principal: phone,
-            ...(email ? { email } : {}),
-            ...(cpf ? { cpf } : {}),
-          })
-        } catch (pessoaError) {
-          console.warn('Pessoa não criada; salvando cliente com dados mínimos', pessoaError)
-          pessoa = null
-        }
-      }
       const clienteData = {
         nome: nome.trim(),
         telefone_principal: phone,
@@ -201,9 +188,29 @@ const NovoCliente = () => {
         ...(observacoes ? { observacoes } : {}),
       }
       const cliente = await pb.collection('clientes').create(clienteData)
-      await pb
-        .collection('clientes_pessoas')
-        .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
+      if (!pessoa) {
+        try {
+          pessoa = await pb.collection('pessoas').create({
+            nome: nome.trim(),
+            telefone_principal: phone,
+            ...(email ? { email } : {}),
+            ...(cpf ? { cpf } : {}),
+          })
+        } catch (pessoaError) {
+          console.warn('Pessoa não vinculada; cliente salvo com dados mínimos', pessoaError)
+        }
+      }
+      if (pessoa) {
+        try {
+          await pb
+            .collection('clientes_pessoas')
+            .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
+          if (!cliente.pessoa_id)
+            await pb.collection('clientes').update(cliente.id, { pessoa_id: pessoa.id })
+        } catch (vinculoError) {
+          console.warn('Cliente salvo; vínculo com Pessoa pendente', vinculoError)
+        }
+      }
       toast({ title: 'Cliente criado com sucesso!' })
       navigate('/')
     } catch (error) {

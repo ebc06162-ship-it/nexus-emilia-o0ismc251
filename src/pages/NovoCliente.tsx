@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -79,49 +79,57 @@ const NovoCliente = () => {
   const [indicador, setIndicador] = useState(null)
   const [buscandoIndicador, setBuscandoIndicador] = useState(false)
   const [loading, setLoading] = useState(false)
+  const buscaTelefoneRef = useRef(0)
   const navigate = useNavigate()
   const { toast } = useToast()
 
-  const buscarPessoa = async () => {
-    const phone = telefone.replace(/\D/g, '')
-    if (!phone) return
+  const consultarPessoaPorTelefone = async (phone) => {
+    const requestId = ++buscaTelefoneRef.current
     setBuscandoPessoa(true)
     try {
       const result = await pb
         .collection('pessoas')
         .getList(1, 5, { filter: `telefone_principal = "${phone}"` })
-      setPessoaExistente(result.items[0] || null)
-      setUsarPessoaExistente(Boolean(result.items[0]))
-      if (result.items[0])
+      if (requestId !== buscaTelefoneRef.current) return
+      const pessoa = result.items[0] || null
+      setPessoaExistente(pessoa)
+      setUsarPessoaExistente(Boolean(pessoa))
+      if (pessoa)
         toast({
-          title: 'Pessoa encontrada',
-          description: 'Você pode reutilizar este cadastro para evitar duplicidade.',
-        })
-      else
-        toast({
-          title: 'Nenhuma pessoa encontrada',
-          description: 'Será criado um novo cadastro mínimo.',
+          title: 'Telefone já cadastrado',
+          description: `${pessoa.nome} já existe na base. Você pode reutilizar a Pessoa.`,
         })
     } catch (error) {
-      toast({
-        title: 'Não foi possível pesquisar a pessoa',
-        description: error?.message || 'Tente novamente',
-        variant: 'destructive',
-      })
+      if (requestId === buscaTelefoneRef.current)
+        toast({
+          title: 'Não foi possível verificar o telefone',
+          description: error?.message || 'Tente novamente',
+          variant: 'destructive',
+        })
     } finally {
-      setBuscandoPessoa(false)
+      if (requestId === buscaTelefoneRef.current) setBuscandoPessoa(false)
     }
   }
+
+  useEffect(() => {
+    const phone = telefone.replace(/\D/g, '')
+    setPessoaExistente(null)
+    setUsarPessoaExistente(false)
+    if (phone.length < 10) {
+      setBuscandoPessoa(false)
+      return
+    }
+    const timer = window.setTimeout(() => consultarPessoaPorTelefone(phone), 450)
+    return () => window.clearTimeout(timer)
+  }, [telefone])
 
   const buscarIndicador = async () => {
     if (!indicadorBusca.trim()) return
     setBuscandoIndicador(true)
     try {
-      const result = await pb
-        .collection('pessoas')
-        .getList(1, 5, {
-          filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
-        })
+      const result = await pb.collection('pessoas').getList(1, 5, {
+        filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
+      })
       setIndicador(result.items[0] || null)
       if (result.items[0])
         toast({ title: 'Indicador encontrado', description: result.items[0].nome })
@@ -160,32 +168,28 @@ const NovoCliente = () => {
       const pessoa =
         usarPessoaExistente && pessoaExistente
           ? pessoaExistente
-          : await pb
-              .collection('pessoas')
-              .create({
-                nome: nome.trim(),
-                telefone_principal: phone,
-                ...(email ? { email } : {}),
-                ...(cpf ? { cpf } : {}),
-              })
-      const cliente = await pb
-        .collection('clientes')
-        .create({
-          nome: nome.trim(),
-          telefone_principal: phone,
-          situacao: 'ativo',
-          natureza_cadastral: natureza,
-          classificacao_comercial: classificacao,
-          pessoa_id: pessoa.id,
-          ...(email ? { email } : {}),
-          ...(cpf ? { cpf_cnpj: cpf } : {}),
-          ...(cnpj ? { cpf_cnpj: cnpj } : {}),
-          ...(origem ? { origem_cliente: origem } : {}),
-          ...(categoria ? { categoria_indicacao: categoria } : {}),
-          ...(referencia ? { referencia_origem: referencia } : {}),
-          ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
-          ...(observacoes ? { observacoes } : {}),
-        })
+          : await pb.collection('pessoas').create({
+              nome: nome.trim(),
+              telefone_principal: phone,
+              ...(email ? { email } : {}),
+              ...(cpf ? { cpf } : {}),
+            })
+      const cliente = await pb.collection('clientes').create({
+        nome: nome.trim(),
+        telefone_principal: phone,
+        situacao: 'ativo',
+        natureza_cadastral: natureza,
+        classificacao_comercial: classificacao,
+        pessoa_id: pessoa.id,
+        ...(email ? { email } : {}),
+        ...(cpf ? { cpf_cnpj: cpf } : {}),
+        ...(cnpj ? { cpf_cnpj: cnpj } : {}),
+        ...(origem ? { origem_cliente: origem } : {}),
+        ...(categoria ? { categoria_indicacao: categoria } : {}),
+        ...(referencia ? { referencia_origem: referencia } : {}),
+        ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
+        ...(observacoes ? { observacoes } : {}),
+      })
       await pb
         .collection('clientes_pessoas')
         .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
@@ -263,14 +267,9 @@ const NovoCliente = () => {
                       required
                       placeholder="(XX) XXXXX-XXXX"
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={buscarPessoa}
-                      disabled={buscandoPessoa}
-                    >
-                      {buscandoPessoa ? 'Buscando...' : 'Buscar'}
-                    </Button>
+                    <span className="self-center text-xs text-muted-foreground whitespace-nowrap">
+                      {buscandoPessoa ? 'Verificando...' : 'Verificação automática'}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -125,11 +125,9 @@ const NovoCliente = () => {
     if (!indicadorBusca.trim()) return
     setBuscandoIndicador(true)
     try {
-      const result = await pb
-        .collection('pessoas')
-        .getList(1, 5, {
-          filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
-        })
+      const result = await pb.collection('pessoas').getList(1, 5, {
+        filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
+      })
       setIndicador(result.items[0] || null)
       if (result.items[0])
         toast({ title: 'Indicador encontrado', description: result.items[0].nome })
@@ -168,41 +166,35 @@ const NovoCliente = () => {
       const phone = paisTelefone === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
       let pessoa = usarPessoaExistente && pessoaExistente ? pessoaExistente : null
       if (!pessoa) {
-        try {
-          pessoa = await pb
-            .collection('pessoas')
-            .getFirstListItem(`telefone_principal = "${phone}"`)
-        } catch (error) {
-          if (error?.status !== 404) throw error
-        }
-      }
-      if (!pessoa)
-        pessoa = await pb
+        const resultadoBusca = await pb
           .collection('pessoas')
-          .create({
-            nome: nome.trim(),
-            telefone_principal: phone,
-            ...(email ? { email } : {}),
-            ...(cpf ? { cpf } : {}),
-          })
-      const cliente = await pb
-        .collection('clientes')
-        .create({
+          .getList(1, 1, { filter: `telefone_principal = "${phone}"` })
+        pessoa = resultadoBusca.items[0] || null
+      }
+      if (!pessoa) {
+        pessoa = await pb.collection('pessoas').create({
           nome: nome.trim(),
           telefone_principal: phone,
-          situacao: 'ativo',
-          natureza_cadastral: natureza,
-          classificacao_comercial: classificacao,
-          pessoa_id: pessoa.id,
           ...(email ? { email } : {}),
-          ...(cpf ? { cpf_cnpj: cpf } : {}),
-          ...(cnpj ? { cpf_cnpj: cnpj } : {}),
-          ...(origem ? { origem_cliente: origem } : {}),
-          ...(categoria ? { categoria_indicacao: categoria } : {}),
-          ...(referencia ? { referencia_origem: referencia } : {}),
-          ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
-          ...(observacoes ? { observacoes } : {}),
+          ...(cpf ? { cpf } : {}),
         })
+      }
+      const cliente = await pb.collection('clientes').create({
+        nome: nome.trim(),
+        telefone_principal: phone,
+        situacao: 'ativo',
+        natureza_cadastral: natureza,
+        classificacao_comercial: classificacao,
+        pessoa_id: pessoa.id,
+        ...(email ? { email } : {}),
+        ...(cpf ? { cpf_cnpj: cpf } : {}),
+        ...(cnpj ? { cpf_cnpj: cnpj } : {}),
+        ...(origem ? { origem_cliente: origem } : {}),
+        ...(categoria ? { categoria_indicacao: categoria } : {}),
+        ...(referencia ? { referencia_origem: referencia } : {}),
+        ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
+        ...(observacoes ? { observacoes } : {}),
+      })
       await pb
         .collection('clientes_pessoas')
         .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })

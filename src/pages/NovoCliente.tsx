@@ -120,11 +120,9 @@ export default function NovoCliente() {
   const buscarIndicador = async () => {
     if (!indicadorBusca.trim()) return
     try {
-      const r = await pb
-        .collection('pessoas')
-        .getList(1, 1, {
-          filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
-        })
+      const r = await pb.collection('pessoas').getList(1, 1, {
+        filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
+      })
       setIndicador(r.items[0] || null)
     } catch (error) {
       console.warn('Falha ao pesquisar indicador', error)
@@ -175,14 +173,12 @@ export default function NovoCliente() {
       const cliente = await pb.collection('clientes').create(clienteData)
       if (!pessoa) {
         try {
-          pessoa = await pb
-            .collection('pessoas')
-            .create({
-              nome: nome.trim(),
-              telefone_principal: phone,
-              ...(email ? { email } : {}),
-              ...(cpfCnpj && natureza === 'pessoa_fisica' ? { cpf: cpfCnpj } : {}),
-            })
+          pessoa = await pb.collection('pessoas').create({
+            nome: nome.trim(),
+            telefone_principal: phone,
+            ...(email ? { email } : {}),
+            ...(cpfCnpj && natureza === 'pessoa_fisica' ? { cpf: cpfCnpj } : {}),
+          })
         } catch (error) {
           console.warn('Pessoa auxiliar não criada', error)
         }

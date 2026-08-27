@@ -37,8 +37,11 @@ const NovaOportunidade = () => {
     qtd_convidados: '',
     qtd_bem_casados: '',
     observacoes: '',
+    source_ref: '',
   })
   const [loading, setLoading] = useState(false)
+  const [duplicata, setDuplicata] = useState(null)
+  const [verificandoDuplicata, setVerificandoDuplicata] = useState(false)
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -59,6 +62,20 @@ const NovaOportunidade = () => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const registrarDecisao = async (oportunidadeId, descricao, decisao) => {
+    try {
+      await pb.collection('historico_eventos').create({
+        oportunidade_id: oportunidadeId,
+        descricao,
+        tipo_evento: 'nota',
+        autor: pb.authStore.record.id,
+        decisao_duplicidade: decisao,
+      })
+    } catch (error) {
+      console.warn('Decisão não registrada no histórico', error)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -72,6 +89,36 @@ const NovaOportunidade = () => {
       const dataToSend = {
         ...formData,
         responsavel_atual: pb.authStore.record.id,
+      }
+
+      if (dataToSend.source_ref) {
+        setVerificandoDuplicata(true)
+        const repetida = await pb.collection('oportunidades').getList(1, 1, {
+          filter: `source_ref = "${dataToSend.source_ref.replace(/"/g, '\\"')}"`,
+        })
+        setVerificandoDuplicata(false)
+        if (repetida.items[0]) {
+          setDuplicata(repetida.items[0])
+          const reutilizar = window.confirm(
+            `Já existe uma oportunidade com este identificador (${repetida.items[0].id}).\n\nOK: reutilizar a existente.\nCancelar: criar uma nova sem alterar a original.`,
+          )
+          setDuplicata(null)
+          if (reutilizar) {
+            await registrarDecisao(
+              repetida.items[0].id,
+              `Duplicidade identificada por source_ref ${dataToSend.source_ref}; cadastro reutilizado por decisão humana.`,
+              'reutilizar',
+            )
+            toast({ title: 'Oportunidade existente reutilizada' })
+            navigate('/')
+            return
+          }
+          await registrarDecisao(
+            repetida.items[0].id,
+            `Duplicidade identificada por source_ref ${dataToSend.source_ref}; novo registro autorizado por decisão humana.`,
+            'criar_novo',
+          )
+        }
       }
 
       // Converter valores numéricos
@@ -222,6 +269,25 @@ const NovaOportunidade = () => {
                   </div>
                 </div>
               )}
+              <div className="space-y-2">
+                <Label htmlFor="source_ref">Identificador de origem (opcional)</Label>
+                <Input
+                  id="source_ref"
+                  value={formData.source_ref}
+                  onChange={(e) => handleChange('source_ref', e.target.value)}
+                  placeholder="Ex.: whatsapp-2026-001"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Se repetido, o sistema pedirá uma decisão antes de criar outro registro.
+                </p>
+              </div>
+
+              {duplicata && (
+                <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-3 text-sm">
+                  Possível duplicidade encontrada: {duplicata.id}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="valor_estimado">Valor Estimado (R$)</Label>
@@ -309,7 +375,7 @@ const NovaOportunidade = () => {
                   className="bg-[#C69D5F] hover:bg-[#DCC39E] text-white"
                   disabled={loading}
                 >
-                  {loading ? 'Salvando...' : 'Salvar Oportunidade'}
+                  {loading || verificandoDuplicata ? 'Verificando...' : 'Salvar Oportunidade'}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/')}>
                   Cancelar

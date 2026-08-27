@@ -90,7 +90,6 @@ export default function NovoCliente() {
   const [indicador, setIndicador] = useState(null)
   const [indicadorBusca, setIndicadorBusca] = useState('')
   const [loading, setLoading] = useState(false)
-
   useEffect(() => {
     const phone = pais === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
     setExistente(null)
@@ -110,14 +109,14 @@ export default function NovoCliente() {
           setExistente(r.items[0] || null)
           setUsandoExistente(Boolean(r.items[0]))
         }
-      } catch {
+      } catch (error) {
+        console.warn('Falha ao consultar telefone', error)
       } finally {
         if (id === requestRef.current) setBuscando(false)
       }
     }, 450)
     return () => window.clearTimeout(timer)
   }, [telefone, pais])
-
   const buscarIndicador = async () => {
     if (!indicadorBusca.trim()) return
     try {
@@ -127,7 +126,8 @@ export default function NovoCliente() {
           filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
         })
       setIndicador(r.items[0] || null)
-    } catch {
+    } catch (error) {
+      console.warn('Falha ao pesquisar indicador', error)
       toast({ title: 'Não foi possível pesquisar o indicador', variant: 'destructive' })
     }
   }
@@ -183,14 +183,18 @@ export default function NovoCliente() {
               ...(email ? { email } : {}),
               ...(cpfCnpj && natureza === 'pessoa_fisica' ? { cpf: cpfCnpj } : {}),
             })
-        } catch {}
+        } catch (error) {
+          console.warn('Pessoa auxiliar não criada', error)
+        }
       }
       if (pessoa) {
         try {
           await pb
             .collection('clientes_pessoas')
             .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
-        } catch {}
+        } catch (error) {
+          console.warn('Vínculo auxiliar não criado', error)
+        }
       }
       toast({ title: 'Cliente criado com sucesso!' })
       navigate('/')
@@ -367,6 +371,17 @@ export default function NovoCliente() {
                     placeholder="Ex.: indicação da sogra"
                   />
                 </div>
+              )}
+              {classificacao === 'cerimonialista' && (
+                <p className="text-sm text-muted-foreground rounded-md bg-[#F5EEE7] p-3">
+                  Cerimonialista pode ser PF ou PJ. Os contatos e a equipe serão complementados no
+                  mesmo relacionamento.
+                </p>
+              )}
+              {classificacao === 'parceiro_comercial' && (
+                <p className="text-sm text-muted-foreground rounded-md bg-[#F5EEE7] p-3">
+                  Parceiro pode ser pessoa ou empresa. CPF/CNPJ não é obrigatório para começar.
+                </p>
               )}
               <Field
                 id="observacoes"

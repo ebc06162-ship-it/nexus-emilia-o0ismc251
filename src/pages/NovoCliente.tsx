@@ -97,10 +97,7 @@ const NovoCliente = () => {
       setPessoaExistente(pessoa)
       setUsarPessoaExistente(Boolean(pessoa))
       if (pessoa)
-        toast({
-          title: 'Telefone já cadastrado',
-          description: `${pessoa.nome} já existe na base. Você pode reutilizar a Pessoa.`,
-        })
+        toast({ title: 'Telefone já cadastrado', description: `${pessoa.nome} já existe na base.` })
     } catch (error) {
       if (requestId === buscaTelefoneRef.current)
         toast({
@@ -112,7 +109,6 @@ const NovoCliente = () => {
       if (requestId === buscaTelefoneRef.current) setBuscandoPessoa(false)
     }
   }
-
   useEffect(() => {
     const phone = paisTelefone === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
     setPessoaExistente(null)
@@ -129,16 +125,18 @@ const NovoCliente = () => {
     if (!indicadorBusca.trim()) return
     setBuscandoIndicador(true)
     try {
-      const result = await pb.collection('pessoas').getList(1, 5, {
-        filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
-      })
+      const result = await pb
+        .collection('pessoas')
+        .getList(1, 5, {
+          filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
+        })
       setIndicador(result.items[0] || null)
       if (result.items[0])
         toast({ title: 'Indicador encontrado', description: result.items[0].nome })
       else
         toast({
           title: 'Indicador não encontrado',
-          description: 'Você pode usar a referência livre ou cadastrar apenas o nome depois.',
+          description: 'Use a referência livre ou cadastre depois.',
         })
     } catch (error) {
       toast({ title: 'Não foi possível pesquisar o indicador', variant: 'destructive' })
@@ -150,34 +148,6 @@ const NovoCliente = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     buscaTelefoneRef.current += 1
-=======
-<<<<<<< SEARCH
-      const pessoa =
-        usarPessoaExistente && pessoaExistente
-          ? pessoaExistente
-          : await pb.collection('pessoas').create({
-              nome: nome.trim(),
-              telefone_principal: phone,
-              ...(email ? { email } : {}),
-              ...(cpf ? { cpf } : {}),
-            })
-=======
-      let pessoa = usarPessoaExistente && pessoaExistente ? pessoaExistente : null
-      if (!pessoa) {
-        try {
-          pessoa = await pb.collection('pessoas').getFirstListItem(`telefone_principal = "${phone}"`)
-        } catch (lookupError) {
-          if (lookupError?.status !== 404) throw lookupError
-        }
-      }
-      if (!pessoa) {
-        pessoa = await pb.collection('pessoas').create({
-          nome: nome.trim(),
-          telefone_principal: phone,
-          ...(email ? { email } : {}),
-          ...(cpf ? { cpf } : {}),
-        })
-      }
     if (!pb.authStore.isValid || !pb.authStore.record?.id) {
       window.location.assign('/login')
       return
@@ -196,31 +166,43 @@ const NovoCliente = () => {
     setLoading(true)
     try {
       const phone = paisTelefone === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
-      const pessoa =
-        usarPessoaExistente && pessoaExistente
-          ? pessoaExistente
-          : await pb.collection('pessoas').create({
-              nome: nome.trim(),
-              telefone_principal: phone,
-              ...(email ? { email } : {}),
-              ...(cpf ? { cpf } : {}),
-            })
-      const cliente = await pb.collection('clientes').create({
-        nome: nome.trim(),
-        telefone_principal: phone,
-        situacao: 'ativo',
-        natureza_cadastral: natureza,
-        classificacao_comercial: classificacao,
-        pessoa_id: pessoa.id,
-        ...(email ? { email } : {}),
-        ...(cpf ? { cpf_cnpj: cpf } : {}),
-        ...(cnpj ? { cpf_cnpj: cnpj } : {}),
-        ...(origem ? { origem_cliente: origem } : {}),
-        ...(categoria ? { categoria_indicacao: categoria } : {}),
-        ...(referencia ? { referencia_origem: referencia } : {}),
-        ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
-        ...(observacoes ? { observacoes } : {}),
-      })
+      let pessoa = usarPessoaExistente && pessoaExistente ? pessoaExistente : null
+      if (!pessoa) {
+        try {
+          pessoa = await pb
+            .collection('pessoas')
+            .getFirstListItem(`telefone_principal = "${phone}"`)
+        } catch (error) {
+          if (error?.status !== 404) throw error
+        }
+      }
+      if (!pessoa)
+        pessoa = await pb
+          .collection('pessoas')
+          .create({
+            nome: nome.trim(),
+            telefone_principal: phone,
+            ...(email ? { email } : {}),
+            ...(cpf ? { cpf } : {}),
+          })
+      const cliente = await pb
+        .collection('clientes')
+        .create({
+          nome: nome.trim(),
+          telefone_principal: phone,
+          situacao: 'ativo',
+          natureza_cadastral: natureza,
+          classificacao_comercial: classificacao,
+          pessoa_id: pessoa.id,
+          ...(email ? { email } : {}),
+          ...(cpf ? { cpf_cnpj: cpf } : {}),
+          ...(cnpj ? { cpf_cnpj: cnpj } : {}),
+          ...(origem ? { origem_cliente: origem } : {}),
+          ...(categoria ? { categoria_indicacao: categoria } : {}),
+          ...(referencia ? { referencia_origem: referencia } : {}),
+          ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
+          ...(observacoes ? { observacoes } : {}),
+        })
       await pb
         .collection('clientes_pessoas')
         .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
@@ -228,11 +210,12 @@ const NovoCliente = () => {
       navigate('/')
     } catch (error) {
       toast({
-        title: 'Erro ao criar cliente',
+        title: 'Não foi possível salvar o cliente',
         description:
           error?.response?.data?.message ||
           error?.response?.data?.data?.message ||
-          JSON.stringify(error?.response?.data || error?.data || error?.message || 'Tente novamente'),
+          error?.message ||
+          'Tente novamente',
         variant: 'destructive',
       })
     } finally {
@@ -283,53 +266,48 @@ const NovoCliente = () => {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <F
-                  id="nome"
-                  label={natureza === 'pessoa_juridica' ? 'Nome / Nome Fantasia *' : 'Nome *'}
-                  value={nome}
-                  onChange={setNome}
-                  required
-                />
-                        <div className="space-y-2">
-                  <Label htmlFor="telefone">Telefone principal *</Label>
-                  <div className="flex min-w-0 gap-2">
-                    <Select
-                      value={paisTelefone}
-                      onValueChange={(value) => {
-                        setPaisTelefone(value)
-                        setTelefone(formatPhone(telefone, value))
-                      }}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="brasil">Brasil</SelectItem>
-                        <SelectItem value="outro">Outro país</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      id="telefone"
-                      className="min-w-0 flex-1"
-                      value={telefone}
-                      onChange={(e) => setTelefone(formatPhone(e.target.value, paisTelefone))}
-                      required
-                      placeholder={
-                        paisTelefone === 'brasil'
-                          ? '(XX) XXXXX-XXXX'
-                          : '+ código do país e telefone'
-                      }
-                    />
-
-                  </div>
+              <F
+                id="nome"
+                label={natureza === 'pessoa_juridica' ? 'Nome / Nome Fantasia *' : 'Nome *'}
+                value={nome}
+                onChange={setNome}
+                required
+              />
+              <div className="space-y-2">
+                <Label htmlFor="telefone">Telefone principal *</Label>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+                  <Select
+                    value={paisTelefone}
+                    onValueChange={(value) => {
+                      setPaisTelefone(value)
+                      setTelefone(formatPhone(telefone, value))
+                    }}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="brasil">Brasil</SelectItem>
+                      <SelectItem value="outro">Outro país</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="telefone"
+                    className="min-w-0 w-full"
+                    value={telefone}
+                    onChange={(e) => setTelefone(formatPhone(e.target.value, paisTelefone))}
+                    required
+                    placeholder={
+                      paisTelefone === 'brasil' ? '(XX) XXXXX-XXXX' : '+ código do país e telefone'
+                    }
+                  />
                 </div>
               </div>
               {pessoaExistente && (
                 <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-3 text-sm">
-                  <strong>Pessoa encontrada:</strong> {pessoaExistente.nome} •{' '}
+                  <strong>Telefone já cadastrado:</strong> {pessoaExistente.nome} •{' '}
                   {pessoaExistente.telefone_principal}
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     <Button type="button" size="sm" onClick={() => setUsarPessoaExistente(true)}>
                       Usar este cadastro
                     </Button>
@@ -414,10 +392,6 @@ const NovoCliente = () => {
                     onChange={setReferencia}
                     placeholder="Ex.: indicação da sogra"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Se não existir no sistema, você pode registrar apenas o nome ou a referência
-                    livre e complementar depois.
-                  </p>
                 </div>
               )}
               {classificacao === 'cerimonialista' && (

@@ -130,7 +130,7 @@ export default function NovoCliente() {
     }
   }
   const submit = async (e) => {
-    e.preventDefault()
+    e?.preventDefault()
     if (!pb.authStore.isValid) {
       window.location.assign('/login')
       return
@@ -387,7 +387,8 @@ export default function NovoCliente() {
               />
               <div className="flex gap-4">
                 <Button
-                  type="submit"
+                  type="button"
+                  onClick={submit}
                   className="bg-[#C69D5F] hover:bg-[#DCC39E] text-white"
                   disabled={loading}
                 >

@@ -39,7 +39,8 @@ const CLASSIFICATIONS = [
   ['revendedor', 'Revendedor'],
   ['parceiro_comercial', 'Parceiro Comercial'],
 ]
-const formatPhone = (value) => {
+const formatPhone = (value, country = 'brasil') => {
+  if (country === 'outro') return value.slice(0, 30)
   const d = value.replace(/\D/g, '').replace(/^55/, '').slice(0, 11)
   if (d.length <= 2) return d ? `(${d}` : ''
   if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
@@ -63,6 +64,7 @@ const F = ({ id, label, value, onChange, type = 'text', required = false, placeh
 const NovoCliente = () => {
   const [natureza, setNatureza] = useState('pessoa_fisica')
   const [classificacao, setClassificacao] = useState('cliente_padrao')
+  const [paisTelefone, setPaisTelefone] = useState('brasil')
   const [nome, setNome] = useState('')
   const [telefone, setTelefone] = useState('')
   const [email, setEmail] = useState('')
@@ -112,7 +114,7 @@ const NovoCliente = () => {
   }
 
   useEffect(() => {
-    const phone = telefone.replace(/\D/g, '')
+    const phone = paisTelefone === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
     setPessoaExistente(null)
     setUsarPessoaExistente(false)
     if (phone.length < 10) {
@@ -121,7 +123,7 @@ const NovoCliente = () => {
     }
     const timer = window.setTimeout(() => consultarPessoaPorTelefone(phone), 450)
     return () => window.clearTimeout(timer)
-  }, [telefone])
+  }, [telefone, paisTelefone])
 
   const buscarIndicador = async () => {
     if (!indicadorBusca.trim()) return
@@ -164,7 +166,7 @@ const NovoCliente = () => {
     }
     setLoading(true)
     try {
-      const phone = telefone.replace(/\D/g, '')
+      const phone = paisTelefone === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
       const pessoa =
         usarPessoaExistente && pessoaExistente
           ? pessoaExistente
@@ -260,12 +262,31 @@ const NovoCliente = () => {
                 <div className="space-y-2">
                   <Label htmlFor="telefone">Telefone principal *</Label>
                   <div className="flex gap-2">
+                    <Select
+                      value={paisTelefone}
+                      onValueChange={(value) => {
+                        setPaisTelefone(value)
+                        setTelefone(formatPhone(telefone, value))
+                      }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="brasil">Brasil</SelectItem>
+                        <SelectItem value="outro">Outro país</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Input
                       id="telefone"
                       value={telefone}
-                      onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                      onChange={(e) => setTelefone(formatPhone(e.target.value, paisTelefone))}
                       required
-                      placeholder="(XX) XXXXX-XXXX"
+                      placeholder={
+                        paisTelefone === 'brasil'
+                          ? '(XX) XXXXX-XXXX'
+                          : '+ código do país e telefone'
+                      }
                     />
                     <span className="self-center text-xs text-muted-foreground whitespace-nowrap">
                       {buscandoPessoa ? 'Verificando...' : 'Verificação automática'}

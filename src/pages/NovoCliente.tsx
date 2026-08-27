@@ -33,7 +33,7 @@ const CATEGORIES = [
   ['outro', 'Outro'],
   ['nao_informado', 'Não informado'],
 ]
-const TYPES = [
+const CLASSIFICATIONS = [
   ['cliente_padrao', 'Cliente padrão'],
   ['cerimonialista', 'Cerimonialista'],
   ['revendedor', 'Revendedor'],
@@ -72,9 +72,71 @@ const NovoCliente = () => {
   const [categoria, setCategoria] = useState('')
   const [referencia, setReferencia] = useState('')
   const [observacoes, setObservacoes] = useState('')
+  const [pessoaExistente, setPessoaExistente] = useState(null)
+  const [buscandoPessoa, setBuscandoPessoa] = useState(false)
+  const [usarPessoaExistente, setUsarPessoaExistente] = useState(false)
+  const [indicadorBusca, setIndicadorBusca] = useState('')
+  const [indicador, setIndicador] = useState(null)
+  const [buscandoIndicador, setBuscandoIndicador] = useState(false)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { toast } = useToast()
+
+  const buscarPessoa = async () => {
+    const phone = telefone.replace(/\D/g, '')
+    if (!phone) return
+    setBuscandoPessoa(true)
+    try {
+      const result = await pb
+        .collection('pessoas')
+        .getList(1, 5, { filter: `telefone_principal = "${phone}"` })
+      setPessoaExistente(result.items[0] || null)
+      setUsarPessoaExistente(Boolean(result.items[0]))
+      if (result.items[0])
+        toast({
+          title: 'Pessoa encontrada',
+          description: 'Você pode reutilizar este cadastro para evitar duplicidade.',
+        })
+      else
+        toast({
+          title: 'Nenhuma pessoa encontrada',
+          description: 'Será criado um novo cadastro mínimo.',
+        })
+    } catch (error) {
+      toast({
+        title: 'Não foi possível pesquisar a pessoa',
+        description: error?.message || 'Tente novamente',
+        variant: 'destructive',
+      })
+    } finally {
+      setBuscandoPessoa(false)
+    }
+  }
+
+  const buscarIndicador = async () => {
+    if (!indicadorBusca.trim()) return
+    setBuscandoIndicador(true)
+    try {
+      const result = await pb
+        .collection('pessoas')
+        .getList(1, 5, {
+          filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
+        })
+      setIndicador(result.items[0] || null)
+      if (result.items[0])
+        toast({ title: 'Indicador encontrado', description: result.items[0].nome })
+      else
+        toast({
+          title: 'Indicador não encontrado',
+          description: 'Você pode usar a referência livre ou cadastrar apenas o nome depois.',
+        })
+    } catch (error) {
+      toast({ title: 'Não foi possível pesquisar o indicador', variant: 'destructive' })
+    } finally {
+      setBuscandoIndicador(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!pb.authStore.isValid || !pb.authStore.record?.id) {
@@ -94,28 +156,34 @@ const NovoCliente = () => {
     }
     setLoading(true)
     try {
-      const pessoa = await pb
-        .collection('pessoas')
-        .create({
-          nome: nome.trim(),
-          telefone_principal: telefone.replace(/\D/g, ''),
-          ...(email ? { email } : {}),
-          ...(cpf ? { cpf } : {}),
-        })
+      const phone = telefone.replace(/\D/g, '')
+      const pessoa =
+        usarPessoaExistente && pessoaExistente
+          ? pessoaExistente
+          : await pb
+              .collection('pessoas')
+              .create({
+                nome: nome.trim(),
+                telefone_principal: phone,
+                ...(email ? { email } : {}),
+                ...(cpf ? { cpf } : {}),
+              })
       const cliente = await pb
         .collection('clientes')
         .create({
           nome: nome.trim(),
-          telefone_principal: telefone.replace(/\D/g, ''),
+          telefone_principal: phone,
           situacao: 'ativo',
           natureza_cadastral: natureza,
           classificacao_comercial: classificacao,
+          pessoa_id: pessoa.id,
           ...(email ? { email } : {}),
           ...(cpf ? { cpf_cnpj: cpf } : {}),
           ...(cnpj ? { cpf_cnpj: cnpj } : {}),
           ...(origem ? { origem_cliente: origem } : {}),
           ...(categoria ? { categoria_indicacao: categoria } : {}),
           ...(referencia ? { referencia_origem: referencia } : {}),
+          ...(indicador ? { indicador_pessoa_id: indicador.id } : {}),
           ...(observacoes ? { observacoes } : {}),
         })
       await pb
@@ -133,6 +201,7 @@ const NovoCliente = () => {
       setLoading(false)
     }
   }
+
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <header className="bg-[#3D2314] text-white p-4">
@@ -167,7 +236,7 @@ const NovoCliente = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {TYPES.map(([v, l]) => (
+                      {CLASSIFICATIONS.map(([v, l]) => (
                         <SelectItem key={v} value={v}>
                           {l}
                         </SelectItem>
@@ -184,15 +253,46 @@ const NovoCliente = () => {
                   onChange={setNome}
                   required
                 />
-                <F
-                  id="telefone"
-                  label="Telefone principal *"
-                  value={telefone}
-                  onChange={(v) => setTelefone(formatPhone(v))}
-                  required
-                  placeholder="(XX) XXXXX-XXXX"
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="telefone">Telefone principal *</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="telefone"
+                      value={telefone}
+                      onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                      required
+                      placeholder="(XX) XXXXX-XXXX"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={buscarPessoa}
+                      disabled={buscandoPessoa}
+                    >
+                      {buscandoPessoa ? 'Buscando...' : 'Buscar'}
+                    </Button>
+                  </div>
+                </div>
               </div>
+              {pessoaExistente && (
+                <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-3 text-sm">
+                  <strong>Pessoa encontrada:</strong> {pessoaExistente.nome} •{' '}
+                  {pessoaExistente.telefone_principal}
+                  <div className="mt-2 flex gap-2">
+                    <Button type="button" size="sm" onClick={() => setUsarPessoaExistente(true)}>
+                      Usar este cadastro
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setUsarPessoaExistente(false)}
+                    >
+                      Criar novo e revisar depois
+                    </Button>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <F id="email" label="E-mail" type="email" value={email} onChange={setEmail} />
                 {natureza === 'pessoa_fisica' ? (
@@ -233,22 +333,46 @@ const NovoCliente = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Buscar quem indicou (opcional)</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={indicadorBusca}
+                        onChange={(e) => setIndicadorBusca(e.target.value)}
+                        placeholder="Nome ou telefone"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={buscarIndicador}
+                        disabled={buscandoIndicador}
+                      >
+                        {buscandoIndicador ? 'Buscando...' : 'Buscar'}
+                      </Button>
+                    </div>
+                  </div>
+                  {indicador && (
+                    <p className="text-sm">
+                      <strong>Indicador vinculado:</strong> {indicador.nome}
+                    </p>
+                  )}
                   <F
                     id="referencia"
-                    label="Quem indicou? (opcional)"
+                    label="Referência livre (opcional)"
                     value={referencia}
                     onChange={setReferencia}
                     placeholder="Ex.: indicação da sogra"
                   />
                   <p className="text-sm text-muted-foreground">
-                    Primeiro buscamos uma pessoa existente; o vínculo poderá ser completado depois.
+                    Se não existir no sistema, você pode registrar apenas o nome ou a referência
+                    livre e complementar depois.
                   </p>
                 </div>
               )}
               {classificacao === 'cerimonialista' && (
                 <p className="text-sm text-muted-foreground rounded-md bg-[#F5EEE7] p-3">
-                  Cerimonialista pode ser PF ou PJ. A equipe e os contatos serão complementados
-                  neste mesmo cadastro.
+                  Cerimonialista pode ser PF ou PJ. Os contatos e a equipe serão complementados no
+                  mesmo relacionamento.
                 </p>
               )}
               {classificacao === 'parceiro_comercial' && (

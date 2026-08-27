@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T18:50:05.237Z",
+  "generatedAt": "2026-08-27T18:52:07.502Z",
   "collections": [
     {
       "name": "users",
@@ -250,6 +250,33 @@
         },
         {
           "name": "data_nascimento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pessoa_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "pessoas"
+        },
+        {
+          "name": "indicador_pessoa_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "pessoas"
+        },
+        {
+          "name": "cerimonialista_origem_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "cerimonialistas"
+        },
+        {
+          "name": "coordenador_origem_nome",
           "type": "text",
           "required": false,
           "system": false

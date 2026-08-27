@@ -47,7 +47,15 @@ const formatPhone = (value, country = 'brasil') => {
   if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
 }
-const F = ({ id, label, value, onChange, type = 'text', required = false, placeholder = '' }) => (
+const Field = ({
+  id,
+  label,
+  value,
+  onChange,
+  type = 'text',
+  required = false,
+  placeholder = '',
+}) => (
   <div className="space-y-2">
     <Label htmlFor={id}>{label}</Label>
     <Input
@@ -61,96 +69,76 @@ const F = ({ id, label, value, onChange, type = 'text', required = false, placeh
   </div>
 )
 
-const NovoCliente = () => {
+export default function NovoCliente() {
+  const navigate = useNavigate()
+  const { toast } = useToast()
+  const requestRef = useRef(0)
   const [natureza, setNatureza] = useState('pessoa_fisica')
   const [classificacao, setClassificacao] = useState('cliente_padrao')
-  const [paisTelefone, setPaisTelefone] = useState('brasil')
+  const [pais, setPais] = useState('brasil')
   const [nome, setNome] = useState('')
   const [telefone, setTelefone] = useState('')
   const [email, setEmail] = useState('')
-  const [cpf, setCpf] = useState('')
-  const [cnpj, setCnpj] = useState('')
+  const [cpfCnpj, setCpfCnpj] = useState('')
   const [origem, setOrigem] = useState('')
   const [categoria, setCategoria] = useState('')
   const [referencia, setReferencia] = useState('')
   const [observacoes, setObservacoes] = useState('')
-  const [pessoaExistente, setPessoaExistente] = useState(null)
-  const [buscandoPessoa, setBuscandoPessoa] = useState(false)
-  const [usarPessoaExistente, setUsarPessoaExistente] = useState(false)
-  const [indicadorBusca, setIndicadorBusca] = useState('')
+  const [existente, setExistente] = useState(null)
+  const [usandoExistente, setUsandoExistente] = useState(false)
+  const [buscando, setBuscando] = useState(false)
   const [indicador, setIndicador] = useState(null)
-  const [buscandoIndicador, setBuscandoIndicador] = useState(false)
+  const [indicadorBusca, setIndicadorBusca] = useState('')
   const [loading, setLoading] = useState(false)
-  const buscaTelefoneRef = useRef(0)
-  const navigate = useNavigate()
-  const { toast } = useToast()
 
-  const consultarPessoaPorTelefone = async (phone) => {
-    const requestId = ++buscaTelefoneRef.current
-    setBuscandoPessoa(true)
-    try {
-      const result = await pb
-        .collection('pessoas')
-        .getList(1, 5, { filter: `telefone_principal = "${phone}"` })
-      if (requestId !== buscaTelefoneRef.current) return
-      const pessoa = result.items[0] || null
-      setPessoaExistente(pessoa)
-      setUsarPessoaExistente(Boolean(pessoa))
-      if (pessoa)
-        toast({ title: 'Telefone já cadastrado', description: `${pessoa.nome} já existe na base.` })
-    } catch (error) {
-      if (requestId === buscaTelefoneRef.current)
-        toast({
-          title: 'Não foi possível verificar o telefone',
-          description: error?.message || 'Tente novamente',
-          variant: 'destructive',
-        })
-    } finally {
-      if (requestId === buscaTelefoneRef.current) setBuscandoPessoa(false)
-    }
-  }
   useEffect(() => {
-    const phone = paisTelefone === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
-    setPessoaExistente(null)
-    setUsarPessoaExistente(false)
+    const phone = pais === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
+    setExistente(null)
+    setUsandoExistente(false)
     if (phone.length < 10) {
-      setBuscandoPessoa(false)
+      setBuscando(false)
       return
     }
-    const timer = window.setTimeout(() => consultarPessoaPorTelefone(phone), 450)
+    const id = ++requestRef.current
+    const timer = window.setTimeout(async () => {
+      setBuscando(true)
+      try {
+        const r = await pb
+          .collection('pessoas')
+          .getList(1, 1, { filter: `telefone_principal = "${phone}"` })
+        if (id === requestRef.current) {
+          setExistente(r.items[0] || null)
+          setUsandoExistente(Boolean(r.items[0]))
+        }
+      } catch {
+      } finally {
+        if (id === requestRef.current) setBuscando(false)
+      }
+    }, 450)
     return () => window.clearTimeout(timer)
-  }, [telefone, paisTelefone])
+  }, [telefone, pais])
 
   const buscarIndicador = async () => {
     if (!indicadorBusca.trim()) return
-    setBuscandoIndicador(true)
     try {
-      const result = await pb.collection('pessoas').getList(1, 5, {
-        filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
-      })
-      setIndicador(result.items[0] || null)
-      if (result.items[0])
-        toast({ title: 'Indicador encontrado', description: result.items[0].nome })
-      else
-        toast({
-          title: 'Indicador não encontrado',
-          description: 'Use a referência livre ou cadastre depois.',
+      const r = await pb
+        .collection('pessoas')
+        .getList(1, 1, {
+          filter: `nome ~ "${indicadorBusca.trim()}" || telefone_principal ~ "${indicadorBusca.trim()}"`,
         })
-    } catch (error) {
+      setIndicador(r.items[0] || null)
+    } catch {
       toast({ title: 'Não foi possível pesquisar o indicador', variant: 'destructive' })
-    } finally {
-      setBuscandoIndicador(false)
     }
   }
-
-  const handleSubmit = async (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    buscaTelefoneRef.current += 1
-    if (!pb.authStore.isValid || !pb.authStore.record?.id) {
+    if (!pb.authStore.isValid) {
       window.location.assign('/login')
       return
     }
-    if (!nome.trim() || !telefone.trim() || !natureza || !classificacao) {
+    const phone = pais === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
+    if (!nome.trim() || !phone || !natureza || !classificacao) {
       toast({
         title: 'Nome, telefone, natureza e classificação são obrigatórios',
         variant: 'destructive',
@@ -163,13 +151,12 @@ const NovoCliente = () => {
     }
     setLoading(true)
     try {
-      const phone = paisTelefone === 'brasil' ? telefone.replace(/\D/g, '') : telefone.trim()
-      let pessoa = usarPessoaExistente && pessoaExistente ? pessoaExistente : null
+      let pessoa = usandoExistente && existente ? existente : null
       if (!pessoa) {
-        const resultadoBusca = await pb
+        const r = await pb
           .collection('pessoas')
           .getList(1, 1, { filter: `telefone_principal = "${phone}"` })
-        pessoa = resultadoBusca.items[0] || null
+        pessoa = r.items[0] || null
       }
       const clienteData = {
         nome: nome.trim(),
@@ -177,10 +164,8 @@ const NovoCliente = () => {
         situacao: 'ativo',
         natureza_cadastral: natureza,
         classificacao_comercial: classificacao,
-        ...(pessoa ? { pessoa_id: pessoa.id } : {}),
         ...(email ? { email } : {}),
-        ...(cpf ? { cpf_cnpj: cpf } : {}),
-        ...(cnpj ? { cpf_cnpj: cnpj } : {}),
+        ...(cpfCnpj ? { cpf_cnpj: cpfCnpj } : {}),
         ...(origem ? { origem_cliente: origem } : {}),
         ...(categoria ? { categoria_indicacao: categoria } : {}),
         ...(referencia ? { referencia_origem: referencia } : {}),
@@ -190,44 +175,35 @@ const NovoCliente = () => {
       const cliente = await pb.collection('clientes').create(clienteData)
       if (!pessoa) {
         try {
-          pessoa = await pb.collection('pessoas').create({
-            nome: nome.trim(),
-            telefone_principal: phone,
-            ...(email ? { email } : {}),
-            ...(cpf ? { cpf } : {}),
-          })
-        } catch (pessoaError) {
-          console.warn('Pessoa não vinculada; cliente salvo com dados mínimos', pessoaError)
-        }
+          pessoa = await pb
+            .collection('pessoas')
+            .create({
+              nome: nome.trim(),
+              telefone_principal: phone,
+              ...(email ? { email } : {}),
+              ...(cpfCnpj && natureza === 'pessoa_fisica' ? { cpf: cpfCnpj } : {}),
+            })
+        } catch {}
       }
       if (pessoa) {
         try {
           await pb
             .collection('clientes_pessoas')
             .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
-          if (!cliente.pessoa_id)
-            await pb.collection('clientes').update(cliente.id, { pessoa_id: pessoa.id })
-        } catch (vinculoError) {
-          console.warn('Cliente salvo; vínculo com Pessoa pendente', vinculoError)
-        }
+        } catch {}
       }
       toast({ title: 'Cliente criado com sucesso!' })
       navigate('/')
     } catch (error) {
       toast({
         title: 'Não foi possível salvar o cliente',
-        description:
-          error?.response?.data?.message ||
-          error?.response?.data?.data?.message ||
-          error?.message ||
-          'Tente novamente',
+        description: error?.response?.data?.message || error?.message || 'Tente novamente',
         variant: 'destructive',
       })
     } finally {
       setLoading(false)
     }
   }
-
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <header className="bg-[#3D2314] text-white p-4">
@@ -241,7 +217,7 @@ const NovoCliente = () => {
             <CardTitle>Cadastro progressivo</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form noValidate onSubmit={submit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Natureza cadastral *</Label>
@@ -271,7 +247,7 @@ const NovoCliente = () => {
                   </Select>
                 </div>
               </div>
-              <F
+              <Field
                 id="nome"
                 label={natureza === 'pessoa_juridica' ? 'Nome / Nome Fantasia *' : 'Nome *'}
                 value={nome}
@@ -279,13 +255,13 @@ const NovoCliente = () => {
                 required
               />
               <div className="space-y-2">
-                <Label htmlFor="telefone">Telefone principal *</Label>
+                <Label>Telefone principal *</Label>
                 <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
                   <Select
-                    value={paisTelefone}
-                    onValueChange={(value) => {
-                      setPaisTelefone(value)
-                      setTelefone(formatPhone(telefone, value))
+                    value={pais}
+                    onValueChange={(v) => {
+                      setPais(v)
+                      setTelefone(formatPhone(telefone, v))
                     }}
                   >
                     <SelectTrigger className="w-32">
@@ -301,27 +277,26 @@ const NovoCliente = () => {
                     type="tel"
                     className="min-w-0 w-full"
                     value={telefone}
-                    onChange={(e) => setTelefone(formatPhone(e.target.value, paisTelefone))}
+                    onChange={(e) => setTelefone(formatPhone(e.target.value, pais))}
                     required
                     placeholder={
-                      paisTelefone === 'brasil' ? '(XX) XXXXX-XXXX' : '+ código do país e telefone'
+                      pais === 'brasil' ? '(XX) XXXXX-XXXX' : '+ código do país e telefone'
                     }
                   />
                 </div>
               </div>
-              {pessoaExistente && (
+              {existente && (
                 <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-3 text-sm">
-                  <strong>Telefone já cadastrado:</strong> {pessoaExistente.nome} •{' '}
-                  {pessoaExistente.telefone_principal}
+                  <strong>Telefone já cadastrado:</strong> {existente.nome}
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <Button type="button" size="sm" onClick={() => setUsarPessoaExistente(true)}>
+                    <Button type="button" size="sm" onClick={() => setUsandoExistente(true)}>
                       Usar este cadastro
                     </Button>
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      onClick={() => setUsarPessoaExistente(false)}
+                      onClick={() => setUsandoExistente(false)}
                     >
                       Criar novo e revisar depois
                     </Button>
@@ -329,12 +304,13 @@ const NovoCliente = () => {
                 </div>
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <F id="email" label="E-mail" type="email" value={email} onChange={setEmail} />
-                {natureza === 'pessoa_fisica' ? (
-                  <F id="cpf" label="CPF (opcional)" value={cpf} onChange={setCpf} />
-                ) : (
-                  <F id="cnpj" label="CNPJ (opcional)" value={cnpj} onChange={setCnpj} />
-                )}
+                <Field id="email" label="E-mail" type="email" value={email} onChange={setEmail} />
+                <Field
+                  id="cpf_cnpj"
+                  label={natureza === 'pessoa_fisica' ? 'CPF (opcional)' : 'CNPJ (opcional)'}
+                  value={cpfCnpj}
+                  onChange={setCpfCnpj}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Origem do cliente</Label>
@@ -368,30 +344,22 @@ const NovoCliente = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Buscar quem indicou (opcional)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={indicadorBusca}
-                        onChange={(e) => setIndicadorBusca(e.target.value)}
-                        placeholder="Nome ou telefone"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={buscarIndicador}
-                        disabled={buscandoIndicador}
-                      >
-                        {buscandoIndicador ? 'Buscando...' : 'Buscar'}
-                      </Button>
-                    </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={indicadorBusca}
+                      onChange={(e) => setIndicadorBusca(e.target.value)}
+                      placeholder="Buscar quem indicou"
+                    />
+                    <Button type="button" variant="outline" onClick={buscarIndicador}>
+                      Buscar
+                    </Button>
                   </div>
                   {indicador && (
                     <p className="text-sm">
-                      <strong>Indicador vinculado:</strong> {indicador.nome}
+                      <strong>Indicador:</strong> {indicador.nome}
                     </p>
                   )}
-                  <F
+                  <Field
                     id="referencia"
                     label="Referência livre (opcional)"
                     value={referencia}
@@ -400,18 +368,7 @@ const NovoCliente = () => {
                   />
                 </div>
               )}
-              {classificacao === 'cerimonialista' && (
-                <p className="text-sm text-muted-foreground rounded-md bg-[#F5EEE7] p-3">
-                  Cerimonialista pode ser PF ou PJ. Os contatos e a equipe serão complementados no
-                  mesmo relacionamento.
-                </p>
-              )}
-              {classificacao === 'parceiro_comercial' && (
-                <p className="text-sm text-muted-foreground rounded-md bg-[#F5EEE7] p-3">
-                  Parceiro pode ser pessoa ou empresa. CPF/CNPJ não é obrigatório para começar.
-                </p>
-              )}
-              <F
+              <Field
                 id="observacoes"
                 label="Observações"
                 value={observacoes}
@@ -437,4 +394,3 @@ const NovoCliente = () => {
     </div>
   )
 }
-export default NovoCliente

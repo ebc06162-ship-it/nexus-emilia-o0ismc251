@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-28T15:06:04.350Z",
+  "generatedAt": "2026-08-28T15:07:44.250Z",
   "collections": [
     {
       "name": "users",
@@ -624,6 +624,20 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "segmento_classificado",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "casamento",
+            "eventos_sociais",
+            "maternidade",
+            "corporativo",
+            "presente",
+            "outros"
+          ]
         }
       ],
       "indexes": [

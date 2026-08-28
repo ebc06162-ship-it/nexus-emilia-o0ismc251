@@ -39,6 +39,7 @@ const NovaOportunidade = () => {
     observacoes: '',
     source_ref: '',
     tipo_evento: '',
+    segmento_classificado: '',
     subtipo_evento: '',
     justificativa_outros: '',
   })
@@ -147,7 +148,7 @@ const NovaOportunidade = () => {
     setLoading(true)
 
     try {
-      if (!formData.tipo_evento || !formData.segmento) {
+      if (!formData.tipo_evento || !formData.segmento_classificado) {
         toast({ title: 'Informe o tipo de evento', variant: 'destructive' })
         setLoading(false)
         return

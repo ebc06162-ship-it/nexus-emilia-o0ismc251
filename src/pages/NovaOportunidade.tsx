@@ -38,10 +38,14 @@ const NovaOportunidade = () => {
     qtd_bem_casados: '',
     observacoes: '',
     source_ref: '',
+    tipo_evento: '',
+    subtipo_evento: '',
+    justificativa_outros: '',
   })
   const [loading, setLoading] = useState(false)
   const [duplicata, setDuplicata] = useState(null)
   const [verificandoDuplicata, setVerificandoDuplicata] = useState(false)
+  const [segmentoDerivado, setSegmentoDerivado] = useState('')
   const [rollbackRef, setRollbackRef] = useState('')
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -110,13 +114,51 @@ const NovaOportunidade = () => {
     }
   }
 
+  const deriveSegment = (tipo) =>
+    ({
+      casamento: 'casamento',
+      batizado: 'eventos_sociais',
+      bodas: 'eventos_sociais',
+      formatura: 'eventos_sociais',
+      aniversario: 'eventos_sociais',
+      cha_bebe: 'maternidade',
+      revelacao: 'maternidade',
+      maternidade: 'maternidade',
+      corporativo: 'corporativo',
+      presente: 'presente',
+      outros: 'outros',
+    })[tipo] || ''
+
+  const handleEventTypeChange = (tipo) => {
+    const segmento = deriveSegment(tipo)
+    setSegmentoDerivado(segmento)
+    setFormData((prev) => ({
+      ...prev,
+      tipo_evento: tipo,
+      tipo_pedido: tipo,
+      segmento,
+      subtipo_evento: '',
+      justificativa_outros: '',
+    }))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      if (!formData.segmento || !formData.tipo_pedido) {
-        toast({ title: 'Segmento e tipo de evento são obrigatórios', variant: 'destructive' })
+      if (!formData.tipo_evento || !formData.segmento) {
+        toast({ title: 'Informe o tipo de evento', variant: 'destructive' })
+        setLoading(false)
+        return
+      }
+      if (formData.tipo_evento === 'aniversario' && !formData.subtipo_evento) {
+        toast({ title: 'Informe o tipo de aniversário', variant: 'destructive' })
+        setLoading(false)
+        return
+      }
+      if (formData.tipo_evento === 'outros' && !formData.justificativa_outros.trim()) {
+        toast({ title: 'Justifique o tipo de evento', variant: 'destructive' })
         setLoading(false)
         return
       }
@@ -231,8 +273,8 @@ const NovaOportunidade = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="tipo_pedido">Tipo de Evento *</Label>
-                  <Select onValueChange={(v) => handleChange('tipo_pedido', v)} required>
+                  <Label htmlFor="tipo_evento">Tipo de Evento *</Label>
+                  <Select onValueChange={handleEventTypeChange} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
@@ -243,22 +285,57 @@ const NovaOportunidade = () => {
                       <SelectItem value="corporativo">Corporativo</SelectItem>
                       <SelectItem value="maternidade">Maternidade</SelectItem>
                       <SelectItem value="bodas">Bodas</SelectItem>
-                      <SelectItem value="outro">Outro</SelectItem>
+                      <SelectItem value="formatura">Formatura</SelectItem>
+                      <SelectItem value="cha_bebe">Chá de bebê</SelectItem>
+                      <SelectItem value="revelacao">Revelação</SelectItem>
+                      <SelectItem value="presente">Presente</SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
-              {formData.segmento === 'casamento_noiva' && (
+              {segmentoDerivado && (
+                <p className="text-sm text-muted-foreground">
+                  Segmento: {segmentoDerivado.replace('_', ' ')}
+                </p>
+              )}
+              {formData.tipo_evento === 'aniversario' && (
                 <div className="space-y-2">
-                  <Label>Nome dos Noivos</Label>
+                  <Label>Tipo de aniversário *</Label>
+                  <Select onValueChange={(v) => handleChange('subtipo_evento', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="infantil">Infantil</SelectItem>
+                      <SelectItem value="debutante_bar">Debutante / baile</SelectItem>
+                      <SelectItem value="bat_mitzvah">Bat mitzvah</SelectItem>
+                      <SelectItem value="adulto">Adulto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {formData.tipo_evento === 'outros' && (
+                <div className="space-y-2">
+                  <Label>Justificativa *</Label>
+                  <Input
+                    value={formData.justificativa_outros}
+                    onChange={(e) => handleChange('justificativa_outros', e.target.value)}
+                    placeholder="Explique o tipo de evento"
+                  />
+                </div>
+              )}
+              {formData.tipo_evento === 'casamento' && (
+                <div className="space-y-2">
+                  <Label>Nome dos Noivos</Label>{' '}
                   <Input
                     value={formData.nome_noivos}
                     onChange={(e) => handleChange('nome_noivos', e.target.value)}
                   />
                 </div>
               )}
-              {formData.segmento === 'eventos_sociais' && (
+              {segmentoDerivado === 'eventos_sociais' && formData.tipo_evento !== 'aniversario' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Nome do Aniversariante</Label>
@@ -276,22 +353,22 @@ const NovaOportunidade = () => {
                   </div>
                 </div>
               )}
-              {formData.segmento === 'maternidade' && (
+              {segmentoDerivado === 'maternidade' && (
                 <div className="space-y-2">
-                  <Label>Nome do Bebê</Label>
+                  <Label>Nome do Bebê / criança</Label>{' '}
                   <Input
                     value={formData.nome_bebe}
                     onChange={(e) => handleChange('nome_bebe', e.target.value)}
                   />
                 </div>
               )}
-              {formData.segmento === 'outros' && (
+              {formData.tipo_evento === 'outros' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Tipo de Evento</Label>
+                    <Label>Justificativa do tipo de evento *</Label>
                     <Input
-                      value={formData.tipo_outro}
-                      onChange={(e) => handleChange('tipo_outro', e.target.value)}
+                      value={formData.justificativa_outros}
+                      onChange={(e) => handleChange('justificativa_outros', e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">

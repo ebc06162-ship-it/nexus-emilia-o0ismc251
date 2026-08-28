@@ -108,6 +108,21 @@ const NovaOportunidade = () => {
     setFormData((prev) => ({ ...prev, cliente_id: cliente.id }))
   }
 
+  const abrirNovoClienteDaBusca = () => {
+    const digitado = clienteBusca.trim()
+    setNovoCliente((prev) => {
+      const temLetra = /[A-Za-zÀ-ú]/.test(digitado)
+      const temTelefone = digitado.replace(/\D/g, '').length >= 10
+      return {
+        ...prev,
+        nome: temLetra ? digitado : prev.nome,
+        telefone: temTelefone ? digitado : prev.telefone,
+      }
+    })
+    setClientesFiltrados([])
+    setShowNovoCliente(true)
+  }
+
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
@@ -364,8 +379,13 @@ const NovaOportunidade = () => {
                     autoComplete="off"
                   />
                   {buscandoClientes && <p className="text-xs text-muted-foreground">Buscando...</p>}
-                  {clientesFiltrados.length > 0 && !clienteSelecionado && (
+                  {!clienteSelecionado && clienteBusca.trim() && (
                     <div className="rounded-md border bg-white shadow-sm max-h-56 overflow-auto">
+                      {clientesFiltrados.length === 0 && !buscandoClientes && (
+                        <p className="px-3 py-2 text-sm text-muted-foreground">
+                          Nenhum cliente encontrado
+                        </p>
+                      )}
                       {clientesFiltrados.map((cliente) => (
                         <button
                           key={cliente.id}
@@ -381,6 +401,13 @@ const NovaOportunidade = () => {
                           )}
                         </button>
                       ))}
+                      <button
+                        type="button"
+                        onClick={abrirNovoClienteDaBusca}
+                        className="w-full text-left px-3 py-2 text-sm font-medium text-[#3D2314] bg-[#F5EEE7] hover:bg-[#EADFCF] border-t border-[#EADFCF]"
+                      >
+                        + Adicionar novo
+                      </button>
                     </div>
                   )}
                 </div>
@@ -408,15 +435,6 @@ const NovaOportunidade = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowNovoCliente((v) => !v)}
-                >
-                  {showNovoCliente ? 'Fechar cadastro rápido' : '+ Adicionar novo'}
-                </Button>
-              </div>
               {showNovoCliente && (
                 <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3">
                   <div className="flex items-center justify-between">

@@ -108,13 +108,6 @@ const NovaOportunidade = () => {
     setFormData((prev) => ({ ...prev, cliente_id: cliente.id }))
   }
 
-  const limparCliente = () => {
-    setClienteSelecionado(null)
-    setClienteBusca('')
-    setClientesFiltrados([])
-    setFormData((prev) => ({ ...prev, cliente_id: '' }))
-  }
-
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
@@ -388,22 +381,6 @@ const NovaOportunidade = () => {
                           )}
                         </button>
                       ))}
-                    </div>
-                  )}
-                  {clienteSelecionado && (
-                    <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-2 text-sm flex justify-between items-center">
-                      <span>
-                        <strong>{clienteSelecionado.nome}</strong>
-                        {clienteSelecionado.telefone_principal && (
-                          <span className="text-muted-foreground">
-                            {' '}
-                            · {clienteSelecionado.telefone_principal}
-                          </span>
-                        )}
-                      </span>
-                      <button type="button" className="text-xs underline" onClick={limparCliente}>
-                        Trocar
-                      </button>
                     </div>
                   )}
                 </div>

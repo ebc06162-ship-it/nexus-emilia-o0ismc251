@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,7 +16,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/hooks/use-toast'
 
 const NovaOportunidade = () => {
-  const [clientes, setClientes] = useState([])
   const [formData, setFormData] = useState({
     cliente_id: '',
     segmento: '',
@@ -57,20 +56,63 @@ const NovaOportunidade = () => {
     classificacao: 'cliente_padrao',
   })
   const [criandoCliente, setCriandoCliente] = useState(false)
+  const [clienteBusca, setClienteBusca] = useState('')
+  const [clientesFiltrados, setClientesFiltrados] = useState([])
+  const [clienteSelecionado, setClienteSelecionado] = useState(null)
+  const [buscandoClientes, setBuscandoClientes] = useState(false)
+  const buscaTimer = useRef(null)
+  const buscaClienteRef = useRef(0)
   const navigate = useNavigate()
   const { toast } = useToast()
 
   useEffect(() => {
-    loadClientes()
+    return () => window.clearTimeout(buscaTimer.current)
   }, [])
 
-  const loadClientes = async () => {
-    try {
-      const result = await pb.collection('clientes').getList(1, 100)
-      setClientes(result.items)
-    } catch (error) {
-      console.error('Erro ao carregar clientes:', error)
+  const buscarClientes = async (termo) => {
+    const id = ++buscaClienteRef.current
+    if (!termo.trim()) {
+      setClientesFiltrados([])
+      return
     }
+    setBuscandoClientes(true)
+    try {
+      const safeName = termo.trim().replace(/"/g, '\\"')
+      const safeDigits = termo.replace(/\D/g, '')
+      const parts = [`nome ~ "${safeName}"`]
+      if (safeDigits.length >= 3) parts.push(`telefone_principal ~ "${safeDigits}"`)
+      const r = await pb.collection('clientes').getList(1, 8, {
+        filter: `(${parts.join(' || ')})`,
+        sort: 'nome',
+      })
+      if (id === buscaClienteRef.current) setClientesFiltrados(r.items)
+    } catch (error) {
+      console.warn('Falha ao buscar clientes', error)
+    } finally {
+      if (id === buscaClienteRef.current) setBuscandoClientes(false)
+    }
+  }
+
+  const handleClienteBusca = (value) => {
+    setClienteBusca(value)
+    setClienteSelecionado(null)
+    setFormData((prev) => ({ ...prev, cliente_id: '' }))
+    if (buscaTimer.current) window.clearTimeout(buscaTimer.current)
+    buscaTimer.current = window.setTimeout(() => buscarClientes(value), 300)
+  }
+
+  const selecionarCliente = (cliente) => {
+    setClienteSelecionado(cliente)
+    setClienteBusca(cliente.nome)
+    setClientesFiltrados([])
+    setFormData((prev) => ({ ...prev, cliente_id: cliente.id }))
+  }
+
+  const limparCliente = () => {
+    setClienteSelecionado(null)
+    setClienteBusca('')
+    setClientesFiltrados([])
+    setFormData((prev) => ({ ...prev, cliente_id: '' }))
   }
 
   const handleChange = (field, value) => {
@@ -119,7 +161,9 @@ const NovaOportunidade = () => {
           console.warn('Vínculo auxiliar não criado', error)
         }
       }
-      await loadClientes()
+      setClienteSelecionado(cliente)
+      setClienteBusca(cliente.nome)
+      setClientesFiltrados([])
       setFormData((prev) => ({ ...prev, cliente_id: cliente.id }))
       setNovoCliente({
         nome: '',
@@ -318,19 +362,50 @@ const NovaOportunidade = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="cliente_id">Cliente *</Label>
-                  <Select onValueChange={(v) => handleChange('cliente_id', v)} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o cliente" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clientes.map((cliente) => (
-                        <SelectItem key={cliente.id} value={cliente.id}>
-                          {cliente.nome}
-                        </SelectItem>
+                  <Label htmlFor="cliente_busca">Cliente *</Label>
+                  <Input
+                    id="cliente_busca"
+                    value={clienteBusca}
+                    onChange={(e) => handleClienteBusca(e.target.value)}
+                    placeholder="Digite para buscar"
+                    autoComplete="off"
+                  />
+                  {buscandoClientes && <p className="text-xs text-muted-foreground">Buscando...</p>}
+                  {clientesFiltrados.length > 0 && !clienteSelecionado && (
+                    <div className="rounded-md border bg-white shadow-sm max-h-56 overflow-auto">
+                      {clientesFiltrados.map((cliente) => (
+                        <button
+                          key={cliente.id}
+                          type="button"
+                          onClick={() => selecionarCliente(cliente)}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-[#F5EEE7]"
+                        >
+                          <span className="font-medium">{cliente.nome}</span>
+                          {cliente.telefone_principal && (
+                            <span className="block text-xs text-muted-foreground">
+                              {cliente.telefone_principal}
+                            </span>
+                          )}
+                        </button>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </div>
+                  )}
+                  {clienteSelecionado && (
+                    <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-2 text-sm flex justify-between items-center">
+                      <span>
+                        <strong>{clienteSelecionado.nome}</strong>
+                        {clienteSelecionado.telefone_principal && (
+                          <span className="text-muted-foreground">
+                            {' '}
+                            · {clienteSelecionado.telefone_principal}
+                          </span>
+                        )}
+                      </span>
+                      <button type="button" className="text-xs underline" onClick={limparCliente}>
+                        Trocar
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -362,9 +437,7 @@ const NovaOportunidade = () => {
                   variant="outline"
                   onClick={() => setShowNovoCliente((v) => !v)}
                 >
-                  {showNovoCliente
-                    ? 'Fechar cadastro rápido de cliente'
-                    : '+ Cadastrar novo cliente'}
+                  {showNovoCliente ? 'Fechar cadastro rápido' : '+ Adicionar novo'}
                 </Button>
               </div>
               {showNovoCliente && (
@@ -469,10 +542,10 @@ const NovaOportunidade = () => {
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="infantil">Infantil</SelectItem>
-                      <SelectItem value="debutante_bar">Debutante / baile</SelectItem>
-                      <SelectItem value="bat_mitzvah">Bat mitzvah</SelectItem>
-                      <SelectItem value="adulto">Adulto</SelectItem>
+                      <SelectItem value="aniversario_infantil">Aniversário infantil</SelectItem>
+                      <SelectItem value="debutante">Debutante</SelectItem>
+                      <SelectItem value="bar_bat_mitzvah">Bar ou bat mitzvah</SelectItem>
+                      <SelectItem value="aniversario_adulto">Aniversário adulto</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

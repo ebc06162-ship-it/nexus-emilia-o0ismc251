@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-28T15:07:44.250Z",
+  "generatedAt": "2026-08-28T15:21:01.328Z",
   "collections": [
     {
       "name": "users",
@@ -558,7 +558,7 @@
         {
           "name": "segmento",
           "type": "select",
-          "required": true,
+          "required": false,
           "system": false,
           "selectValues": [
             "casamento_noiva",

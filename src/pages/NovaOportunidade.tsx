@@ -137,7 +137,8 @@ const NovaOportunidade = () => {
       ...prev,
       tipo_evento: tipo,
       tipo_pedido: tipo,
-      segmento,
+      segmento: '',
+      segmento_classificado: segmento,
       subtipo_evento: '',
       justificativa_outros: '',
     }))
@@ -258,21 +259,7 @@ const NovaOportunidade = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="segmento">Segmento *</Label>
-                  <Select onValueChange={(v) => handleChange('segmento', v)} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o segmento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="casamento_noiva">Casamento / Noiva</SelectItem>
-                      <SelectItem value="eventos_sociais">Eventos sociais</SelectItem>
-                      <SelectItem value="maternidade">Maternidade</SelectItem>
-                      <SelectItem value="corporativo">Corporativo</SelectItem>
-                      <SelectItem value="outros">Outros</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="tipo_evento">Tipo de Evento *</Label>
                   <Select onValueChange={handleEventTypeChange} required>

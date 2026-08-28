@@ -48,6 +48,15 @@ const NovaOportunidade = () => {
   const [verificandoDuplicata, setVerificandoDuplicata] = useState(false)
   const [segmentoDerivado, setSegmentoDerivado] = useState('')
   const [rollbackRef, setRollbackRef] = useState('')
+  const [showNovoCliente, setShowNovoCliente] = useState(false)
+  const [novoCliente, setNovoCliente] = useState({
+    nome: '',
+    telefone: '',
+    email: '',
+    natureza: 'pessoa_fisica',
+    classificacao: 'cliente_padrao',
+  })
+  const [criandoCliente, setCriandoCliente] = useState(false)
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -66,6 +75,70 @@ const NovaOportunidade = () => {
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const criarClienteInline = async () => {
+    const nome = novoCliente.nome.trim()
+    const telefone = novoCliente.telefone.replace(/\D/g, '')
+    if (!nome || telefone.length < 10) {
+      toast({ title: 'Informe nome e telefone do cliente', variant: 'destructive' })
+      return
+    }
+    setCriandoCliente(true)
+    try {
+      let pessoa = null
+      const busca = await pb.collection('pessoas').getList(1, 1, {
+        filter: `telefone_principal = "${telefone}"`,
+      })
+      pessoa = busca.items[0] || null
+      const cliente = await pb.collection('clientes').create({
+        nome,
+        telefone_principal: telefone,
+        situacao: 'ativo',
+        natureza_cadastral: novoCliente.natureza,
+        classificacao_comercial: novoCliente.classificacao,
+        ...(novoCliente.email ? { email: novoCliente.email } : {}),
+      })
+      if (!pessoa) {
+        try {
+          pessoa = await pb.collection('pessoas').create({
+            nome,
+            telefone_principal: telefone,
+            ...(novoCliente.email ? { email: novoCliente.email } : {}),
+          })
+        } catch (error) {
+          console.warn('Pessoa auxiliar não criada', error)
+        }
+      }
+      if (pessoa) {
+        try {
+          await pb
+            .collection('clientes_pessoas')
+            .create({ cliente_id: cliente.id, pessoa_id: pessoa.id, papel: 'titular' })
+        } catch (error) {
+          console.warn('Vínculo auxiliar não criado', error)
+        }
+      }
+      await loadClientes()
+      setFormData((prev) => ({ ...prev, cliente_id: cliente.id }))
+      setNovoCliente({
+        nome: '',
+        telefone: '',
+        email: '',
+        natureza: 'pessoa_fisica',
+        classificacao: 'cliente_padrao',
+      })
+      setShowNovoCliente(false)
+      toast({ title: 'Cliente cadastrado e vinculado a esta oportunidade' })
+    } catch (error) {
+      toast({
+        title: 'Não foi possível cadastrar o cliente',
+        description: error?.message || 'Tente novamente',
+        variant: 'destructive',
+      })
+    } finally {
+      setCriandoCliente(false)
+    }
   }
 
   const registrarDecisao = async (oportunidadeId, descricao, decisao) => {
@@ -282,6 +355,106 @@ const NovaOportunidade = () => {
                   </Select>
                 </div>
               </div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowNovoCliente((v) => !v)}
+                >
+                  {showNovoCliente
+                    ? 'Fechar cadastro rápido de cliente'
+                    : '+ Cadastrar novo cliente'}
+                </Button>
+              </div>
+              {showNovoCliente && (
+                <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Cadastrar novo cliente</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowNovoCliente(false)}
+                      disabled={criandoCliente}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="nc_nome">Nome *</Label>
+                      <Input
+                        id="nc_nome"
+                        value={novoCliente.nome}
+                        onChange={(e) =>
+                          setNovoCliente((prev) => ({ ...prev, nome: e.target.value }))
+                        }
+                        placeholder="Nome do cliente"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="nc_telefone">Telefone principal *</Label>
+                      <Input
+                        id="nc_telefone"
+                        value={novoCliente.telefone}
+                        onChange={(e) =>
+                          setNovoCliente((prev) => ({ ...prev, telefone: e.target.value }))
+                        }
+                        placeholder="(11) 99999-9999"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="nc_email">E-mail</Label>
+                      <Input
+                        id="nc_email"
+                        type="email"
+                        value={novoCliente.email}
+                        onChange={(e) =>
+                          setNovoCliente((prev) => ({ ...prev, email: e.target.value }))
+                        }
+                        placeholder="cliente@email.com"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>Natureza</Label>
+                      <select
+                        value={novoCliente.natureza}
+                        onChange={(e) =>
+                          setNovoCliente((prev) => ({ ...prev, natureza: e.target.value }))
+                        }
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      >
+                        <option value="pessoa_fisica">Pessoa Física</option>
+                        <option value="pessoa_juridica">Pessoa Jurídica</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label>Classificação</Label>
+                      <select
+                        value={novoCliente.classificacao}
+                        onChange={(e) =>
+                          setNovoCliente((prev) => ({ ...prev, classificacao: e.target.value }))
+                        }
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      >
+                        <option value="cliente_padrao">Cliente padrão</option>
+                        <option value="cerimonialista">Cerimonialista</option>
+                        <option value="revendedor">Revendedor</option>
+                        <option value="parceiro_comercial">Parceiro Comercial</option>
+                      </select>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={criarClienteInline}
+                    disabled={criandoCliente}
+                    className="bg-[#C69D5F] hover:bg-[#DCC39E] text-white"
+                  >
+                    {criandoCliente ? 'Cadastrando...' : 'Salvar cliente e vincular'}
+                  </Button>
+                </div>
+              )}
 
               {segmentoDerivado && (
                 <p className="text-sm text-muted-foreground">

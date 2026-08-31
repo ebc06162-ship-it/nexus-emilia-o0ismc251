@@ -209,38 +209,32 @@ const NovaOportunidade = () => {
     }
     setLoading(true)
     try {
-      const oportunidade = await pb
-        .collection('oportunidades')
-        .create({
-          ...formData,
-          responsavel_atual: pb.authStore.record.id,
-          status: 'aguardando_dados',
-        })
-      await pb
-        .collection('pendencias')
-        .create({
-          oportunidade_id: oportunidade.id,
-          campo: pendingField.trim(),
-          valor_atual: '',
-          origem: 'atendimento',
-          motivo: pendingReason.trim(),
-          responsavel: pendingOwner,
-          proxima_acao: pendingAction.trim(),
-          prazo: pendingDue,
-          pending_type: 'campo_ausente',
-          status: 'aberta',
-        })
-      await pb
-        .collection('historico_eventos')
-        .create({
-          oportunidade_id: oportunidade.id,
-          descricao: `Pendência registrada para ${pendingField.trim()}: ${pendingReason.trim()}`,
-          tipo_evento: 'atualizacao',
-          autor: pb.authStore.record.id,
-          campo: pendingField.trim(),
-          origem: 'atendimento',
-          valor_novo: '',
-        })
+      const oportunidade = await pb.collection('oportunidades').create({
+        ...formData,
+        responsavel_atual: pb.authStore.record.id,
+        status: 'aguardando_dados',
+      })
+      await pb.collection('pendencias').create({
+        oportunidade_id: oportunidade.id,
+        campo: pendingField.trim(),
+        valor_atual: '',
+        origem: 'atendimento',
+        motivo: pendingReason.trim(),
+        responsavel: pendingOwner,
+        proxima_acao: pendingAction.trim(),
+        prazo: pendingDue,
+        pending_type: 'campo_ausente',
+        status: 'aberta',
+      })
+      await pb.collection('historico_eventos').create({
+        oportunidade_id: oportunidade.id,
+        descricao: `Pendência registrada para ${pendingField.trim()}: ${pendingReason.trim()}`,
+        tipo_evento: 'atualizacao',
+        autor: pb.authStore.record.id,
+        campo: pendingField.trim(),
+        origem: 'atendimento',
+        valor_novo: '',
+      })
       toast({ title: 'Pedido salvo com pendência' })
       navigate('/')
     } catch (error) {
@@ -268,39 +262,33 @@ const NovaOportunidade = () => {
     }
     setLoading(true)
     try {
-      const oportunidade = await pb
-        .collection('oportunidades')
-        .create({
-          ...formData,
-          responsavel_atual: pb.authStore.record.id,
-          status: 'aguardando_dados',
-        })
-      await pb
-        .collection('pendencias')
-        .create({
-          oportunidade_id: oportunidade.id,
-          campo: conflictField.trim(),
-          valor_atual: conflictNew.trim(),
-          origem: 'atendimento',
-          motivo: 'Dois valores diferentes precisam de confirmação humana',
-          responsavel: pb.authStore.record.id,
-          proxima_acao: 'Confirmar qual valor é correto com a cliente',
-          prazo: pendingDue || new Date().toISOString().slice(0, 10),
-          pending_type: 'identity_conflict',
-          status: 'aberta',
-        })
-      await pb
-        .collection('historico_eventos')
-        .create({
-          oportunidade_id: oportunidade.id,
-          descricao: `Conflito em ${conflictField.trim()}; confirmação humana necessária`,
-          tipo_evento: 'erro',
-          autor: pb.authStore.record.id,
-          campo: conflictField.trim(),
-          origem: 'atendimento',
-          valor_anterior: conflictOld.trim(),
-          valor_novo: conflictNew.trim(),
-        })
+      const oportunidade = await pb.collection('oportunidades').create({
+        ...formData,
+        responsavel_atual: pb.authStore.record.id,
+        status: 'aguardando_dados',
+      })
+      await pb.collection('pendencias').create({
+        oportunidade_id: oportunidade.id,
+        campo: conflictField.trim(),
+        valor_atual: conflictNew.trim(),
+        origem: 'atendimento',
+        motivo: 'Dois valores diferentes precisam de confirmação humana',
+        responsavel: pb.authStore.record.id,
+        proxima_acao: 'Confirmar qual valor é correto com a cliente',
+        prazo: pendingDue || new Date().toISOString().slice(0, 10),
+        pending_type: 'identity_conflict',
+        status: 'aberta',
+      })
+      await pb.collection('historico_eventos').create({
+        oportunidade_id: oportunidade.id,
+        descricao: `Conflito em ${conflictField.trim()}; confirmação humana necessária`,
+        tipo_evento: 'erro',
+        autor: pb.authStore.record.id,
+        campo: conflictField.trim(),
+        origem: 'atendimento',
+        valor_anterior: conflictOld.trim(),
+        valor_novo: conflictNew.trim(),
+      })
       toast({ title: 'Conflito registrado sem apagar nenhum valor' })
       navigate('/')
     } catch (error) {

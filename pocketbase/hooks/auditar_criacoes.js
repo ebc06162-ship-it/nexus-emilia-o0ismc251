@@ -1,24 +1,21 @@
-onRecordCreateRequest(
+onRecordAfterCreateSuccess(
   (e) => {
     try {
       const record = e.record
-      const auth = e.auth
+      const auth = e.requestInfo ? e.requestInfo().auth : null
       const audit = new Record($app.findCollectionByNameOrId('auditoria'))
       audit.set('ator_id', auth ? auth.id : '')
-      audit.set('ator_nome', auth ? auth.getString('name') : '')
-      audit.set('papel', auth ? auth.getString('papel') : '')
+      audit.set('ator_nome', auth ? auth.getString('name') : 'sistema')
+      audit.set('papel', auth ? auth.getString('papel') : 'sistema')
       audit.set('objeto_tipo', record.collection().name)
       audit.set('objeto_id', record.id)
       audit.set('acao', 'criacao')
-      audit.set('origem', e.request ? e.request.url.path : 'api')
+      audit.set('origem', 'pocketbase')
       audit.set('resultado', 'permitido')
       audit.set('trace_id', record.id + '-create')
       $app.save(audit)
     } catch (err) {
-      $app.logger().error('auditoria de criação falhou', 'error', String(err))
-      throw e.internalServerError(
-        'A alteração foi bloqueada porque não foi possível registrar a auditoria.',
-      )
+      $app.logger().error('auditoria pós-criação falhou', 'error', String(err))
     }
     e.next()
   },

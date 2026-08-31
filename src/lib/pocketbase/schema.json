@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-31T20:16:25.602Z",
+  "generatedAt": "2026-08-31T20:17:02.853Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "id = @request.auth.id",
-        "view": "id = @request.auth.id",
-        "create": "",
-        "update": "id = @request.auth.id",
-        "delete": "id = @request.auth.id"
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\") || id = @request.auth.id",
+        "delete": null
       },
       "fields": [
         {
@@ -67,10 +67,10 @@
       "name": "clientes",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -305,10 +305,10 @@
       "name": "participantes",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -383,10 +383,10 @@
       "name": "oportunidades",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -755,10 +755,10 @@
       "name": "pendencias",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -865,9 +865,9 @@
       "name": "historico_eventos",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "update": null,
         "delete": null
       },
@@ -959,10 +959,10 @@
       "name": "dados_entrega",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1073,10 +1073,10 @@
       "name": "cerimonialistas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1120,10 +1120,10 @@
       "name": "contatos_cerimonialistas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1180,10 +1180,10 @@
       "name": "grupos_parceiros",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1227,10 +1227,10 @@
       "name": "empresas_parceiros",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1312,10 +1312,10 @@
       "name": "contatos_parceiros",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1372,10 +1372,10 @@
       "name": "unidades_parceiros",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1456,10 +1456,10 @@
       "name": "contatos_unidades_parceiros",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1505,10 +1505,10 @@
       "name": "eventos",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1592,10 +1592,10 @@
       "name": "pessoas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1676,10 +1676,10 @@
       "name": "clientes_pessoas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1729,10 +1729,10 @@
       "name": "locais_entrega",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1825,10 +1825,10 @@
       "name": "enderecos_pessoas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -1931,10 +1931,10 @@
       "name": "enderecos_entrega",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\")",
         "delete": null
       },
       "fields": [
@@ -2041,10 +2041,10 @@
       "name": "catalogo_itens",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "view": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\")",
-        "create": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel != \"\") && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
         "delete": null
       },
       "fields": [

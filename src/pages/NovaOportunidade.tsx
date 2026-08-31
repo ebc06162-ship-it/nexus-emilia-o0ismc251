@@ -707,57 +707,73 @@ const NovaOportunidade = () => {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="valor_estimado">Valor Estimado (R$)</Label>
-                  <Input
-                    id="valor_estimado"
-                    type="number"
-                    step="0.01"
-                    value={formData.valor_estimado}
-                    onChange={(e) => handleChange('valor_estimado', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="data_evento">Data do Evento</Label>
-                  <Input
-                    id="data_evento"
-                    type="date"
-                    value={formData.data_evento}
-                    onChange={(e) => handleChange('data_evento', e.target.value)}
-                  />
-                </div>
-              </div>
+              {[
+                'casamento',
+                'batizado',
+                'aniversario',
+                'corporativo',
+                'maternidade',
+                'bodas',
+                'formatura',
+                'cha_bebe',
+                'revelacao',
+                'presente',
+                'outros',
+              ].includes(formData.tipo_evento) && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="valor_estimado">Valor Estimado (R$)</Label>
+                      <Input
+                        id="valor_estimado"
+                        type="number"
+                        step="0.01"
+                        value={formData.valor_estimado}
+                        onChange={(e) => handleChange('valor_estimado', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="data_evento">Data do Evento</Label>
+                      <Input
+                        id="data_evento"
+                        type="date"
+                        value={formData.data_evento}
+                        onChange={(e) => handleChange('data_evento', e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="qtd_convidados">Quantidade de Convidados</Label>
-                  <Input
-                    id="qtd_convidados"
-                    type="number"
-                    value={formData.qtd_convidados}
-                    onChange={(e) => handleChange('qtd_convidados', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="qtd_bem_casados">Quantidade de Bem-Casados</Label>
-                  <Input
-                    id="qtd_bem_casados"
-                    type="number"
-                    value={formData.qtd_bem_casados}
-                    onChange={(e) => handleChange('qtd_bem_casados', e.target.value)}
-                  />
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="qtd_convidados">Quantidade de Convidados</Label>
+                      <Input
+                        id="qtd_convidados"
+                        type="number"
+                        value={formData.qtd_convidados}
+                        onChange={(e) => handleChange('qtd_convidados', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="qtd_bem_casados">Quantidade de Bem-Casados</Label>
+                      <Input
+                        id="qtd_bem_casados"
+                        type="number"
+                        value={formData.qtd_bem_casados}
+                        onChange={(e) => handleChange('qtd_bem_casados', e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="local_evento">Local do Evento</Label>
-                <Input
-                  id="local_evento"
-                  value={formData.local_evento}
-                  onChange={(e) => handleChange('local_evento', e.target.value)}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="local_evento">Local do Evento</Label>
+                    <Input
+                      id="local_evento"
+                      value={formData.local_evento}
+                      onChange={(e) => handleChange('local_evento', e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">

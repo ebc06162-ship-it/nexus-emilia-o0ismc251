@@ -55,6 +55,9 @@ const NovaOportunidade = () => {
   const [verificandoDuplicata, setVerificandoDuplicata] = useState(false)
   const [segmentoDerivado, setSegmentoDerivado] = useState('')
   const [rollbackRef, setRollbackRef] = useState('')
+  const [catalogItems, setCatalogItems] = useState([])
+  const [catalogLoading, setCatalogLoading] = useState(true)
+  const [catalogItemId, setCatalogItemId] = useState('')
   const [pendingField, setPendingField] = useState('')
   const [pendingReason, setPendingReason] = useState('')
   const [pendingOwner, setPendingOwner] = useState('')
@@ -82,6 +85,23 @@ const NovaOportunidade = () => {
   const { toast } = useToast()
 
   useEffect(() => () => window.clearTimeout(buscaTimer.current), [])
+
+  useEffect(() => {
+    const loadCatalog = async () => {
+      try {
+        const result = await pb.collection('catalogo_itens').getList(1, 200, {
+          filter: 'review_status = "aprovado"',
+          sort: 'categoria,display_label',
+        })
+        setCatalogItems(result.items)
+      } catch (error) {
+        toast({ title: 'Não foi possível carregar o catálogo aprovado', variant: 'destructive' })
+      } finally {
+        setCatalogLoading(false)
+      }
+    }
+    loadCatalog()
+  }, [])
   const buscarClientes = async (termo) => {
     const id = ++buscaClienteRef.current
     if (!termo.trim()) {
@@ -128,6 +148,20 @@ const NovaOportunidade = () => {
     setShowNovoCliente(true)
   }
   const handleChange = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }))
+
+  const selecionarItemCatalogo = (itemId) => {
+    const item = catalogItems.find((candidate) => candidate.id === itemId)
+    setCatalogItemId(itemId)
+    setFormData((prev) => ({
+      ...prev,
+      catalogo_item_id: item?.id || '',
+      catalogo_codigo: item?.codigo || '',
+      catalogo_label: item?.display_label || '',
+      catalogo_source_version: item?.source_version || '',
+      catalogo_selected_at: item ? new Date().toISOString() : '',
+      catalogo_selected_by: item ? pb.authStore.record.id : '',
+    }))
+  }
   const criarClienteInline = async () => {
     const nome = novoCliente.nome.trim()
     const telefone = novoCliente.telefone.replace(/\D/g, '')

@@ -41,6 +41,14 @@ const NovaOportunidade = () => {
     segmento_classificado: '',
     subtipo_evento: '',
     justificativa_outros: '',
+    modalidade_entrega: '',
+    referencia_paleta: '',
+    datas_entrega: '',
+    tipo_cliente: '',
+    data_estimada_parto: '',
+    maternidade: '',
+    tipo_parto: '',
+    responsavel_acompanhamento: '',
   })
   const [loading, setLoading] = useState(false)
   const [duplicata, setDuplicata] = useState(null)
@@ -243,6 +251,9 @@ const NovaOportunidade = () => {
   const deriveSegment = (tipo) =>
     ({
       casamento: 'casamento',
+      degustacao: 'eventos_sociais',
+      revendedor: 'corporativo',
+      bem_nascido: 'maternidade',
       batizado: 'eventos_sociais',
       bodas: 'eventos_sociais',
       formatura: 'eventos_sociais',
@@ -420,6 +431,9 @@ const NovaOportunidade = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="casamento">Casamento</SelectItem>
+                      <SelectItem value="degustacao">Degustação</SelectItem>
+                      <SelectItem value="revendedor">Revendedor</SelectItem>
+                      <SelectItem value="bem_nascido">Bem-nascido</SelectItem>
                       <SelectItem value="batizado">Batizado</SelectItem>
                       <SelectItem value="aniversario">Aniversário</SelectItem>
                       <SelectItem value="corporativo">Corporativo</SelectItem>
@@ -526,9 +540,20 @@ const NovaOportunidade = () => {
 
               {segmentoDerivado && (
                 <p className="text-sm text-muted-foreground">
-                  Segmento: {segmentoDerivado.replace('_', ' ')}
+                  Segmento classificado: {segmentoDerivado.replace('_', ' ')}
                 </p>
               )}
+
+              {formData.tipo_evento === 'casamento' && (
+                <div className="space-y-2">
+                  <Label>Nome dos noivos</Label>
+                  <Input
+                    value={formData.nome_noivos}
+                    onChange={(e) => handleChange('nome_noivos', e.target.value)}
+                  />
+                </div>
+              )}
+
               {formData.tipo_evento === 'aniversario' && (
                 <div className="space-y-2">
                   <Label>Tipo de aniversário *</Label>
@@ -545,6 +570,7 @@ const NovaOportunidade = () => {
                   </Select>
                 </div>
               )}
+
               {formData.tipo_evento === 'outros' && (
                 <div className="space-y-2">
                   <Label>Justificativa *</Label>
@@ -555,56 +581,86 @@ const NovaOportunidade = () => {
                   />
                 </div>
               )}
-              {formData.tipo_evento === 'casamento' && (
-                <div className="space-y-2">
-                  <Label>Nome dos Noivos</Label>{' '}
-                  <Input
-                    value={formData.nome_noivos}
-                    onChange={(e) => handleChange('nome_noivos', e.target.value)}
-                  />
-                </div>
-              )}
+
               {segmentoDerivado === 'eventos_sociais' && formData.tipo_evento !== 'aniversario' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Nome do Aniversariante</Label>
-                    <Input
-                      value={formData.nome_aniversariante}
-                      onChange={(e) => handleChange('nome_aniversariante', e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Nome do Casal</Label>
-                    <Input
-                      value={formData.nome_casal}
-                      onChange={(e) => handleChange('nome_casal', e.target.value)}
-                    />
-                  </div>
-                </div>
-              )}
-              {segmentoDerivado === 'maternidade' && (
                 <div className="space-y-2">
-                  <Label>Nome do Bebê / criança</Label>{' '}
+                  <Label>Nome do casal / aniversariante</Label>
                   <Input
-                    value={formData.nome_bebe}
-                    onChange={(e) => handleChange('nome_bebe', e.target.value)}
+                    value={formData.nome_casal || formData.nome_aniversariante}
+                    onChange={(e) => handleChange('nome_casal', e.target.value)}
                   />
                 </div>
               )}
-              {formData.tipo_evento === 'outros' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {formData.tipo_evento === 'degustacao' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md border p-4">
                   <div className="space-y-2">
-                    <Label>Justificativa do tipo de evento *</Label>
+                    <Label>Modalidade de entrega</Label>
                     <Input
-                      value={formData.justificativa_outros}
-                      onChange={(e) => handleChange('justificativa_outros', e.target.value)}
+                      value={formData.modalidade_entrega}
+                      onChange={(e) => handleChange('modalidade_entrega', e.target.value)}
+                      placeholder="Presencial, retirada ou envio"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Descrição</Label>
+                    <Label>Referência / paleta</Label>
                     <Input
-                      value={formData.descricao_outro_evento}
-                      onChange={(e) => handleChange('descricao_outro_evento', e.target.value)}
+                      value={formData.referencia_paleta}
+                      onChange={(e) => handleChange('referencia_paleta', e.target.value)}
+                      placeholder="Se informada pela cliente"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {formData.tipo_evento === 'revendedor' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md border p-4">
+                  <div className="space-y-2">
+                    <Label>Datas de entrega</Label>
+                    <Input
+                      value={formData.datas_entrega}
+                      onChange={(e) => handleChange('datas_entrega', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tipo de cliente</Label>
+                    <Input
+                      value={formData.tipo_cliente}
+                      onChange={(e) => handleChange('tipo_cliente', e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {formData.tipo_evento === 'bem_nascido' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md border p-4">
+                  <div className="space-y-2">
+                    <Label>Data estimada do parto</Label>
+                    <Input
+                      type="date"
+                      value={formData.data_estimada_parto}
+                      onChange={(e) => handleChange('data_estimada_parto', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Maternidade</Label>
+                    <Input
+                      value={formData.maternidade}
+                      onChange={(e) => handleChange('maternidade', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tipo de parto</Label>
+                    <Input
+                      value={formData.tipo_parto}
+                      onChange={(e) => handleChange('tipo_parto', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Responsável pelo acompanhamento</Label>
+                    <Input
+                      value={formData.responsavel_acompanhamento}
+                      onChange={(e) => handleChange('responsavel_acompanhamento', e.target.value)}
                     />
                   </div>
                 </div>

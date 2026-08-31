@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T15:39:54.061Z",
+  "generatedAt": "2026-08-31T16:06:58.668Z",
   "collections": [
     {
       "name": "users",
@@ -390,13 +390,19 @@
           "system": false,
           "selectValues": [
             "casamento",
+            "degustacao",
+            "revendedor",
+            "bem_nascido",
+            "batizado",
             "aniversario",
+            "corporativo",
+            "maternidade",
+            "bodas",
+            "formatura",
             "cha_bebe",
             "revelacao",
-            "bodas",
-            "batizado",
-            "corporativo",
-            "outro"
+            "presente",
+            "outros"
           ]
         },
         {
@@ -638,6 +644,54 @@
             "presente",
             "outros"
           ]
+        },
+        {
+          "name": "modalidade_entrega",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "referencia_paleta",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "datas_entrega",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_cliente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_estimada_parto",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "maternidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_parto",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_acompanhamento",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

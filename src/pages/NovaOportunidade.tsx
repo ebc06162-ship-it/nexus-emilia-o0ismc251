@@ -134,25 +134,21 @@ const NovaOportunidade = () => {
         .collection('pessoas')
         .getList(1, 1, { filter: `telefone_principal = "${telefone}"` })
       pessoa = busca.items[0] || null
-      const cliente = await pb
-        .collection('clientes')
-        .create({
-          nome,
-          telefone_principal: telefone,
-          situacao: 'ativo',
-          natureza_cadastral: novoCliente.natureza,
-          classificacao_comercial: novoCliente.classificacao,
-          ...(novoCliente.email ? { email: novoCliente.email } : {}),
-        })
+      const cliente = await pb.collection('clientes').create({
+        nome,
+        telefone_principal: telefone,
+        situacao: 'ativo',
+        natureza_cadastral: novoCliente.natureza,
+        classificacao_comercial: novoCliente.classificacao,
+        ...(novoCliente.email ? { email: novoCliente.email } : {}),
+      })
       if (!pessoa) {
         try {
-          pessoa = await pb
-            .collection('pessoas')
-            .create({
-              nome,
-              telefone_principal: telefone,
-              ...(novoCliente.email ? { email: novoCliente.email } : {}),
-            })
+          pessoa = await pb.collection('pessoas').create({
+            nome,
+            telefone_principal: telefone,
+            ...(novoCliente.email ? { email: novoCliente.email } : {}),
+          })
         } catch (error) {
           console.warn('Pessoa auxiliar não criada', error)
         }
@@ -184,15 +180,13 @@ const NovaOportunidade = () => {
   }
   const registrarDecisao = async (oportunidadeId, descricao, decisao) => {
     try {
-      await pb
-        .collection('historico_eventos')
-        .create({
-          oportunidade_id: oportunidadeId,
-          descricao,
-          tipo_evento: 'nota',
-          autor: pb.authStore.record.id,
-          decisao_duplicidade: decisao,
-        })
+      await pb.collection('historico_eventos').create({
+        oportunidade_id: oportunidadeId,
+        descricao,
+        tipo_evento: 'nota',
+        autor: pb.authStore.record.id,
+        decisao_duplicidade: decisao,
+      })
     } catch (error) {
       console.warn('Decisão não registrada no histórico', error)
     }

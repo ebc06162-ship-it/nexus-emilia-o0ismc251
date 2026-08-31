@@ -582,15 +582,16 @@ const NovaOportunidade = () => {
                 </div>
               )}
 
-              {segmentoDerivado === 'eventos_sociais' && formData.tipo_evento !== 'aniversario' && (
-                <div className="space-y-2">
-                  <Label>Nome do casal / aniversariante</Label>
-                  <Input
-                    value={formData.nome_casal || formData.nome_aniversariante}
-                    onChange={(e) => handleChange('nome_casal', e.target.value)}
-                  />
-                </div>
-              )}
+              {segmentoDerivado === 'eventos_sociais' &&
+                !['aniversario', 'degustacao'].includes(formData.tipo_evento) && (
+                  <div className="space-y-2">
+                    <Label>Nome do casal / aniversariante</Label>
+                    <Input
+                      value={formData.nome_casal || formData.nome_aniversariante}
+                      onChange={(e) => handleChange('nome_casal', e.target.value)}
+                    />
+                  </div>
+                )}
 
               {formData.tipo_evento === 'degustacao' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md border p-4">

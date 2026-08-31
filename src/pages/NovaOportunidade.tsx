@@ -703,6 +703,33 @@ const NovaOportunidade = () => {
                 />
               </div>
               <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3">
+                <div>
+                  <Label htmlFor="catalogo_item">Opção aprovada do catálogo</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Somente itens aprovados podem ser usados em novos pedidos.
+                  </p>
+                </div>
+                <select
+                  id="catalogo_item"
+                  value={catalogItemId}
+                  onChange={(e) => selecionarItemCatalogo(e.target.value)}
+                  disabled={catalogLoading}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                >
+                  <option value="">Selecione uma opção (opcional)</option>
+                  {catalogItems.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.codigo} · {item.display_label} · v{item.source_version}
+                    </option>
+                  ))}
+                </select>
+                {catalogItemId && (
+                  <p className="text-xs text-muted-foreground">
+                    A seleção será salva com código, nome e versão no pedido.
+                  </p>
+                )}
+              </div>
+              <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3">
                 <p className="font-medium">Registrar informação faltante</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Input

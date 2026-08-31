@@ -125,6 +125,13 @@ const Dashboard = () => {
             >
               + Nova Oportunidade
             </Button>
+            <Button
+              variant="outline"
+              className="border-[#C69D5F] text-[#3D2314]"
+              onClick={() => navigate('/catalogo')}
+            >
+              Ver catálogo
+            </Button>
           </CardContent>
         </Card>
       </main>

@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import NovoCliente from './pages/NovoCliente'
 import NovaOportunidade from './pages/NovaOportunidade'
+import Catalogo from './pages/Catalogo'
 import Layout from './components/Layout'
 import pb from '@/lib/pocketbase/client'
 
@@ -40,6 +41,14 @@ const App = () => (
           element={
             <ProtectedRoute>
               <NovoCliente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/catalogo"
+          element={
+            <ProtectedRoute>
+              <Catalogo />
             </ProtectedRoute>
           }
         />

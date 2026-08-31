@@ -8,9 +8,9 @@ migrate(
       listRule: '@request.auth.id != ""',
       viewRule: '@request.auth.id != ""',
       createRule:
-        '@request.auth.id != "" && (@request.data.review_status = "rascunho" || (@request.data.codigo != "" && @request.data.source_document != "" && @request.data.source_version != ""))',
+        '@request.auth.id != "" && (@request.body.review_status = "rascunho" || (@request.body.codigo != "" && @request.body.source_document != "" && @request.body.source_version != ""))',
       updateRule:
-        '@request.auth.id != "" && (@request.data.review_status = "rascunho" || (@request.data.review_status = "conflito") || (@request.data.review_status = "inativo") || (@request.data.codigo != "" && @request.data.source_document != "" && @request.data.source_version != ""))',
+        '@request.auth.id != "" && (@request.body.review_status = "rascunho" || @request.body.review_status = "conflito" || @request.body.review_status = "inativo" || (@request.body.codigo != "" && @request.body.source_document != "" && @request.body.source_version != ""))',
       deleteRule: null,
       fields: [
         { name: 'codigo', type: 'text', required: false, max: 80 },

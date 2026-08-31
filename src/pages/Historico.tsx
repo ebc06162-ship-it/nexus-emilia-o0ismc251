@@ -4,18 +4,42 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import pb from '@/lib/pocketbase/client'
 
+const roleLabels = {
+  administrador: 'Administrador',
+  gestao: 'Gestão',
+  atendimento: 'Atendimento',
+  financeiro: 'Financeiro',
+  producao: 'Produção',
+  cliente_externo: 'Cliente/externo',
+}
+
 export default function Historico() {
   const navigate = useNavigate()
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
-
+  const canRead = ['administrador', 'gestao'].includes(pb.authStore.record?.papel)
   useEffect(() => {
-    pb.collection('historico_eventos')
-      .getList(1, 100, { sort: '-created', expand: 'autor,oportunidade_id' })
+    if (!canRead) return
+    pb.collection('auditoria')
+      .getList(1, 100, { sort: '-created' })
       .then((result) => setItems(result.items))
-      .catch((err) => setError(err.message || 'Não foi possível carregar o histórico.'))
-  }, [])
-
+      .catch((err) => setError(err.message || 'Não foi possível carregar a auditoria.'))
+  }, [canRead])
+  if (!canRead)
+    return (
+      <div className="min-h-screen bg-[#FAF8F5] p-8">
+        <Card>
+          <CardContent className="p-6">
+            <p role="alert" className="text-[#7A2E2E]">
+              Você não tem permissão para consultar o histórico.
+            </p>
+            <Button className="mt-4" onClick={() => navigate('/')}>
+              Voltar
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <header className="bg-[#3D2314] text-white p-4">
@@ -55,16 +79,21 @@ export default function Historico() {
             <CardContent className="p-4">
               <div className="flex flex-col gap-1 md:flex-row md:justify-between">
                 <div>
-                  <p className="font-semibold text-[#3D2314]">{item.tipo_evento}</p>
-                  <p className="text-sm">{item.descricao}</p>
-                  {item.campo && (
-                    <p className="text-xs text-gray-600">
-                      Campo: {item.campo} · Origem: {item.origem || 'não informada'}
-                    </p>
-                  )}
+                  <p className="font-semibold text-[#3D2314]">
+                    {item.acao} · {item.resultado}
+                  </p>
+                  <p className="text-sm">
+                    {item.objeto_tipo}
+                    {item.objeto_id ? ` · ${item.objeto_id}` : ''}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Motivo: {item.motivo || 'não informado'} · Origem:{' '}
+                    {item.origem || 'não informada'}
+                  </p>
                 </div>
                 <div className="text-xs text-gray-600 md:text-right">
-                  <p>Ator: {item.expand?.autor?.name || item.autor || 'não informado'}</p>
+                  <p>Ator: {item.ator_nome || 'não informado'}</p>
+                  <p>Papel: {roleLabels[item.papel] || item.papel || 'não informado'}</p>
                   <p>{new Date(item.created).toLocaleString('pt-BR')}</p>
                 </div>
               </div>

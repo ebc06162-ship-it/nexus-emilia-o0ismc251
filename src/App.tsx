@@ -8,6 +8,7 @@ import NovoCliente from './pages/NovoCliente'
 import NovaOportunidade from './pages/NovaOportunidade'
 import Catalogo from './pages/Catalogo'
 import Historico from './pages/Historico'
+import Usuarios from './pages/Usuarios'
 import Layout from './components/Layout'
 import pb from '@/lib/pocketbase/client'
 
@@ -58,6 +59,14 @@ const App = () => (
           element={
             <ProtectedRoute>
               <Historico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/usuarios"
+          element={
+            <ProtectedRoute>
+              <Usuarios />
             </ProtectedRoute>
           }
         />

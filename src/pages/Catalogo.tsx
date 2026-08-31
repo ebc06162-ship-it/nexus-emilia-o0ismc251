@@ -123,6 +123,20 @@ const Catalogo = () => {
         review_status: 'rascunho',
       })
     } catch (err) {
+      if (err?.status === 403 && pb.authStore.isValid) {
+        try {
+          await pb.send('/backend/v1/auditoria/negacao', {
+            method: 'POST',
+            body: {
+              objeto_tipo: 'catalogo_itens',
+              acao: editing ? 'edicao' : 'criacao',
+              origem: 'catalogo',
+            },
+          })
+        } catch (auditError) {
+          console.warn('Não foi possível registrar a tentativa negada', auditError)
+        }
+      }
       setError(err.message || 'Não foi possível salvar o item.')
     }
   }

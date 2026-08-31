@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import pb from '@/lib/pocketbase/client'
 
 const statusLabel = {
@@ -35,6 +36,18 @@ const Catalogo = () => {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [editing, setEditing] = useState(null)
+  const [draft, setDraft] = useState({
+    codigo: '',
+    nome: '',
+    display_label: '',
+    categoria: 'papel',
+    source_document: '',
+    source_version: '',
+    source_locator: '',
+    review_status: 'rascunho',
+  })
+  const canManage = ['administrador', 'gestao'].includes(pb.authStore.record?.papel)
 
   useEffect(() => {
     const load = async () => {
@@ -60,6 +73,59 @@ const Catalogo = () => {
         .includes(normalized),
     )
   }, [items, query])
+
+  const openNew = () => {
+    setEditing(null)
+    setDraft({
+      codigo: '',
+      nome: '',
+      display_label: '',
+      categoria: 'papel',
+      source_document: '',
+      source_version: '',
+      source_locator: '',
+      review_status: 'rascunho',
+    })
+  }
+
+  const openEdit = (item) => {
+    setEditing(item)
+    setDraft({
+      codigo: item.codigo || '',
+      nome: item.nome || '',
+      display_label: item.display_label || '',
+      categoria: item.categoria || 'papel',
+      source_document: item.source_document || '',
+      source_version: item.source_version || '',
+      source_locator: item.source_locator || '',
+      review_status: item.review_status || 'rascunho',
+    })
+  }
+
+  const saveItem = async (event) => {
+    event.preventDefault()
+    setError('')
+    try {
+      const data = { ...draft, display_label: draft.display_label || draft.nome }
+      if (editing) await pb.collection('catalogo_itens').update(editing.id, data)
+      else await pb.collection('catalogo_itens').create(data)
+      const result = await pb.collection('catalogo_itens').getList(1, 200, { sort: '-created' })
+      setItems(result.items)
+      setEditing(null)
+      setDraft({
+        codigo: '',
+        nome: '',
+        display_label: '',
+        categoria: 'papel',
+        source_document: '',
+        source_version: '',
+        source_locator: '',
+        review_status: 'rascunho',
+      })
+    } catch (err) {
+      setError(err.message || 'Não foi possível salvar o item.')
+    }
+  }
 
   const counts = useMemo(
     () =>
@@ -87,7 +153,6 @@ const Catalogo = () => {
           </Button>
         </div>
       </header>
-
       <main className="container mx-auto py-8 px-4 space-y-6">
         <Card>
           <CardHeader>
@@ -98,6 +163,92 @@ const Catalogo = () => {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
+            {canManage && (
+              <form
+                onSubmit={saveItem}
+                className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3"
+              >
+                <h2 className="font-semibold text-[#3D2314]">
+                  {editing ? 'Editar item' : 'Novo item'}
+                </h2>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="catalogo-codigo">Código</Label>
+                    <Input
+                      id="catalogo-codigo"
+                      value={draft.codigo}
+                      onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-nome">Nome</Label>
+                    <Input
+                      id="catalogo-nome"
+                      required
+                      value={draft.nome}
+                      onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-label">Label de exibição</Label>
+                    <Input
+                      id="catalogo-label"
+                      value={draft.display_label}
+                      onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-categoria">Categoria</Label>
+                    <select
+                      id="catalogo-categoria"
+                      value={draft.categoria}
+                      onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="papel">Papel</option>
+                      <option value="fita">Fita</option>
+                      <option value="sabor">Sabor</option>
+                      <option value="caixinha">Caixinha</option>
+                      <option value="outro">Outro</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-fonte">Documento fonte</Label>
+                    <Input
+                      id="catalogo-fonte"
+                      value={draft.source_document}
+                      onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-versao">Versão da fonte</Label>
+                    <Input
+                      id="catalogo-versao"
+                      value={draft.source_version}
+                      onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label htmlFor="catalogo-localizador">Localizador</Label>
+                    <Input
+                      id="catalogo-localizador"
+                      value={draft.source_locator}
+                      onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" className="bg-[#C69D5F] text-white">
+                    Salvar item
+                  </Button>
+                  {editing && (
+                    <Button type="button" variant="outline" onClick={openNew}>
+                      Cancelar edição
+                    </Button>
+                  )}
+                </div>
+              </form>
+            )}
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -153,6 +304,16 @@ const Catalogo = () => {
                     <p>Localizador: {item.source_locator || 'Não informado'}</p>
                   </div>
                 </div>
+                {canManage && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => openEdit(item)}
+                  >
+                    Editar item
+                  </Button>
+                )}
                 {item.review_status === 'rascunho' && (
                   <p className="mt-4 text-sm text-[#7A2E2E]">
                     Este item não pode ser tratado como opção aprovada sem código, fonte e versão.
@@ -162,7 +323,7 @@ const Catalogo = () => {
             </Card>
           ))}
         </div>
-      </main>
+      </main>{' '}
     </div>
   )
 }

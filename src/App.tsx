@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import NovoCliente from './pages/NovoCliente'
 import NovaOportunidade from './pages/NovaOportunidade'
 import Catalogo from './pages/Catalogo'
+import Historico from './pages/Historico'
 import Layout from './components/Layout'
 import pb from '@/lib/pocketbase/client'
 
@@ -49,6 +50,14 @@ const App = () => (
           element={
             <ProtectedRoute>
               <Catalogo />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/historico"
+          element={
+            <ProtectedRoute>
+              <Historico />
             </ProtectedRoute>
           }
         />

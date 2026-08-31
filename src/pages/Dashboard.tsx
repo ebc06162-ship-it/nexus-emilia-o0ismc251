@@ -132,6 +132,15 @@ const Dashboard = () => {
             >
               Ver catálogo
             </Button>
+            {['administrador', 'gestao'].includes(user?.papel) && (
+              <Button
+                variant="outline"
+                className="border-[#C69D5F] text-[#3D2314]"
+                onClick={() => navigate('/historico')}
+              >
+                Ver histórico
+              </Button>
+            )}
           </CardContent>
         </Card>
       </main>

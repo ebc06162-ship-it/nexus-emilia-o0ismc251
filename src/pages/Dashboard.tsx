@@ -13,6 +13,8 @@ const Dashboard = () => {
     oportunidades: 0,
     pendencias: 0,
   })
+  const [clientesRecentes, setClientesRecentes] = useState([])
+  const [oportunidadesRecentes, setOportunidadesRecentes] = useState([])
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -30,7 +32,13 @@ const Dashboard = () => {
       const clientes = await pb.collection('clientes').getList(1, 1)
       const oportunidades = await pb.collection('oportunidades').getList(1, 1)
       const pendencias = await pb.collection('pendencias').getList(1, 1)
+      const clientesLista = await pb.collection('clientes').getList(1, 10, { sort: '-created' })
+      const oportunidadesLista = await pb
+        .collection('oportunidades')
+        .getList(1, 10, { sort: '-created', expand: 'cliente_id' })
 
+      setClientesRecentes(clientesLista.items)
+      setOportunidadesRecentes(oportunidadesLista.items)
       setStats({
         clientes: clientes.totalItems,
         oportunidades: oportunidades.totalItems,
@@ -143,6 +151,55 @@ const Dashboard = () => {
             )}
           </CardContent>
         </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Clientes recentes</CardTitle>
+              <CardDescription>Consulta dos cadastros mais recentes</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {clientesRecentes.length === 0 && (
+                <p className="text-sm text-gray-600">Nenhum cliente cadastrado.</p>
+              )}
+              {clientesRecentes.map((cliente) => (
+                <div key={cliente.id} className="border-b pb-2 last:border-0">
+                  <p className="font-medium text-[#3D2314]">{cliente.nome}</p>
+                  <p className="text-sm text-gray-600">
+                    {cliente.telefone_principal || 'Telefone não informado'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {cliente.classificacao_comercial || 'Classificação não informada'}
+                  </p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Oportunidades recentes</CardTitle>
+              <CardDescription>Consulta dos pedidos-base mais recentes</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {oportunidadesRecentes.length === 0 && (
+                <p className="text-sm text-gray-600">Nenhuma oportunidade cadastrada.</p>
+              )}
+              {oportunidadesRecentes.map((oportunidade) => (
+                <div key={oportunidade.id} className="border-b pb-2 last:border-0">
+                  <p className="font-medium text-[#3D2314]">
+                    {oportunidade.expand?.cliente_id?.nome || 'Cliente não identificado'}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {oportunidade.tipo_evento || oportunidade.tipo_pedido || 'Tipo não informado'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Status: {oportunidade.status || 'Não informado'}
+                  </p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </main>
 
       <Toaster />

@@ -55,6 +55,14 @@ const NovaOportunidade = () => {
   const [verificandoDuplicata, setVerificandoDuplicata] = useState(false)
   const [segmentoDerivado, setSegmentoDerivado] = useState('')
   const [rollbackRef, setRollbackRef] = useState('')
+  const [pendingField, setPendingField] = useState('')
+  const [pendingReason, setPendingReason] = useState('')
+  const [pendingOwner, setPendingOwner] = useState('')
+  const [pendingDue, setPendingDue] = useState('')
+  const [pendingAction, setPendingAction] = useState('')
+  const [conflictField, setConflictField] = useState('')
+  const [conflictOld, setConflictOld] = useState('')
+  const [conflictNew, setConflictNew] = useState('')
   const [showNovoCliente, setShowNovoCliente] = useState(false)
   const [novoCliente, setNovoCliente] = useState({
     nome: '',
@@ -178,7 +186,49 @@ const NovaOportunidade = () => {
       setCriandoCliente(false)
     }
   }
-  const registrarDecisao = async (oportunidadeId, descricao, decisao) => {
+  const registrarPendencia = async () => {
+    if (!pendingField.trim() || !pendingReason.trim() || !pendingOwner || !pendingDue || !pendingAction.trim()) {
+      toast({ title: 'Preencha campo, motivo, responsável, próxima ação e prazo', variant: 'destructive' })
+      return
+    }
+    if (!formData.cliente_id || !formData.tipo_pedido) {
+      toast({ title: 'Selecione cliente e tipo antes de registrar a pendência', variant: 'destructive' })
+      return
+    }
+    setLoading(true)
+    try {
+      const oportunidade = await pb.collection('oportunidades').create({ ...formData, responsavel_atual: pb.authStore.record.id, status: 'aguardando_dados' })
+      await pb.collection('pendencias').create({ oportunidade_id: oportunidade.id, campo: pendingField.trim(), valor_atual: '', origem: 'atendimento', motivo: pendingReason.trim(), responsavel: pendingOwner, proxima_acao: pendingAction.trim(), prazo: pendingDue, pending_type: 'campo_ausente', status: 'aberta' })
+      await pb.collection('historico_eventos').create({ oportunidade_id: oportunidade.id, descricao: `Pendência registrada para ${pendingField.trim()}: ${pendingReason.trim()}`, tipo_evento: 'atualizacao', autor: pb.authStore.record.id, campo: pendingField.trim(), origem: 'atendimento', valor_novo: '' })
+      toast({ title: 'Pedido salvo com pendência' })
+      navigate('/')
+    } catch (error) {
+      toast({ title: 'Não foi possível registrar a pendência', description: error?.message || 'Tente novamente', variant: 'destructive' })
+    } finally { setLoading(false) }
+  }
+
+  const registrarConflito = async () => {
+    if (!conflictField.trim() || !conflictOld.trim() || !conflictNew.trim()) {
+      toast({ title: 'Informe campo e os dois valores conflitantes', variant: 'destructive' })
+      return
+    }
+    if (!formData.cliente_id || !formData.tipo_pedido) {
+      toast({ title: 'Selecione cliente e tipo antes de registrar o conflito', variant: 'destructive' })
+      return
+    }
+    setLoading(true)
+    try {
+      const oportunidade = await pb.collection('oportunidades').create({ ...formData, responsavel_atual: pb.authStore.record.id, status: 'aguardando_dados' })
+      await pb.collection('pendencias').create({ oportunidade_id: oportunidade.id, campo: conflictField.trim(), valor_atual: conflictNew.trim(), origem: 'atendimento', motivo: 'Dois valores diferentes precisam de confirmação humana', responsavel: pb.authStore.record.id, proxima_acao: 'Confirmar qual valor é correto com a cliente', prazo: pendingDue || new Date().toISOString().slice(0, 10), pending_type: 'identity_conflict', status: 'aberta' })
+      await pb.collection('historico_eventos').create({ oportunidade_id: oportunidade.id, descricao: `Conflito em ${conflictField.trim()}; confirmação humana necessária`, tipo_evento: 'erro', autor: pb.authStore.record.id, campo: conflictField.trim(), origem: 'atendimento', valor_anterior: conflictOld.trim(), valor_novo: conflictNew.trim() })
+      toast({ title: 'Conflito registrado sem apagar nenhum valor' })
+      navigate('/')
+    } catch (error) {
+      toast({ title: 'Não foi possível registrar o conflito', description: error?.message || 'Tente novamente', variant: 'destructive' })
+    } finally { setLoading(false) }
+  }
+
+  const registrarDecisao = async (oportunidadeId, descricao, decisao) =>
     try {
       await pb.collection('historico_eventos').create({
         oportunidade_id: oportunidadeId,
@@ -544,6 +594,29 @@ const NovaOportunidade = () => {
                   onChange={(e) => handleChange('observacoes', e.target.value)}
                 />
               </div>
+              <div className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3">
+                <p className="font-medium">Registrar informação faltante</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Input placeholder="Campo faltante" value={pendingField} onChange={(e) => setPendingField(e.target.value)} />
+                  <Input placeholder="Motivo" value={pendingReason} onChange={(e) => setPendingReason(e.target.value)} />
+                  <Input placeholder="ID do responsável" value={pendingOwner} onChange={(e) => setPendingOwner(e.target.value)} />
+                  <Input type="date" value={pendingDue} onChange={(e) => setPendingDue(e.target.value)} />
+                  <Input placeholder="Próxima ação" value={pendingAction} onChange={(e) => setPendingAction(e.target.value)} />
+                </div>
+                <Button type="button" variant="outline" onClick={registrarPendencia} disabled={loading}>Salvar como pendência</Button>
+              </div>
+
+              <div className="rounded-md border border-[#7A2E2E] bg-[#FAF1F1] p-4 space-y-3">
+                <p className="font-medium text-[#7A2E2E]">Registrar valor contraditório</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Input placeholder="Campo" value={conflictField} onChange={(e) => setConflictField(e.target.value)} />
+                  <Input placeholder="Valor informado antes" value={conflictOld} onChange={(e) => setConflictOld(e.target.value)} />
+                  <Input placeholder="Novo valor informado" value={conflictNew} onChange={(e) => setConflictNew(e.target.value)} />
+                </div>
+                <p className="text-xs text-muted-foreground">Os dois valores ficam preservados e o pedido permanece aguardando confirmação humana.</p>
+                <Button type="button" variant="outline" onClick={registrarConflito} disabled={loading}>Salvar conflito</Button>
+              </div>
+
               <div className="flex gap-4">
                 <Button type="submit" disabled={loading}>
                   {loading || verificandoDuplicata ? 'Verificando...' : 'Salvar Oportunidade'}

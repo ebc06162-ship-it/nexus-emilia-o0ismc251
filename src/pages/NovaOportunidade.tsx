@@ -405,7 +405,7 @@ const NovaOportunidade = () => {
       ...prev,
       tipo_evento: tipo,
       tipo_pedido: tipo,
-      segmento: '',
+      segmento,
       segmento_classificado: segmento,
       subtipo_evento: '',
       justificativa_outros: '',
@@ -549,7 +549,6 @@ const NovaOportunidade = () => {
                         ['batizado', 'Batizado'],
                         ['aniversario', 'Aniversário'],
                         ['corporativo', 'Corporativo'],
-                        ['maternidade', 'Maternidade'],
                         ['bodas', 'Bodas'],
                         ['formatura', 'Formatura'],
                         ['cha_bebe', 'Chá de bebê'],
@@ -583,11 +582,7 @@ const NovaOportunidade = () => {
                   </Button>
                 </div>
               )}
-              {segmentoDerivado && (
-                <p className="text-sm text-muted-foreground">
-                  Segmento classificado: {segmentoDerivado.replace('_', ' ')}
-                </p>
-              )}
+
               {formData.tipo_evento === 'casamento' && (
                 <div>
                   <Label>Nome dos noivos</Label>

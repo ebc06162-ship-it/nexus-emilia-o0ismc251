@@ -1,0 +1,63 @@
+{
+  "contract": "entrada-evento-v1",
+  "payload_version": "1.0",
+  "test_mode": true,
+  "fixtures": [
+    {
+      "id": "FIX-1-401",
+      "description": "válida, novo event_id",
+      "expected_result": "processed",
+      "event": {
+        "event_id": "fixture-401",
+        "event_type": "customer.created",
+        "payload_version": "1.0",
+        "source_system": "fixture",
+        "external_record_id": "ext-customer-401",
+        "occurred_at": "2026-09-01T12:00:00Z",
+        "received_at": "2026-09-01T12:00:01Z",
+        "data": {
+          "nome": "Cliente Fixture 401",
+          "telefone": "5511990000401",
+          "source_ref": "fixture:customer:401"
+        },
+        "trace_id": "trace-fixture-401",
+        "test_mode": true
+      }
+    },
+    {
+      "id": "FIX-1-402",
+      "description": "mesmo event_id e mesmo conteúdo",
+      "expected_result": "duplicate",
+      "event_id_reference": "fixture-401"
+    },
+    {
+      "id": "FIX-1-403",
+      "description": "mesmo event_id com conteúdo divergente",
+      "expected_result": "integration_conflict",
+      "event_id_reference": "fixture-401",
+      "change": { "data.nome": "Cliente Fixture 401 alterado" }
+    },
+    {
+      "id": "FIX-1-404",
+      "description": "campo obrigatório ausente",
+      "expected_result": "rejected",
+      "event": {
+        "event_id": "fixture-404",
+        "event_type": "customer.created",
+        "payload_version": "1.0",
+        "source_system": "fixture",
+        "external_record_id": "ext-customer-404",
+        "data": { "telefone": "5511990000404" },
+        "trace_id": "trace-fixture-404",
+        "test_mode": true
+      }
+    },
+    {
+      "id": "FIX-1-405",
+      "description": "destino indisponível simulado",
+      "expected_result": "manual_reconciliation",
+      "event_id": "fixture-405",
+      "source_ref": "fixture:customer:405"
+    }
+  ]
+}

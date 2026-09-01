@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nexus-emilia.invalid/contracts/entrada-evento-v1.json",
+  "title": "Entrada de evento Nexus Emília",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "payload_version",
+    "source_system",
+    "external_record_id",
+    "occurred_at",
+    "data",
+    "trace_id"
+  ],
+  "properties": {
+    "event_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "event_type": {
+      "type": "string",
+      "enum": ["customer.created", "opportunity.created", "opportunity.updated"]
+    },
+    "payload_version": { "type": "string", "const": "1.0" },
+    "source_system": { "type": "string", "enum": ["fixture", "digisac", "gestaoclick"] },
+    "external_record_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "received_at": { "type": "string", "format": "date-time" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nome", "source_ref"],
+      "properties": {
+        "nome": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "telefone": { "type": "string", "maxLength": 40 },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "tipo_evento": { "type": "string", "maxLength": 100 },
+        "source_ref": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "trace_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "test_mode": { "type": "boolean" }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-01T20:02:12.017Z",
+  "generatedAt": "2026-09-01T20:03:06.555Z",
   "collections": [
     {
       "name": "users",
@@ -2049,8 +2049,8 @@
       "apiRules": {
         "list": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
         "view": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"atendimento\" || @request.auth.papel = \"financeiro\" || @request.auth.papel = \"producao\")",
-        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
-        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && (@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\")",
+        "create": "@request.auth.id != \"\" && @request.auth.papel != \"\" && @request.auth.papel = \"administrador\"",
+        "update": "@request.auth.id != \"\" && @request.auth.papel != \"\" && @request.auth.papel = \"administrador\"",
         "delete": null
       },
       "fields": [

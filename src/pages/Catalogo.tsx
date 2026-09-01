@@ -92,7 +92,7 @@ export default function Catalogo() {
       setEditing(null)
       setDraft(emptyDraft)
     } catch (err) {
-      if (err?.status === 403 && pb.authStore.isValid && !canManage) {
+      if ((err?.status === 403 || err?.status === 400) && pb.authStore.isValid && !canManage) {
         try {
           await pb.send('/backend/v1/auditoria/negacao', {
             method: 'POST',

@@ -12,6 +12,21 @@ const roleLabels = {
   producao: 'Produção',
   cliente_externo: 'Cliente/externo',
 }
+const actionLabel = {
+  criacao: 'Criação',
+  edicao: 'Edição',
+  revogacao: 'Revogação',
+  acesso: 'Acesso',
+  exclusao: 'Exclusão',
+}
+const objectLabel = {
+  clientes: 'Cliente',
+  oportunidades: 'Oportunidade/pedido',
+  catalogo_itens: 'Item de catálogo',
+  users: 'Usuário',
+  historico_eventos: 'Histórico',
+  auditoria: 'Auditoria',
+}
 
 export default function Historico() {
   const navigate = useNavigate()
@@ -25,7 +40,8 @@ export default function Historico() {
       .then((result) => setItems(result.items))
       .catch((err) => setError(err.message || 'Não foi possível carregar a auditoria.'))
   }, [canRead])
-  if (!canRead)
+
+  if (!canRead) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] p-8">
         <Card>
@@ -40,21 +56,10 @@ export default function Historico() {
         </Card>
       </div>
     )
-  const actionLabel = {
-    criacao: 'Criação',
-    edicao: 'Edição',
-    revogacao: 'Revogação',
-    acesso: 'Acesso',
-    exclusao: 'Exclusão',
   }
-  const objectLabel = {
-    clientes: 'Cliente',
-    oportunidades: 'Oportunidade/pedido',
-    catalogo_itens: 'Item de catálogo',
-    users: 'Usuário',
-    historico_eventos: 'Histórico',
-    auditoria: 'Auditoria',
-  }
+
+  const resultLabel = (r) => (r === 'permitido' ? 'Permitida' : r === 'negado' ? 'Negada' : 'Falha')
+
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <header className="bg-[#3D2314] text-white p-4">
@@ -95,18 +100,13 @@ export default function Historico() {
               <div className="flex flex-col gap-1 md:flex-row md:justify-between">
                 <div>
                   <p className="font-semibold text-[#3D2314]">
-                    {actionLabel[item.acao] || item.acao} ·{' '}
-                    {item.resultado === 'permitido'
-                      ? 'Permitida'
-                      : item.resultado === 'negado'
-                        ? 'Negada'
-                        : 'Falha'}
-                  </p>
-                  <p className="text-sm">
                     {item.descricao ||
-                      (objectLabel[item.objeto_tipo] || item.objeto_tipo) +
-                        ' · ' +
-                        (item.objeto_id || '')}
+                      `${actionLabel[item.acao] || item.acao} · ${objectLabel[item.objeto_tipo] || item.objeto_tipo}`}{' '}
+                    · {resultLabel(item.resultado)}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    {item.objeto_tipo}
+                    {item.objeto_id ? ` · ${item.objeto_id}` : ''}
                   </p>
                   <p className="text-xs text-gray-600">
                     Motivo: {item.motivo || 'não informado'} · Origem:{' '}

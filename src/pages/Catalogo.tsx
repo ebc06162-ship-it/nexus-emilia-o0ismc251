@@ -156,90 +156,92 @@ export default function Catalogo() {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <form
-              onSubmit={saveItem}
-              className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3"
-            >
-              <h2 className="font-semibold text-[#3D2314]">
-                {editing ? 'Editar item' : 'Novo item'}
-              </h2>
-              <div className="grid gap-3 md:grid-cols-2">
-                <div>
-                  <Label htmlFor="catalogo-codigo">Código</Label>
-                  <Input
-                    id="catalogo-codigo"
-                    value={draft.codigo}
-                    onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
-                  />
+            {canManage && (
+              <form
+                onSubmit={saveItem}
+                className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3"
+              >
+                <h2 className="font-semibold text-[#3D2314]">
+                  {editing ? 'Editar item' : 'Novo item'}
+                </h2>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="catalogo-codigo">Código</Label>
+                    <Input
+                      id="catalogo-codigo"
+                      value={draft.codigo}
+                      onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-nome">Nome</Label>
+                    <Input
+                      id="catalogo-nome"
+                      required
+                      value={draft.nome}
+                      onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-label">Label de exibição</Label>
+                    <Input
+                      id="catalogo-label"
+                      value={draft.display_label}
+                      onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-categoria">Categoria</Label>
+                    <select
+                      id="catalogo-categoria"
+                      value={draft.categoria}
+                      onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="papel">Papel</option>
+                      <option value="fita">Fita</option>
+                      <option value="sabor">Sabor</option>
+                      <option value="caixinha">Caixinha</option>
+                      <option value="outro">Outro</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-fonte">Documento fonte</Label>
+                    <Input
+                      id="catalogo-fonte"
+                      value={draft.source_document}
+                      onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="catalogo-versao">Versão da fonte</Label>
+                    <Input
+                      id="catalogo-versao"
+                      value={draft.source_version}
+                      onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label htmlFor="catalogo-localizador">Localizador</Label>
+                    <Input
+                      id="catalogo-localizador"
+                      value={draft.source_locator}
+                      onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="catalogo-nome">Nome</Label>
-                  <Input
-                    id="catalogo-nome"
-                    required
-                    value={draft.nome}
-                    onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="catalogo-label">Label de exibição</Label>
-                  <Input
-                    id="catalogo-label"
-                    value={draft.display_label}
-                    onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="catalogo-categoria">Categoria</Label>
-                  <select
-                    id="catalogo-categoria"
-                    value={draft.categoria}
-                    onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="papel">Papel</option>
-                    <option value="fita">Fita</option>
-                    <option value="sabor">Sabor</option>
-                    <option value="caixinha">Caixinha</option>
-                    <option value="outro">Outro</option>
-                  </select>
-                </div>
-                <div>
-                  <Label htmlFor="catalogo-fonte">Documento fonte</Label>
-                  <Input
-                    id="catalogo-fonte"
-                    value={draft.source_document}
-                    onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="catalogo-versao">Versão da fonte</Label>
-                  <Input
-                    id="catalogo-versao"
-                    value={draft.source_version}
-                    onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <Label htmlFor="catalogo-localizador">Localizador</Label>
-                  <Input
-                    id="catalogo-localizador"
-                    value={draft.source_locator}
-                    onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" className="bg-[#C69D5F] text-white">
-                  {canManage ? 'Salvar item' : 'Salvar item (sem permissão)'}
-                </Button>
-                {editing && (
-                  <Button type="button" variant="outline" onClick={openNew}>
-                    Cancelar edição
+                <div className="flex gap-2">
+                  <Button type="submit" className="bg-[#C69D5F] text-white">
+                    Salvar item
                   </Button>
-                )}
-              </div>
-            </form>
+                  {editing && (
+                    <Button type="button" variant="outline" onClick={openNew}>
+                      Cancelar edição
+                    </Button>
+                  )}
+                </div>
+              </form>
+            )}
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -293,14 +295,16 @@ export default function Catalogo() {
                     <p>Localizador: {item.source_locator || 'Não informado'}</p>
                   </div>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Button type="button" variant="outline" onClick={() => openEdit(item)}>
-                    Editar item
-                  </Button>
-                </div>
+                {canManage && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" onClick={() => openEdit(item)}>
+                      Editar item
+                    </Button>
+                  </div>
+                )}
                 {item.review_status === 'rascunho' && (
                   <p className="mt-4 text-sm text-[#7A2E2E]">
-                    Este item não pode ser tratado como opção aprovada sem código, fonte e versão.
+                    Este item não pode ser tratado como opção aprovada sem códig, fonte e versão.
                   </p>
                 )}
               </CardContent>

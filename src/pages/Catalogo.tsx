@@ -13,7 +13,6 @@ const statusLabel = {
   conflito: 'Conflito',
   inativo: 'Inativo',
 }
-
 const categoryLabel = {
   produto: 'Produto',
   sabor: 'Sabor',
@@ -30,64 +29,44 @@ const categoryLabel = {
   outro: 'Outro',
 }
 
-const Catalogo = () => {
+const emptyDraft = {
+  codigo: '',
+  nome: '',
+  display_label: '',
+  categoria: 'papel',
+  source_document: '',
+  source_version: '',
+  source_locator: '',
+  review_status: 'rascunho',
+}
+
+export default function Catalogo() {
   const navigate = useNavigate()
   const [items, setItems] = useState([])
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editing, setEditing] = useState(null)
-  const [draft, setDraft] = useState({
-    codigo: '',
-    nome: '',
-    display_label: '',
-    categoria: 'papel',
-    source_document: '',
-    source_version: '',
-    source_locator: '',
-    review_status: 'rascunho',
-  })
+  const [draft, setDraft] = useState(emptyDraft)
   const canManage = ['administrador', 'gestao'].includes(pb.authStore.record?.papel)
 
+  const load = async () => {
+    const result = await pb.collection('catalogo_itens').getList(1, 200, { sort: '-created' })
+    setItems(result.items)
+  }
   useEffect(() => {
-    const load = async () => {
-      try {
-        const result = await pb.collection('catalogo_itens').getList(1, 200, { sort: '-created' })
-        setItems(result.items)
-      } catch (err) {
-        setError(err.message || 'Não foi possível carregar o catálogo.')
-      } finally {
-        setLoading(false)
-      }
-    }
     load()
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false)
+        setError(err.message || 'Não foi possível carregar o catálogo.')
+      })
   }, [])
-
-  const filtered = useMemo(() => {
-    const normalized = query.trim().toLowerCase()
-    if (!normalized) return items
-    return items.filter((item) =>
-      [item.codigo, item.nome, item.display_label, item.categoria, item.tipo, item.cor]
-        .join(' ')
-        .toLowerCase()
-        .includes(normalized),
-    )
-  }, [items, query])
 
   const openNew = () => {
     setEditing(null)
-    setDraft({
-      codigo: '',
-      nome: '',
-      display_label: '',
-      categoria: 'papel',
-      source_document: '',
-      source_version: '',
-      source_locator: '',
-      review_status: 'rascunho',
-    })
+    setDraft(emptyDraft)
   }
-
   const openEdit = (item) => {
     setEditing(item)
     setDraft({
@@ -109,27 +88,17 @@ const Catalogo = () => {
       const data = { ...draft, display_label: draft.display_label || draft.nome }
       if (editing) await pb.collection('catalogo_itens').update(editing.id, data)
       else await pb.collection('catalogo_itens').create(data)
-      const result = await pb.collection('catalogo_itens').getList(1, 200, { sort: '-created' })
-      setItems(result.items)
+      await load()
       setEditing(null)
-      setDraft({
-        codigo: '',
-        nome: '',
-        display_label: '',
-        categoria: 'papel',
-        source_document: '',
-        source_version: '',
-        source_locator: '',
-        review_status: 'rascunho',
-      })
+      setDraft(emptyDraft)
     } catch (err) {
-      if (err?.status === 403 && pb.authStore.isValid) {
+      if (err?.status === 403 && pb.authStore.isValid && !canManage) {
         try {
           await pb.send('/backend/v1/auditoria/negacao', {
             method: 'POST',
             body: {
               objeto_tipo: 'catalogo_itens',
-              acao: editing ? 'edicao' : 'criacao',
+              acao: editing ? 'edição' : 'criação',
               origem: 'catalogo',
             },
           })
@@ -141,6 +110,16 @@ const Catalogo = () => {
     }
   }
 
+  const filtered = useMemo(() => {
+    const normalized = query.trim().toLowerCase()
+    if (!normalized) return items
+    return items.filter((item) =>
+      [item.codigo, item.nome, item.display_label, item.categoria, item.tipo, item.cor]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalized),
+    )
+  }, [items, query])
   const counts = useMemo(
     () =>
       items.reduce(
@@ -177,92 +156,90 @@ const Catalogo = () => {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {canManage && (
-              <form
-                onSubmit={saveItem}
-                className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3"
-              >
-                <h2 className="font-semibold text-[#3D2314]">
-                  {editing ? 'Editar item' : 'Novo item'}
-                </h2>
-                <div className="grid gap-3 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="catalogo-codigo">Código</Label>
-                    <Input
-                      id="catalogo-codigo"
-                      value={draft.codigo}
-                      onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="catalogo-nome">Nome</Label>
-                    <Input
-                      id="catalogo-nome"
-                      required
-                      value={draft.nome}
-                      onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="catalogo-label">Label de exibição</Label>
-                    <Input
-                      id="catalogo-label"
-                      value={draft.display_label}
-                      onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="catalogo-categoria">Categoria</Label>
-                    <select
-                      id="catalogo-categoria"
-                      value={draft.categoria}
-                      onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    >
-                      <option value="papel">Papel</option>
-                      <option value="fita">Fita</option>
-                      <option value="sabor">Sabor</option>
-                      <option value="caixinha">Caixinha</option>
-                      <option value="outro">Outro</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="catalogo-fonte">Documento fonte</Label>
-                    <Input
-                      id="catalogo-fonte"
-                      value={draft.source_document}
-                      onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="catalogo-versao">Versão da fonte</Label>
-                    <Input
-                      id="catalogo-versao"
-                      value={draft.source_version}
-                      onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Label htmlFor="catalogo-localizador">Localizador</Label>
-                    <Input
-                      id="catalogo-localizador"
-                      value={draft.source_locator}
-                      onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
-                    />
-                  </div>
+            <form
+              onSubmit={saveItem}
+              className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3"
+            >
+              <h2 className="font-semibold text-[#3D2314]">
+                {editing ? 'Editar item' : 'Novo item'}
+              </h2>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
+                  <Label htmlFor="catalogo-codigo">Código</Label>
+                  <Input
+                    id="catalogo-codigo"
+                    value={draft.codigo}
+                    onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
+                  />
                 </div>
-                <div className="flex gap-2">
-                  <Button type="submit" className="bg-[#C69D5F] text-white">
-                    Salvar item
+                <div>
+                  <Label htmlFor="catalogo-nome">Nome</Label>
+                  <Input
+                    id="catalogo-nome"
+                    required
+                    value={draft.nome}
+                    onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="catalogo-label">Label de exibição</Label>
+                  <Input
+                    id="catalogo-label"
+                    value={draft.display_label}
+                    onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="catalogo-categoria">Categoria</Label>
+                  <select
+                    id="catalogo-categoria"
+                    value={draft.categoria}
+                    onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="papel">Papel</option>
+                    <option value="fita">Fita</option>
+                    <option value="sabor">Sabor</option>
+                    <option value="caixinha">Caixinha</option>
+                    <option value="outro">Outro</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="catalogo-fonte">Documento fonte</Label>
+                  <Input
+                    id="catalogo-fonte"
+                    value={draft.source_document}
+                    onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="catalogo-versao">Versão da fonte</Label>
+                  <Input
+                    id="catalogo-versao"
+                    value={draft.source_version}
+                    onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="catalogo-localizador">Localizador</Label>
+                  <Input
+                    id="catalogo-localizador"
+                    value={draft.source_locator}
+                    onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" className="bg-[#C69D5F] text-white">
+                  {canManage ? 'Salvar item' : 'Salvar item (sem permissão)'}
+                </Button>
+                {editing && (
+                  <Button type="button" variant="outline" onClick={openNew}>
+                    Cancelar edição
                   </Button>
-                  {editing && (
-                    <Button type="button" variant="outline" onClick={openNew}>
-                      Cancelar edição
-                    </Button>
-                  )}
-                </div>
-              </form>
-            )}
+                )}
+              </div>
+            </form>
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -277,17 +254,15 @@ const Catalogo = () => {
             </div>
           </CardContent>
         </Card>
-
         {loading && <p className="text-gray-600">Carregando catálogo...</p>}
         {error && (
-          <p className="text-[#7A2E2E]" role="alert">
+          <p role="alert" className="text-[#7A2E2E]">
             {error}
           </p>
         )}
         {!loading && !error && filtered.length === 0 && (
           <p className="text-gray-600">Nenhum item encontrado.</p>
         )}
-
         <div className="grid gap-4">
           {filtered.map((item) => (
             <Card key={item.id}>
@@ -318,16 +293,11 @@ const Catalogo = () => {
                     <p>Localizador: {item.source_locator || 'Não informado'}</p>
                   </div>
                 </div>
-                {canManage && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="mt-4"
-                    onClick={() => openEdit(item)}
-                  >
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" onClick={() => openEdit(item)}>
                     Editar item
                   </Button>
-                )}
+                </div>
                 {item.review_status === 'rascunho' && (
                   <p className="mt-4 text-sm text-[#7A2E2E]">
                     Este item não pode ser tratado como opção aprovada sem código, fonte e versão.
@@ -337,9 +307,7 @@ const Catalogo = () => {
             </Card>
           ))}
         </div>
-      </main>{' '}
+      </main>
     </div>
   )
 }
-
-export default Catalogo

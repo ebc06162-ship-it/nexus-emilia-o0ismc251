@@ -40,6 +40,21 @@ export default function Historico() {
         </Card>
       </div>
     )
+  const actionLabel = {
+    criacao: 'Criação',
+    edicao: 'Edição',
+    revogacao: 'Revogação',
+    acesso: 'Acesso',
+    exclusao: 'Exclusão',
+  }
+  const objectLabel = {
+    clientes: 'Cliente',
+    oportunidades: 'Oportunidade/pedido',
+    catalogo_itens: 'Item de catálogo',
+    users: 'Usuário',
+    historico_eventos: 'Histórico',
+    auditoria: 'Auditoria',
+  }
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <header className="bg-[#3D2314] text-white p-4">
@@ -80,11 +95,18 @@ export default function Historico() {
               <div className="flex flex-col gap-1 md:flex-row md:justify-between">
                 <div>
                   <p className="font-semibold text-[#3D2314]">
-                    {item.acao} · {item.resultado}
+                    {actionLabel[item.acao] || item.acao} ·{' '}
+                    {item.resultado === 'permitido'
+                      ? 'Permitida'
+                      : item.resultado === 'negado'
+                        ? 'Negada'
+                        : 'Falha'}
                   </p>
                   <p className="text-sm">
-                    {item.objeto_tipo}
-                    {item.objeto_id ? ` · ${item.objeto_id}` : ''}
+                    {item.descricao ||
+                      (objectLabel[item.objeto_tipo] || item.objeto_tipo) +
+                        ' · ' +
+                        (item.objeto_id || '')}
                   </p>
                   <p className="text-xs text-gray-600">
                     Motivo: {item.motivo || 'não informado'} · Origem:{' '}

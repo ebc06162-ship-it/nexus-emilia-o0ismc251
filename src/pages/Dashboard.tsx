@@ -150,13 +150,22 @@ const Dashboard = () => {
                   Ver histórico
                 </Button>
                 {user?.papel === 'administrador' && (
-                  <Button
-                    variant="outline"
-                    className="border-[#C69D5F] text-[#3D2314]"
-                    onClick={() => navigate('/usuarios')}
-                  >
-                    Gerir usuários
-                  </Button>
+                  <>
+                    <Button
+                      variant="outline"
+                      className="border-[#C69D5F] text-[#3D2314]"
+                      onClick={() => navigate('/usuarios')}
+                    >
+                      Gerir usuários
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="border-[#C69D5F] text-[#3D2314]"
+                      onClick={() => navigate('/integracoes/homologacao')}
+                    >
+                      Harness de integração
+                    </Button>{' '}
+                  </>
                 )}
               </>
             )}

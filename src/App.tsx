@@ -9,6 +9,7 @@ import NovaOportunidade from './pages/NovaOportunidade'
 import Catalogo from './pages/Catalogo'
 import Historico from './pages/Historico'
 import Usuarios from './pages/Usuarios'
+import IntegrationHarness from './pages/IntegrationHarness'
 import Layout from './components/Layout'
 import pb from '@/lib/pocketbase/client'
 
@@ -85,6 +86,14 @@ const App = () => (
           element={
             <ProtectedRoute roles={['administrador']}>
               <Usuarios />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/integracoes/homologacao"
+          element={
+            <ProtectedRoute roles={['administrador']}>
+              <IntegrationHarness />
             </ProtectedRoute>
           }
         />

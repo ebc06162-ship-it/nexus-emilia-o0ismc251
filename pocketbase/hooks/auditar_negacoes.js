@@ -36,7 +36,7 @@ routerAdd(
 
 routerAdd(
   'POST',
-  '/backend/v1/integracao/harness',
+  '/backend/v1/integracao/harness-v2',
   (e) => {
     const auth = e.auth
     if (

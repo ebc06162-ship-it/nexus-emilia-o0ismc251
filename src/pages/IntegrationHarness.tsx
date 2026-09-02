@@ -18,7 +18,7 @@ export default function IntegrationHarness() {
   const run = async (id) => {
     setRunning(true)
     try {
-      const r = await pb.send('/backend/v1/integracao/harness', {
+      const r = await pb.send('/backend/v1/integracao/harness-v2', {
         method: 'POST',
         body: { fixture_id: id },
       })

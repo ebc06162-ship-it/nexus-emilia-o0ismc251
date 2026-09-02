@@ -34,8 +34,10 @@ export default function IntegrationHarness() {
     }
   }
 
+  // Upsert por event_id: reexecução não tenta recriar um registro que já existe.
   const saveEvent = async ({ event, status, errorCode = '', lastState = 'nenhum', nextAction }) => {
-    return pb.collection('integration_events').create({
+    const existing = await loadExisting(event.event_id)
+    const payload = {
       event_id: event.event_id,
       payload_hash: hashPayload(event),
       event_type: 'customer.created',
@@ -50,11 +52,20 @@ export default function IntegrationHarness() {
       next_action: nextAction,
       trace_id: `trace-${event.event_id}`,
       test_mode: true,
-    })
+    }
+    if (existing) return pb.collection('integration_events').update(existing.id, payload)
+    return pb.collection('integration_events').create(payload)
   }
 
   const saveFallback = async (event, errorCode, lastState, nextAction) => {
-    await pb.collection('integration_fallbacks').create({
+    const existing = await pb
+      .collection('integration_fallbacks')
+      .getFirstListItem(`event_id = "${event.event_id}"`)
+      .catch((err) => {
+        if (err.status === 404) return null
+        throw err
+      })
+    const payload = {
       event_id: event.event_id,
       source_ref: event.source_ref,
       error_code: errorCode,
@@ -62,7 +73,9 @@ export default function IntegrationHarness() {
       responsible: pb.authStore.record.id,
       next_action: nextAction,
       status: 'aberta',
-    })
+    }
+    if (existing) return pb.collection('integration_fallbacks').update(existing.id, payload)
+    return pb.collection('integration_fallbacks').create(payload)
   }
 
   const runFixture = async (fixtureId) => {
@@ -146,15 +159,22 @@ export default function IntegrationHarness() {
         ])
         return
       }
+      // Novo event_id: cria evento e vínculo canônico, reutilizando cliente por source_ref
       await saveEvent({
         event,
         status: 'processed',
         lastState: 'processado',
         nextAction: 'Nenhuma; evento processado em homologação',
       })
-      await pb
+      const existingCliente = await pb
         .collection('clientes')
-        .create({
+        .getFirstListItem(`source_ref = "${event.source_ref}"`)
+        .catch((err) => {
+          if (err.status === 404) return null
+          throw err
+        })
+      if (!existingCliente) {
+        await pb.collection('clientes').create({
           nome: event.name,
           telefone_principal: 'não informado',
           situacao: 'ativo',
@@ -164,6 +184,7 @@ export default function IntegrationHarness() {
           referencia_origem: 'fixture de homologação',
           source_ref: event.source_ref,
         })
+      }
       setResults((items) => [
         ...items.filter((item) => item.fixture_id !== fixtureId),
         { fixture_id: fixtureId, result: 'processed', wrote_canonical: true },

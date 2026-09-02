@@ -34,10 +34,12 @@ export default function IntegrationHarness() {
     }
   }
 
-  // Upsert por event_id: reexecução não tenta recriar um registro que já existe.
+  // Eventos de integração são append-only (updateRule null): reexecução não reescreve
+  // registro existente, apenas devolve o estado já confirmado.
   const saveEvent = async ({ event, status, errorCode = '', lastState = 'nenhum', nextAction }) => {
     const existing = await loadExisting(event.event_id)
-    const payload = {
+    if (existing) return existing
+    return pb.collection('integration_events').create({
       event_id: event.event_id,
       payload_hash: hashPayload(event),
       event_type: 'customer.created',
@@ -52,11 +54,11 @@ export default function IntegrationHarness() {
       next_action: nextAction,
       trace_id: `trace-${event.event_id}`,
       test_mode: true,
-    }
-    if (existing) return pb.collection('integration_events').update(existing.id, payload)
-    return pb.collection('integration_events').create(payload)
+    })
   }
 
+  // Fila de fallback é a "ocorrência" reconciliável: permite atualização para registrar
+  // reexecução e reprocessamento com o mesmo event_id.
   const saveFallback = async (event, errorCode, lastState, nextAction) => {
     const existing = await pb
       .collection('integration_fallbacks')

@@ -70,7 +70,7 @@ const Field = ({
   placeholder = '',
 }: FieldProps) => (
   <div className="space-y-1.5">
-    <Label htmlFor={id} className="text-xs md:text-sm font-medium text-[#5C4A32]">
+    <Label htmlFor={id} className="text-base font-semibold text-[#5C4A32]">
       {label}
     </Label>
     <Input
@@ -80,7 +80,7 @@ const Field = ({
       onChange={(e) => onChange(e.target.value)}
       required={required}
       placeholder={placeholder}
-      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm py-2 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5 py-2.5 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
     />
   </div>
 )
@@ -233,9 +233,9 @@ export default function NovoCliente() {
         <Button
           variant="outline"
           onClick={() => navigate('/')}
-          className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
+          className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm rounded-xl flex items-center gap-1.5"
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={16} />
           Voltar ao painel
         </Button>
 
@@ -244,17 +244,17 @@ export default function NovoCliente() {
             <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               Ficha do Cliente
             </CardTitle>
-            <p className="text-xs md:text-sm text-[#8A7A66]">
+            <p className="text-sm md:text-base text-[#8A7A66]">
               Preencha as informações básicas para iniciar o atendimento.
             </p>
           </CardHeader>
           <CardContent className="pt-5">
-            <form noValidate onSubmit={submit} className="space-y-4">
+            <form noValidate onSubmit={submit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="natureza-cadastral"
-                    className="text-xs font-medium text-[#5C4A32]"
+                    className="text-base font-semibold text-[#5C4A32]"
                   >
                     Natureza cadastral *
                   </Label>
@@ -262,7 +262,7 @@ export default function NovoCliente() {
                     id="natureza-cadastral"
                     value={natureza}
                     onChange={(e) => setNatureza(e.target.value)}
-                    className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+                    className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
                   >
                     <option value="pessoa_fisica">Pessoa Física</option>
                     <option value="pessoa_juridica">Pessoa Jurídica</option>
@@ -271,7 +271,7 @@ export default function NovoCliente() {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="classificacao-comercial"
-                    className="text-xs font-medium text-[#5C4A32]"
+                    className="text-base font-semibold text-[#5C4A32]"
                   >
                     Classificação comercial *
                   </Label>
@@ -279,7 +279,7 @@ export default function NovoCliente() {
                     id="classificacao-comercial"
                     value={classificacao}
                     onChange={(e) => setClassificacao(e.target.value)}
-                    className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+                    className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
                   >
                     {CLASSIFICATIONS.map(([v, l]) => (
                       <option key={v} value={v}>
@@ -299,7 +299,7 @@ export default function NovoCliente() {
               />
 
               <div className="space-y-1.5">
-                <Label htmlFor="telefone" className="text-xs font-medium text-[#5C4A32]">
+                <Label htmlFor="telefone" className="text-base font-semibold text-[#5C4A32]">
                   Telefone principal *
                 </Label>
                 <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
@@ -310,7 +310,7 @@ export default function NovoCliente() {
                       setTelefone(formatPhone(telefone, v))
                     }}
                   >
-                    <SelectTrigger className="w-32 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-xs">
+                    <SelectTrigger className="w-36 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-base h-11">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#FDFAF5] border-[#E8DEC8]">
@@ -321,7 +321,7 @@ export default function NovoCliente() {
                   <Input
                     id="telefone"
                     type="tel"
-                    className="min-w-0 w-full rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs py-2 text-[#5C4A32]"
+                    className="min-w-0 w-full rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5 py-2.5 text-[#5C4A32]"
                     value={telefone}
                     onChange={(e) => setTelefone(formatPhone(e.target.value, pais))}
                     required
@@ -331,31 +331,31 @@ export default function NovoCliente() {
                   />
                 </div>
                 {buscando && (
-                  <p className="text-[11px] text-[#8A7A66]">Consultando cadastro existente...</p>
+                  <p className="text-sm text-[#8A7A66]">Consultando cadastro existente...</p>
                 )}
               </div>
 
               {existente && (
-                <div className="rounded-xl border border-[#D6BC7E] bg-[#F4EEDA] p-3 text-xs text-[#5C4A32]">
-                  <p className="font-semibold flex items-center gap-1.5">
-                    <UserCheck size={14} className="text-[#B08A3E]" />
+                <div className="rounded-xl border border-[#D6BC7E] bg-[#F4EEDA] p-3.5 text-sm md:text-base text-[#5C4A32]">
+                  <p className="font-semibold flex items-center gap-1.5 text-base">
+                    <UserCheck size={16} className="text-[#B08A3E]" />
                     Telefone já cadastrado: {existente.nome}
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-2.5 flex flex-wrap gap-2">
                     <Button
                       type="button"
                       size="sm"
                       onClick={() => setUsandoExistente(true)}
-                      className="bg-[#5C4A32] text-white hover:bg-[#473926] text-xs rounded-lg"
+                      className="bg-[#5C4A32] text-white hover:bg-[#473926] text-sm rounded-lg px-3 py-1.5"
                     >
-                      <Check size={12} className="mr-1" /> Usar este cadastro
+                      <Check size={14} className="mr-1" /> Usar este cadastro
                     </Button>
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
                       onClick={() => setUsandoExistente(false)}
-                      className="border-[#D6BC7E] text-[#5C4A32] text-xs rounded-lg hover:bg-white"
+                      className="border-[#D6BC7E] text-[#5C4A32] text-sm rounded-lg hover:bg-white px-3 py-1.5"
                     >
                       Criar novo e revisar depois
                     </Button>
@@ -374,9 +374,9 @@ export default function NovoCliente() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-[#5C4A32]">Origem do cliente</Label>
+                <Label className="text-base font-semibold text-[#5C4A32]">Origem do cliente</Label>
                 <Select value={origem} onValueChange={setOrigem}>
-                  <SelectTrigger className="rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-xs text-[#5C4A32]">
+                  <SelectTrigger className="h-11 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-base text-[#5C4A32] px-3.5 py-2.5">
                     <SelectValue placeholder="Selecione, se souber" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#FDFAF5] border-[#E8DEC8]">
@@ -392,11 +392,11 @@ export default function NovoCliente() {
               {origem === 'indicacao' && (
                 <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-4 space-y-3">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-medium text-[#5C4A32]">
+                    <Label className="text-base font-semibold text-[#5C4A32]">
                       Categoria da indicação *
                     </Label>
                     <Select value={categoria} onValueChange={setCategoria}>
-                      <SelectTrigger className="rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-xs">
+                      <SelectTrigger className="h-11 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-base px-3.5 py-2.5">
                         <SelectValue placeholder="Selecione" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#FDFAF5] border-[#E8DEC8]">
@@ -413,20 +413,20 @@ export default function NovoCliente() {
                       value={indicadorBusca}
                       onChange={(e) => setIndicadorBusca(e.target.value)}
                       placeholder="Buscar quem indicou (nome ou telefone)"
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                      className="h-11 rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base px-3.5"
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={buscarIndicador}
-                      className="border-[#D6BC7E] text-[#5C4A32] text-xs rounded-xl hover:bg-[#F4EEDA]"
+                      className="border-[#D6BC7E] text-[#5C4A32] text-sm rounded-xl hover:bg-[#F4EEDA] px-4"
                     >
-                      <Search size={13} className="mr-1" />
+                      <Search size={15} className="mr-1.5" />
                       Buscar
                     </Button>
                   </div>
                   {indicador && (
-                    <p className="text-xs text-[#5C4A32] bg-[#FDFAF5] p-2 rounded-lg border border-[#E8DEC8]">
+                    <p className="text-sm md:text-base text-[#5C4A32] bg-[#FDFAF5] p-2.5 rounded-lg border border-[#E8DEC8]">
                       <strong>Indicador:</strong> {indicador.nome}
                     </p>
                   )}
@@ -441,13 +441,13 @@ export default function NovoCliente() {
               )}
 
               {classificacao === 'cerimonialista' && (
-                <p className="text-xs text-[#8A7A66] rounded-xl bg-[#F4EEDA] p-3 border border-[#E5D7B7]">
+                <p className="text-sm text-[#8A7A66] rounded-xl bg-[#F4EEDA] p-3 border border-[#E5D7B7]">
                   Cerimonialista pode ser PF ou PJ. Os contatos e a equipe serão complementados no
                   mesmo relacionamento.
                 </p>
               )}
               {classificacao === 'parceiro_comercial' && (
-                <p className="text-xs text-[#8A7A66] rounded-xl bg-[#F4EEDA] p-3 border border-[#E5D7B7]">
+                <p className="text-sm text-[#8A7A66] rounded-xl bg-[#F4EEDA] p-3 border border-[#E5D7B7]">
                   Parceiro pode ser pessoa ou empresa. CPF/CNPJ não é obrigatório para começar.
                 </p>
               )}
@@ -459,11 +459,11 @@ export default function NovoCliente() {
                 onChange={setObservacoes}
               />
 
-              <div className="flex items-center gap-3 pt-3 border-t border-[#E8DEC8]">
+              <div className="flex items-center gap-3 pt-4 border-t border-[#E8DEC8]">
                 <Button
                   type="button"
                   onClick={submit}
-                  className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-xs px-5 py-2.5 rounded-xl shadow-xs"
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-sm md:text-base px-6 py-2.5 rounded-xl shadow-xs"
                   disabled={loading}
                 >
                   {loading ? 'Salvando...' : 'Salvar Cliente'}
@@ -472,7 +472,7 @@ export default function NovoCliente() {
                   type="button"
                   variant="outline"
                   onClick={() => navigate('/')}
-                  className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl"
+                  className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm rounded-xl px-4 py-2.5"
                 >
                   Cancelar
                 </Button>

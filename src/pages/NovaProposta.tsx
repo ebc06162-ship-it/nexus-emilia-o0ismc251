@@ -183,26 +183,26 @@ export default function NovaProposta() {
           <Button
             variant="outline"
             onClick={() => navigate('/')}
-            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm rounded-xl flex items-center gap-1.5"
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={16} />
             Voltar ao painel
           </Button>
         </div>
-        {loading && <p>Carregando dados aprovados...</p>}
+        {loading && <p className="text-base text-[#8A7A66]">Carregando dados aprovados...</p>}
         {error && (
-          <p role="alert" className="text-[#7A2E2E]">
+          <p role="alert" className="text-base text-[#7A2E2E]">
             {error}
           </p>
         )}
         {saved && (
           <Card className="border-green-700">
             <CardContent className="p-4 md:p-5 space-y-3">
-              <p className="font-semibold text-base text-green-800">Orçamento registrado</p>
-              <p className="text-sm md:text-base">
+              <p className="font-semibold text-lg text-green-800">Orçamento registrado</p>
+              <p className="text-base">
                 Orçamento {saved.id}, versão {saved.versao}. Nenhum preço foi calculado.
               </p>
-              <p className="text-sm md:text-base">
+              <p className="text-base">
                 Status comercial: <strong>{saved.status}</strong>
                 {saved.pedido_id ? ` · Pedido: ${saved.pedido_id}` : ''}
               </p>
@@ -211,7 +211,7 @@ export default function NovaProposta() {
                   type="button"
                   disabled={saving}
                   onClick={() => responderProposta('aprovar')}
-                  className="bg-[#5C4A32] hover:bg-[#473926] text-white text-sm rounded-xl px-4 py-2"
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-white text-base rounded-xl px-4 py-2.5"
                 >
                   Aprovar e converter em pedido
                 </Button>
@@ -220,7 +220,7 @@ export default function NovaProposta() {
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('devolver')}
-                  className="border-[#E8DEC8] text-[#5C4A32] text-sm rounded-xl px-4 py-2"
+                  className="border-[#E8DEC8] text-[#5C4A32] text-base rounded-xl px-4 py-2.5"
                 >
                   Devolver orçamento para alteração
                 </Button>
@@ -229,7 +229,7 @@ export default function NovaProposta() {
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('recusar')}
-                  className="border-red-200 text-red-700 text-sm rounded-xl px-4 py-2"
+                  className="border-red-200 text-red-700 text-base rounded-xl px-4 py-2.5"
                 >
                   Recusar orçamento
                 </Button>
@@ -244,8 +244,8 @@ export default function NovaProposta() {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label htmlFor="cliente" className="text-xs text-[#5C4A32]">
+            <div className="space-y-1.5">
+              <Label htmlFor="cliente" className="text-base font-semibold text-[#5C4A32]">
                 Cliente
               </Label>
               <select
@@ -255,7 +255,7 @@ export default function NovaProposta() {
                   setClienteId(e.target.value)
                   setOportunidadeId('')
                 }}
-                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
+                className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
               >
                 <option value="">Selecione</option>
                 {clientes.map((c: any) => (
@@ -265,15 +265,15 @@ export default function NovaProposta() {
                 ))}
               </select>
             </div>
-            <div>
-              <Label htmlFor="oportunidade" className="text-xs text-[#5C4A32]">
+            <div className="space-y-1.5">
+              <Label htmlFor="oportunidade" className="text-base font-semibold text-[#5C4A32]">
                 Oportunidade
               </Label>
               <select
                 id="oportunidade"
                 value={oportunidadeId}
                 onChange={(e) => setOportunidadeId(e.target.value)}
-                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
+                className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
               >
                 <option value="">Selecione</option>
                 {oportunidadesVisiveis.map((o: any) => (
@@ -290,21 +290,21 @@ export default function NovaProposta() {
             <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               2. Itens do orçamento
             </CardTitle>
-            <p className="text-xs md:text-sm text-[#8A7A66]">
+            <p className="text-sm md:text-base text-[#8A7A66]">
               Itens aprovados do catálogo. Alternativas do mesmo grupo não são somadas.{' '}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-5 items-end">
-              <div className="md:col-span-2">
-                <Label htmlFor="item" className="text-xs text-[#5C4A32]">
+              <div className="md:col-span-2 space-y-1.5">
+                <Label htmlFor="item" className="text-base font-semibold text-[#5C4A32]">
                   Item aprovado
                 </Label>
                 <select
                   id="item"
                   value={novoItem.catalogo_item_id}
                   onChange={(e) => setNovoItem({ ...novoItem, catalogo_item_id: e.target.value })}
-                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
+                  className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
                 >
                   <option value="">Selecione</option>
                   {catalogo.map((item: any) => (
@@ -314,15 +314,15 @@ export default function NovaProposta() {
                   ))}
                 </select>
               </div>
-              <div>
-                <Label htmlFor="tipo" className="text-xs text-[#5C4A32]">
+              <div className="space-y-1.5">
+                <Label htmlFor="tipo" className="text-base font-semibold text-[#5C4A32]">
                   Tipo
                 </Label>
                 <select
                   id="tipo"
                   value={novoItem.tipo}
                   onChange={(e) => setNovoItem({ ...novoItem, tipo: e.target.value })}
-                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
+                  className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
                 >
                   {tipos.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -331,8 +331,8 @@ export default function NovaProposta() {
                   ))}
                 </select>
               </div>
-              <div>
-                <Label htmlFor="quantidade" className="text-xs text-[#5C4A32]">
+              <div className="space-y-1.5">
+                <Label htmlFor="quantidade" className="text-base font-semibold text-[#5C4A32]">
                   Quantidade
                 </Label>
                 <Input
@@ -341,19 +341,19 @@ export default function NovaProposta() {
                   min="1"
                   value={novoItem.quantidade}
                   onChange={(e) => setNovoItem({ ...novoItem, quantidade: Number(e.target.value) })}
-                  className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                  className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
                 />
               </div>
               <Button
                 type="button"
                 onClick={addItem}
-                className="bg-[#5C4A32] text-white hover:bg-[#473926] text-xs rounded-xl"
+                className="bg-[#5C4A32] text-white hover:bg-[#473926] text-sm md:text-base rounded-xl h-11 px-4"
               >
                 Adicionar
               </Button>
             </div>
-            <div>
-              <Label htmlFor="grupo" className="text-xs text-[#5C4A32]">
+            <div className="space-y-1.5">
+              <Label htmlFor="grupo" className="text-base font-semibold text-[#5C4A32]">
                 Grupo de alternativa (obrigatório para alternativa)
               </Label>
               <Input
@@ -361,19 +361,21 @@ export default function NovaProposta() {
                 value={novoItem.grupo_alternativa}
                 onChange={(e) => setNovoItem({ ...novoItem, grupo_alternativa: e.target.value })}
                 placeholder="Ex.: embalagem"
-                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
               />
             </div>
             <div className="space-y-2">
-              {!itens.length && <p className="text-xs text-[#8A7A66]">Nenhum item adicionado.</p>}
+              {!itens.length && <p className="text-sm text-[#8A7A66]">Nenhum item adicionado.</p>}
               {itens.map((item: any, index: number) => (
                 <div
                   key={`${item.catalogo_item_id}-${index}`}
-                  className="flex items-center justify-between rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3"
+                  className="flex items-center justify-between rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3.5"
                 >
                   <div>
-                    <p className="font-medium text-xs text-[#5C4A32]">{item.label_snapshot}</p>
-                    <p className="text-[11px] text-[#8A7A66]">
+                    <p className="font-semibold text-sm md:text-base text-[#5C4A32]">
+                      {item.label_snapshot}
+                    </p>
+                    <p className="text-xs md:text-sm text-[#8A7A66]">
                       {item.tipo} · quantidade{' '}
                       <span className="font-data tabular-nums font-semibold">
                         {item.quantidade}
@@ -387,7 +389,7 @@ export default function NovaProposta() {
                     variant="outline"
                     size="sm"
                     onClick={() => removeItem(index)}
-                    className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
+                    className="border-[#E8DEC8] text-[#5C4A32] text-sm rounded-xl px-3 py-1.5"
                   >
                     Remover
                   </Button>
@@ -395,13 +397,13 @@ export default function NovaProposta() {
               ))}
             </div>
             {groups.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs text-[#8A7A66]">Grupos exclusivos:</span>
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm text-[#8A7A66] font-medium">Grupos exclusivos:</span>
                 {groups.map((group) => (
                   <Badge
                     key={group}
                     variant="outline"
-                    className="border-[#D6BC7E] text-[#5C4A32] bg-[#F4EEDA] text-[11px]"
+                    className="border-[#D6BC7E] text-[#5C4A32] bg-[#F4EEDA] text-xs px-2.5 py-1"
                   >
                     {group}:{' '}
                     {alternatives.filter((item: any) => item.grupo_alternativa === group).length}{' '}
@@ -418,26 +420,28 @@ export default function NovaProposta() {
               3. Revisão e política
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm md:text-base text-[#5C4A32]">
+          <CardContent className="space-y-4">
+            <p className="text-base text-[#5C4A32]">
               Políticas aprovadas disponíveis: <strong>{politicas.length}</strong>
             </p>
             {!politicas.length && (
-              <p className="rounded-xl bg-[#F4EEDA] border border-[#E5D7B7] p-3 text-xs md:text-sm text-[#8A7A66]">
+              <p className="rounded-xl bg-[#F4EEDA] border border-[#E5D7B7] p-3 text-sm text-[#8A7A66]">
                 O orçamento pode ser salvo como rascunho, mas a revisão/emissão está bloqueada até
                 existir política aprovada e vigente. Nenhum valor será calculado silenciosamente.
               </p>
             )}
-            <Label htmlFor="observacoes" className="text-xs md:text-sm text-[#5C4A32]">
-              Observações
-            </Label>
-            <Input
-              id="observacoes"
-              value={observacoes}
-              onChange={(e) => setObservacoes(e.target.value)}
-              placeholder="Observações da revisão"
-              className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
-            />
+            <div className="space-y-1.5">
+              <Label htmlFor="observacoes" className="text-base font-semibold text-[#5C4A32]">
+                Observações
+              </Label>
+              <Input
+                id="observacoes"
+                value={observacoes}
+                onChange={(e) => setObservacoes(e.target.value)}
+                placeholder="Observações da revisão"
+                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+              />
+            </div>
             <div className="flex flex-wrap gap-3 pt-2">
               <Button
                 type="button"

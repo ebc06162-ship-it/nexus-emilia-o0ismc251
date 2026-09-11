@@ -182,20 +182,26 @@ export default function Catalogo() {
                     Formulário de gestão
                   </span>
                 </div>
-                <div className="grid gap-3 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="catalogo-codigo" className="text-xs md:text-sm text-[#5C4A32]">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="catalogo-codigo"
+                      className="text-base font-semibold text-[#5C4A32]"
+                    >
                       Código
                     </Label>
                     <Input
                       id="catalogo-codigo"
                       value={draft.codigo}
                       onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="catalogo-nome" className="text-xs md:text-sm text-[#5C4A32]">
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="catalogo-nome"
+                      className="text-base font-semibold text-[#5C4A32]"
+                    >
                       Nome *
                     </Label>
                     <Input
@@ -203,24 +209,27 @@ export default function Catalogo() {
                       required
                       value={draft.nome}
                       onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="catalogo-label" className="text-xs md:text-sm text-[#5C4A32]">
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="catalogo-label"
+                      className="text-base font-semibold text-[#5C4A32]"
+                    >
                       Label de exibição
                     </Label>
                     <Input
                       id="catalogo-label"
                       value={draft.display_label}
                       onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
                     />
                   </div>
-                  <div>
+                  <div className="space-y-1.5">
                     <Label
                       htmlFor="catalogo-categoria"
-                      className="text-xs md:text-sm text-[#5C4A32]"
+                      className="text-base font-semibold text-[#5C4A32]"
                     >
                       Categoria
                     </Label>
@@ -228,7 +237,7 @@ export default function Catalogo() {
                       id="catalogo-categoria"
                       value={draft.categoria}
                       onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
-                      className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-sm text-[#5C4A32]"
+                      className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
                     >
                       <option value="papel">Papel</option>
                       <option value="fita">Fita</option>
@@ -237,32 +246,38 @@ export default function Catalogo() {
                       <option value="outro">Outro</option>
                     </select>
                   </div>
-                  <div>
-                    <Label htmlFor="catalogo-fonte" className="text-xs md:text-sm text-[#5C4A32]">
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="catalogo-fonte"
+                      className="text-base font-semibold text-[#5C4A32]"
+                    >
                       Documento fonte
                     </Label>
                     <Input
                       id="catalogo-fonte"
                       value={draft.source_document}
                       onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="catalogo-versao" className="text-xs md:text-sm text-[#5C4A32]">
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="catalogo-versao"
+                      className="text-base font-semibold text-[#5C4A32]"
+                    >
                       Versão da fonte
                     </Label>
                     <Input
                       id="catalogo-versao"
                       value={draft.source_version}
                       onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
                     />
                   </div>
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-2 space-y-1.5">
                     <Label
                       htmlFor="catalogo-localizador"
-                      className="text-xs md:text-sm text-[#5C4A32]"
+                      className="text-base font-semibold text-[#5C4A32]"
                     >
                       Localizador
                     </Label>
@@ -270,14 +285,14 @@ export default function Catalogo() {
                       id="catalogo-localizador"
                       value={draft.source_locator}
                       onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2 pt-2">
                   <Button
                     type="submit"
-                    className="bg-[#5C4A32] text-white hover:bg-[#473926] text-sm rounded-xl px-4 py-2"
+                    className="bg-[#5C4A32] text-white hover:bg-[#473926] text-base rounded-xl px-5 py-2.5"
                   >
                     Salvar item
                   </Button>
@@ -285,7 +300,7 @@ export default function Catalogo() {
                     type="button"
                     variant="outline"
                     onClick={openNew}
-                    className="border-[#E8DEC8] text-[#5C4A32] text-sm rounded-xl px-4 py-2"
+                    className="border-[#E8DEC8] text-[#5C4A32] text-base rounded-xl px-4 py-2.5"
                   >
                     Limpar
                   </Button>
@@ -304,7 +319,7 @@ export default function Catalogo() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Buscar por código, nome, categoria ou cor..."
                 aria-label="Buscar no catálogo"
-                className="pl-10 rounded-full bg-[#FDFAF5] border-[#E8DEC8] text-sm py-2.5 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+                className="pl-11 rounded-full bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 py-2.5 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
               />
             </div>
 

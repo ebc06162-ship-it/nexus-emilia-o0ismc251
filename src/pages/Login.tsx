@@ -65,12 +65,12 @@ const Login = () => {
         <CardContent className="px-6 md:px-8 pb-8 pt-2">
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs md:text-sm font-medium text-[#5C4A32]">
+              <Label htmlFor="email" className="text-base font-semibold text-[#5C4A32]">
                 E-mail de acesso
               </Label>
               <div className="relative">
                 <Mail
-                  size={18}
+                  size={20}
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A7A66]/70 pointer-events-none"
                 />
                 <Input
@@ -79,19 +79,19 @@ const Login = () => {
                   placeholder="seu@emilia.com.br"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 rounded-xl bg-white/80 border-[#E8DEC8] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30 text-sm py-2.5"
+                  className="pl-11 rounded-xl bg-white/80 border-[#E8DEC8] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30 text-base h-11 py-2.5"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-xs md:text-sm font-medium text-[#5C4A32]">
+              <Label htmlFor="password" className="text-base font-semibold text-[#5C4A32]">
                 Senha
               </Label>
               <div className="relative">
                 <Lock
-                  size={18}
+                  size={20}
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A7A66]/70 pointer-events-none"
                 />
                 <Input
@@ -100,7 +100,7 @@ const Login = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 rounded-xl bg-white/80 border-[#E8DEC8] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30 text-sm py-2.5"
+                  className="pl-11 rounded-xl bg-white/80 border-[#E8DEC8] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30 text-base h-11 py-2.5"
                   required
                 />
               </div>
@@ -108,7 +108,7 @@ const Login = () => {
 
             <Button
               type="submit"
-              className="w-full bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] rounded-xl py-3 font-medium text-sm shadow-xs transition-colors mt-2"
+              className="w-full bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] rounded-xl py-3 font-medium text-base shadow-xs transition-colors mt-2"
               disabled={loading}
             >
               {loading ? 'Entrando...' : 'Entrar no sistema'}

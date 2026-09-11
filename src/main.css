@@ -84,6 +84,38 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Calibragem tipográfica dos formulários Emília:
+     Labels e campos confortavelmente legíveis em pelo menos 15-16px, Mulish,
+     com texto digitado e selecionado em 16px e placeholders/ajuda em 14-15px. */
+  label {
+    font-family:
+      'Mulish',
+      system-ui,
+      -apple-system,
+      sans-serif;
+    font-size: 1rem; /* 16px */
+    font-weight: 600;
+    color: #5c4a32;
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='range']),
+  select,
+  textarea {
+    font-family:
+      'Mulish',
+      system-ui,
+      -apple-system,
+      sans-serif;
+    font-size: 1rem; /* 16px */
+    line-height: 1.5;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    font-size: 0.9375rem; /* 15px */
+    opacity: 0.75;
+  }
+
   /* EB Garamond — Títulos: Romana antiga. Pesos 400 a 700 e itálico; mínimo 19px */
   h1,
   h2,

@@ -43,12 +43,46 @@ routerAdd(
       const novoStatus = acao === 'recusar' ? 'recusada' : 'em_revisao'
       proposta.set('status', novoStatus)
       $app.save(proposta)
+      const auditoriaProposta = new Record($app.findCollectionByNameOrId('auditoria_propostas'))
+      auditoriaProposta.set('proposta_id', proposta.id)
+      auditoriaProposta.set('tipo_evento', acao === 'recusar' ? 'recusa' : 'alteracao')
+      auditoriaProposta.set('autor', auth.id)
+      auditoriaProposta.set('versao', proposta.getInt('versao'))
+      auditoriaProposta.set(
+        'resumo',
+        acao === 'recusar' ? 'Proposta recusada.' : 'Proposta devolvida para alteração.',
+      )
+      auditoriaProposta.set('motivo', String(body.motivo || '').slice(0, 500))
+      $app.save(auditoriaProposta)
       return e.json(200, {
         ok: true,
         proposta_id: proposta.id,
         status: novoStatus,
         convertido: false,
       })
+    }
+
+    const politicaId = proposta.getString('politica_id')
+    if (!politicaId) {
+      throw e.badRequestError('A proposta não pode ser aprovada sem política comercial aprovada.')
+    }
+    let politica
+    try {
+      politica = $app.findRecordById('politicas_comerciais', politicaId)
+    } catch (err) {
+      throw e.badRequestError('A política comercial da proposta não foi encontrada.')
+    }
+    if (politica.getString('estado') !== 'aprovada') {
+      throw e.badRequestError('A política comercial da proposta não está aprovada.')
+    }
+    const hoje = Date.now()
+    const inicio = politica.getString('vigencia_inicio')
+    const fim = politica.getString('vigencia_fim')
+    if (inicio && Date.parse(inicio) > hoje) {
+      throw e.badRequestError('A política comercial ainda não está vigente.')
+    }
+    if (fim && Date.parse(fim) < hoje) {
+      throw e.badRequestError('A política comercial está expirada.')
     }
 
     let resposta = null
@@ -126,6 +160,15 @@ routerAdd(
       propostaTx.set('aprovada_em', new Date().toISOString())
       propostaTx.set('pedido_id', pedido.id)
       txApp.save(propostaTx)
+
+      const auditoriaProposta = new Record(txApp.findCollectionByNameOrId('auditoria_propostas'))
+      auditoriaProposta.set('proposta_id', propostaTx.id)
+      auditoriaProposta.set('tipo_evento', 'aprovacao')
+      auditoriaProposta.set('autor', auth.id)
+      auditoriaProposta.set('versao', propostaTx.getInt('versao'))
+      auditoriaProposta.set('resumo', 'Proposta aprovada e convertida em pedido.')
+      auditoriaProposta.set('depois_snapshot', { proposta_id: propostaTx.id, pedido_id: pedido.id })
+      txApp.save(auditoriaProposta)
 
       const auditoria = new Record(txApp.findCollectionByNameOrId('auditoria_pedidos'))
       auditoria.set('pedido_id', pedido.id)

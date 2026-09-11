@@ -78,6 +78,15 @@ routerAdd(
     const hoje = Date.now()
     const inicio = politica.getString('vigencia_inicio')
     const fim = politica.getString('vigencia_fim')
+    const politicaVersao = politica.getString('versao').trim()
+    const fonte = politica.getString('fonte').trim()
+    const aprovador = politica.getString('aprovador').trim()
+    const alcada = politica.getString('alcada').trim()
+    if (!politicaVersao || !fonte || !aprovador || !inicio || !fim || !alcada) {
+      throw e.badRequestError(
+        'A política comercial está incompleta: exige versão, fonte, aprovador, vigência e alçada.',
+      )
+    }
     if (inicio && Date.parse(inicio) > hoje) {
       throw e.badRequestError('A política comercial ainda não está vigente.')
     }

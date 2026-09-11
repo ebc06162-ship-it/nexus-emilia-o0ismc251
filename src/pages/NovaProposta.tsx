@@ -55,7 +55,17 @@ export default function NovaProposta() {
         setClientes(c.items)
         setOportunidades(o.items)
         setCatalogo(cat.items)
-        setPoliticas(pol.items)
+        setPoliticas(
+          pol.items.filter(
+            (policy: any) =>
+              String(policy.versao || '').trim() &&
+              String(policy.fonte || '').trim() &&
+              String(policy.aprovador || '').trim() &&
+              String(policy.vigencia_inicio || '').trim() &&
+              String(policy.vigencia_fim || '').trim() &&
+              String(policy.alcada || '').trim(),
+          ),
+        )
       })
       .catch((err) => setError(err.message || 'Não foi possível carregar os dados.'))
       .finally(() => setLoading(false))
@@ -95,7 +105,7 @@ export default function NovaProposta() {
 
   const removeItem = (index) =>
     setItens((current) =>
-      current.filter((_, i) => i !== index).map((item, i) => ({ ...item, ordem: i })),
+      current.filter((_, i) => i !== index).map((item, i) => ({ ...item, ordem: i + 1 })),
     )
 
   const alternatives = useMemo(() => itens.filter((item) => item.tipo === 'alternativa'), [itens])

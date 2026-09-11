@@ -39,25 +39,136 @@ routerAdd(
       throw e.badRequestError('A proposta está expirada.')
     }
 
-    if (acao === 'recusar' || acao === 'devolver') {
-      const novoStatus = acao === 'recusar' ? 'recusada' : 'em_revisao'
-      proposta.set('status', novoStatus)
+    if (acao === 'recusar') {
+      proposta.set('status', 'recusada')
       $app.save(proposta)
       const auditoriaProposta = new Record($app.findCollectionByNameOrId('auditoria_propostas'))
       auditoriaProposta.set('proposta_id', proposta.id)
-      auditoriaProposta.set('tipo_evento', acao === 'recusar' ? 'recusa' : 'alteracao')
+      auditoriaProposta.set('tipo_evento', 'recusa')
       auditoriaProposta.set('autor', auth.id)
       auditoriaProposta.set('versao', proposta.getInt('versao'))
-      auditoriaProposta.set(
-        'resumo',
-        acao === 'recusar' ? 'Proposta recusada.' : 'Proposta devolvida para alteração.',
-      )
+      auditoriaProposta.set('resumo', 'Proposta recusada.')
       auditoriaProposta.set('motivo', String(body.motivo || '').slice(0, 500))
       $app.save(auditoriaProposta)
       return e.json(200, {
         ok: true,
         proposta_id: proposta.id,
-        status: novoStatus,
+        status: 'recusada',
+        convertido: false,
+      })
+    }
+
+    if (acao === 'devolver') {
+      let respostaAlteracao = null
+      $app.runInTransaction((txApp) => {
+        const propostaAnterior = txApp.findRecordById('propostas', propostaId)
+        const itensAnteriores = txApp.findRecordsByFilter(
+          'itens_proposta',
+          'proposta_id = {:proposta}',
+          'ordem',
+          0,
+          0,
+          { proposta: propostaId },
+        )
+        const propostasCollection = txApp.findCollectionByNameOrId('propostas')
+        const novaProposta = new Record(propostasCollection)
+        novaProposta.set('oportunidade_id', propostaAnterior.getString('oportunidade_id'))
+        novaProposta.set('cliente_id', propostaAnterior.getString('cliente_id'))
+        novaProposta.set('versao', propostaAnterior.getInt('versao') + 1)
+        novaProposta.set('status', 'em_revisao')
+        novaProposta.set('moeda', propostaAnterior.getString('moeda'))
+        novaProposta.set('subtotal_snapshot', propostaAnterior.get('subtotal_snapshot'))
+        novaProposta.set('desconto_snapshot', propostaAnterior.get('desconto_snapshot'))
+        novaProposta.set('frete_snapshot', propostaAnterior.get('frete_snapshot'))
+        novaProposta.set('total_snapshot', propostaAnterior.get('total_snapshot'))
+        novaProposta.set('validade_ate', propostaAnterior.getString('validade_ate'))
+        novaProposta.set('politica_id', propostaAnterior.getString('politica_id'))
+        novaProposta.set(
+          'politica_versao_snapshot',
+          propostaAnterior.getString('politica_versao_snapshot'),
+        )
+        novaProposta.set(
+          'tabela_comercial_snapshot',
+          propostaAnterior.get('tabela_comercial_snapshot'),
+        )
+        novaProposta.set('condicoes_snapshot', propostaAnterior.get('condicoes_snapshot'))
+        novaProposta.set('criada_por', auth.id)
+        novaProposta.set('observacoes', propostaAnterior.getString('observacoes'))
+        novaProposta.set('versao_anterior_id', propostaAnterior.id)
+        txApp.save(novaProposta)
+
+        const itensCollection = txApp.findCollectionByNameOrId('itens_proposta')
+        const itensSnapshot = []
+        for (const itemAnterior of itensAnteriores) {
+          const novoItem = new Record(itensCollection)
+          novoItem.set('proposta_id', novaProposta.id)
+          const catalogoItemId = itemAnterior.getString('catalogo_item_id')
+          if (catalogoItemId) novoItem.set('catalogo_item_id', catalogoItemId)
+          novoItem.set('codigo_snapshot', itemAnterior.getString('codigo_snapshot'))
+          novoItem.set('label_snapshot', itemAnterior.getString('label_snapshot'))
+          novoItem.set(
+            'catalogo_versao_snapshot',
+            itemAnterior.getString('catalogo_versao_snapshot'),
+          )
+          novoItem.set('quantidade', itemAnterior.getInt('quantidade'))
+          novoItem.set('preco_unitario_snapshot', itemAnterior.get('preco_unitario_snapshot'))
+          novoItem.set('tipo', itemAnterior.getString('tipo'))
+          novoItem.set('grupo_alternativa', itemAnterior.getString('grupo_alternativa'))
+          novoItem.set('ordem', itemAnterior.getInt('ordem'))
+          novoItem.set('composicao_snapshot', itemAnterior.get('composicao_snapshot'))
+          txApp.save(novoItem)
+          itensSnapshot.push({
+            id: novoItem.id,
+            codigo_snapshot: novoItem.getString('codigo_snapshot'),
+            label_snapshot: novoItem.getString('label_snapshot'),
+            catalogo_versao_snapshot: novoItem.getString('catalogo_versao_snapshot'),
+            quantidade: novoItem.getInt('quantidade'),
+            tipo: novoItem.getString('tipo'),
+            grupo_alternativa: novoItem.getString('grupo_alternativa'),
+            ordem: novoItem.getInt('ordem'),
+            composicao_snapshot: novoItem.get('composicao_snapshot'),
+          })
+        }
+
+        propostaAnterior.set('status', 'substituida')
+        txApp.save(propostaAnterior)
+
+        const auditoriaAnterior = new Record(txApp.findCollectionByNameOrId('auditoria_propostas'))
+        auditoriaAnterior.set('proposta_id', propostaAnterior.id)
+        auditoriaAnterior.set('tipo_evento', 'substituicao')
+        auditoriaAnterior.set('autor', auth.id)
+        auditoriaAnterior.set('versao', propostaAnterior.getInt('versao'))
+        auditoriaAnterior.set('resumo', 'Versão substituída por devolução para alteração.')
+        auditoriaAnterior.set('motivo', String(body.motivo || '').slice(0, 500))
+        auditoriaAnterior.set('depois_snapshot', {
+          proposta_id: propostaAnterior.id,
+          nova_proposta_id: novaProposta.id,
+          nova_versao: novaProposta.getInt('versao'),
+        })
+        txApp.save(auditoriaAnterior)
+
+        const auditoriaNova = new Record(txApp.findCollectionByNameOrId('auditoria_propostas'))
+        auditoriaNova.set('proposta_id', novaProposta.id)
+        auditoriaNova.set('tipo_evento', 'alteracao')
+        auditoriaNova.set('autor', auth.id)
+        auditoriaNova.set('versao', novaProposta.getInt('versao'))
+        auditoriaNova.set('resumo', 'Nova versão criada para alteração do orçamento.')
+        auditoriaNova.set('motivo', String(body.motivo || '').slice(0, 500))
+        auditoriaNova.set('antes_snapshot', {
+          proposta_id: propostaAnterior.id,
+          versao: propostaAnterior.getInt('versao'),
+          itens: itensSnapshot,
+        })
+        txApp.save(auditoriaNova)
+        respostaAlteracao = { proposta: novaProposta }
+      })
+
+      return e.json(200, {
+        ok: true,
+        proposta_id: respostaAlteracao.proposta.id,
+        proposta_anterior_id: propostaId,
+        versao: respostaAlteracao.proposta.getInt('versao'),
+        status: 'em_revisao',
         convertido: false,
       })
     }
@@ -86,6 +197,12 @@ routerAdd(
       throw e.badRequestError(
         'A política comercial está incompleta: exige versão, fonte, aprovador, vigência e alçada.',
       )
+    }
+    if (Number.isNaN(Date.parse(inicio)) || Number.isNaN(Date.parse(fim))) {
+      throw e.badRequestError('A vigência da política comercial é inválida.')
+    }
+    if (Date.parse(inicio) > Date.parse(fim)) {
+      throw e.badRequestError('A vigência da política comercial está invertida.')
     }
     if (inicio && Date.parse(inicio) > hoje) {
       throw e.badRequestError('A política comercial ainda não está vigente.')

@@ -173,6 +173,8 @@ export default function NovaProposta() {
       })
       setSaved((current) => ({
         ...current,
+        id: resposta.proposta_id || current.id,
+        versao: resposta.versao || current.versao,
         status: resposta.status,
         pedido_id: resposta.pedido_id || current.pedido_id,
       }))

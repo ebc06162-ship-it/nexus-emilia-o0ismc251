@@ -83,7 +83,7 @@ export default function Historico() {
             Voltar ao painel
           </Button>
 
-          <span className="text-xs font-serif italic text-[#B08A3E] flex items-center gap-1">
+          <span className="text-xs font-sans text-[#B08A3E] flex items-center gap-1 font-medium">
             <ShieldCheck size={14} />
             Rastreabilidade canônica
           </span>
@@ -91,7 +91,7 @@ export default function Historico() {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
               Eventos Registrados
             </CardTitle>
             <p className="text-xs text-[#8A7A66]">
@@ -142,7 +142,7 @@ export default function Historico() {
                     </div>
 
                     <p className="text-xs text-[#5C4A32]">
-                      Objeto: <span className="font-mono">{item.objeto_tipo}</span>
+                      Objeto: <span className="font-sans font-medium">{item.objeto_tipo}</span>
                       {item.objeto_id ? ` · ID: ${item.objeto_id}` : ''}
                     </p>
 
@@ -160,7 +160,7 @@ export default function Historico() {
                       <strong>Papel:</strong>{' '}
                       {roleLabels[item.papel] || item.papel || 'não informado'}
                     </p>
-                    <p className="font-medium text-[#5C4A32] mt-0.5">
+                    <p className="font-medium text-[#5C4A32] mt-0.5 font-data tabular-nums">
                       {new Date(item.created).toLocaleString('pt-BR')}
                     </p>
                   </div>

@@ -160,7 +160,7 @@ export default function Catalogo() {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
               Opções Internas Aprovadas
             </CardTitle>
             <p className="text-xs text-[#8A7A66]">
@@ -175,10 +175,10 @@ export default function Catalogo() {
                 className="rounded-2xl border border-[#D6BC7E] bg-[#F8F3EA] p-4 space-y-3"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="font-serif font-semibold text-[#5C4A32]">
+                  <h3 className="font-serif text-title-min font-semibold text-[#5C4A32]">
                     {editing ? 'Editar item do catálogo' : 'Novo item do catálogo'}
                   </h3>
-                  <span className="text-[10px] text-[#8A7A66] uppercase tracking-wider">
+                  <span className="text-[10px] text-[#8A7A66] uppercase font-sans tracking-[0.18em] font-semibold">
                     Formulário de gestão
                   </span>
                 </div>
@@ -305,16 +305,19 @@ export default function Catalogo() {
             {/* Badges de contagem estilo suave */}
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="px-3 py-1 rounded-full bg-[#F4EEDA] text-[#5C4A32] border border-[#E5D7B7] text-[11px] font-medium">
-                Total: {items.length}
+                Total: <span className="font-data tabular-nums font-semibold">{items.length}</span>
               </span>
               <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-medium">
-                Aprovados: {counts.aprovado || 0}
+                Aprovados:{' '}
+                <span className="font-data tabular-nums font-semibold">{counts.aprovado || 0}</span>
               </span>
               <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-medium">
-                Rascunhos: {counts.rascunho || 0}
+                Rascunhos:{' '}
+                <span className="font-data tabular-nums font-semibold">{counts.rascunho || 0}</span>
               </span>
               <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-medium">
-                Conflitos: {counts.conflito || 0}
+                Conflitos:{' '}
+                <span className="font-data tabular-nums font-semibold">{counts.conflito || 0}</span>
               </span>
             </div>
           </CardContent>
@@ -343,7 +346,7 @@ export default function Catalogo() {
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                      <span className="font-mono text-xs text-[#8A7A66] bg-[#F4EEDA] px-2 py-0.5 rounded-md border border-[#E5D7B7]">
+                      <span className="font-data tabular-nums text-xs text-[#8A7A66] bg-[#F4EEDA] px-2 py-0.5 rounded-md border border-[#E5D7B7]">
                         {item.codigo || 'Sem código'}
                       </span>
                       <span
@@ -360,7 +363,7 @@ export default function Catalogo() {
                       </span>
                     </div>
 
-                    <h2 className="font-serif text-lg font-semibold text-[#5C4A32]">
+                    <h2 className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
                       {item.display_label}
                     </h2>
                     <p className="text-xs text-[#8A7A66] mt-0.5">

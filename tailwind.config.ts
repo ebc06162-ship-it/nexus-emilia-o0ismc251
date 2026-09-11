@@ -27,10 +27,15 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
+        sans: ['Mulish', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['"EB Garamond"', 'Georgia', 'serif'],
+        slab: ['Bitter', 'Georgia', 'serif'],
+        data: ['Bitter', 'Georgia', 'serif'],
         script: ['Great Vibes', 'cursive'],
-        display: ['Playfair Display', 'Georgia', 'serif'],
+        display: ['"EB Garamond"', 'Georgia', 'serif'],
+      },
+      fontSize: {
+        'title-min': ['19px', { lineHeight: '1.3' }],
       },
       colors: {
         emilia: {

@@ -83,7 +83,7 @@ export default function Usuarios() {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
               Usuários do Sistema
             </CardTitle>
             <p className="text-xs text-[#8A7A66]">

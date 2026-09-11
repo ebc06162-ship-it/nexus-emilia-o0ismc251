@@ -233,7 +233,7 @@ export default function IntegrationHarness() {
             Voltar ao painel
           </Button>
 
-          <span className="text-xs font-serif italic text-[#B08A3E] flex items-center gap-1">
+          <span className="text-xs font-sans text-[#B08A3E] flex items-center gap-1 font-medium">
             <ShieldAlert size={14} />
             Ambiente de Homologação
           </span>
@@ -241,7 +241,7 @@ export default function IntegrationHarness() {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
               Fixtures de Teste
             </CardTitle>
             <p className="text-xs text-[#8A7A66]">
@@ -262,7 +262,9 @@ export default function IntegrationHarness() {
               {fixtures.map(([id, label]) => (
                 <div key={id} className="py-3 flex items-center justify-between">
                   <div>
-                    <p className="font-mono text-xs font-semibold text-[#5C4A32]">{id}</p>
+                    <p className="font-data tabular-nums text-xs font-semibold text-[#5C4A32]">
+                      {id}
+                    </p>
                     <p className="text-xs text-[#8A7A66]">{label}</p>
                   </div>
                   <Button
@@ -278,7 +280,7 @@ export default function IntegrationHarness() {
 
             {results.length > 0 && (
               <div className="pt-4 space-y-2 border-t border-[#E8DEC8]">
-                <h4 className="text-xs font-semibold text-[#5C4A32] uppercase tracking-wider">
+                <h4 className="text-xs font-semibold text-[#5C4A32] uppercase font-sans tracking-[0.18em]">
                   Resultados da sessão
                 </h4>
                 {results.map((result) => (
@@ -286,8 +288,8 @@ export default function IntegrationHarness() {
                     key={result.fixture_id + result.result}
                     className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3 text-xs text-[#5C4A32]"
                   >
-                    <b className="font-mono text-[#B08A3E]">{result.fixture_id}</b>: {result.result}{' '}
-                    · escrita canônica: {result.wrote_canonical ? 'sim' : 'não'}
+                    <b className="font-data tabular-nums text-[#B08A3E]">{result.fixture_id}</b>:{' '}
+                    {result.result} · escrita canônica: {result.wrote_canonical ? 'sim' : 'não'}
                   </div>
                 ))}
               </div>

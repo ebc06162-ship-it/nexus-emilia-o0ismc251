@@ -24,7 +24,9 @@ const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
     return (
       <div className="min-h-screen bg-[#F7F1E8] flex items-center justify-center p-6">
         <div className="mx-auto max-w-md rounded-2xl border border-[#E8DEC8] bg-[#FDFAF5] p-6 text-center shadow-card">
-          <h1 className="font-serif text-xl font-semibold text-[#5C4A32]">Acesso não permitido</h1>
+          <h1 className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+            Acesso não permitido
+          </h1>
           <p className="mt-2 text-xs text-[#8A7A66]">
             Seu perfil não tem permissão para consultar esta área.
           </p>

@@ -138,10 +138,10 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
             </NavLink>
 
             <div className="hidden lg:flex flex-col border-l border-[#E8DEC8] pl-5 py-0.5">
-              <span className="text-[10px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-medium leading-tight">
+              <span className="text-[10px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-semibold leading-tight">
                 TRADIÇÃO QUE
               </span>
-              <span className="text-[10px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-medium leading-tight">
+              <span className="text-[10px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-semibold leading-tight">
                 CELEBRA HISTÓRIAS
               </span>
             </div>
@@ -172,7 +172,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
               title="Notificações"
             >
               <Bell size={18} />
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#B08A3E] text-white text-[10px] flex items-center justify-center font-medium">
+              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#B08A3E] text-white text-[10px] flex items-center justify-center font-data tabular-nums font-semibold">
                 3
               </span>
             </button>
@@ -183,7 +183,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
                   type="button"
                   className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#F2E8D8] transition-colors text-left"
                 >
-                  <div className="w-9 h-9 rounded-full bg-[#E8DEC8] text-[#5C4A32] flex items-center justify-center font-serif text-sm font-semibold border border-[#D6BC7E]">
+                  <div className="w-9 h-9 rounded-full bg-[#E8DEC8] text-[#5C4A32] flex items-center justify-center font-sans text-xs font-bold border border-[#D6BC7E]">
                     {userInitials}
                   </div>
                   <div className="hidden sm:flex flex-col pr-1">
@@ -237,7 +237,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
         <aside className="hidden md:flex flex-col w-56 shrink-0 bg-[#FBF7F0] border border-[#E8DEC8] rounded-2xl p-3 shadow-subtle justify-between">
           <div className="space-y-1">
             <div className="px-3 py-2 mb-1">
-              <span className="text-[10px] tracking-[0.18em] uppercase text-[#8A7A66] font-semibold">
+              <span className="text-[10px] tracking-[0.18em] uppercase font-sans text-[#8A7A66] font-semibold">
                 Navegação
               </span>
             </div>
@@ -270,7 +270,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
           {/* Bloco decorativo do rodapé da sidebar (fiel ao mockup: "MOMENTOS QUE ADOÇAM HISTÓRIAS") */}
           <div className="pt-6 border-t border-[#E8DEC8]/60 px-3 pb-2 flex flex-col items-center text-center">
             <EmiliaLogo size="sm" className="items-center" />
-            <p className="text-[9px] tracking-[0.2em] uppercase text-[#8A7A66] font-light mt-1.5">
+            <p className="text-[9px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-medium mt-1.5">
               MOMENTOS QUE ADOÇAM HISTÓRIAS
             </p>
           </div>
@@ -351,7 +351,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
       <footer className="mt-auto border-t border-[#E8DEC8] bg-[#FBF7F0]/60 py-3 px-4 text-center">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#8A7A66]">
           <span>Emília Bem-Casados · ERP integrado para um negócio mais doce.</span>
-          <span className="font-serif italic text-[#B08A3E]">
+          <span className="font-serif italic text-title-min text-[#B08A3E]">
             "Mais que bem-casados, entregamos celebrações."
           </span>
           <span>Versão 1.0.0</span>

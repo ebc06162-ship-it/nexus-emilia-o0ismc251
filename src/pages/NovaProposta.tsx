@@ -239,7 +239,7 @@ export default function NovaProposta() {
         )}
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
               1. Contexto da proposta
             </CardTitle>
           </CardHeader>
@@ -287,7 +287,7 @@ export default function NovaProposta() {
         </Card>
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
               2. Itens da proposta
             </CardTitle>
             <p className="text-xs text-[#8A7A66]">
@@ -374,7 +374,10 @@ export default function NovaProposta() {
                   <div>
                     <p className="font-medium text-xs text-[#5C4A32]">{item.label_snapshot}</p>
                     <p className="text-[11px] text-[#8A7A66]">
-                      {item.tipo} · quantidade {item.quantidade}
+                      {item.tipo} · quantidade{' '}
+                      <span className="font-data tabular-nums font-semibold">
+                        {item.quantidade}
+                      </span>
                       {item.grupo_alternativa ? ` · grupo: ${item.grupo_alternativa}` : ''} ·
                       catálogo {item.catalogo_versao_snapshot || 'sem versão'}
                     </p>
@@ -411,7 +414,7 @@ export default function NovaProposta() {
         </Card>
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
               3. Revisão e política
             </CardTitle>
           </CardHeader>

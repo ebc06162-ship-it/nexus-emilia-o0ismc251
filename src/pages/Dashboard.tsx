@@ -83,29 +83,29 @@ const Dashboard = () => {
             </span>
           </div>
 
-          <p className="hidden xl:block font-serif italic text-xs text-[#8A7A66]">
+          <p className="hidden xl:block font-serif italic text-title-min text-[#8A7A66]">
             "Mais que bem-casados, entregamos celebrações."
           </p>
         </div>
       </div>
 
-      {/* KPI Cards — Estilo dos mockups anexos:
-          Círculo bege com ícone dourado à esquerda, número grande em serif, label superior e variação suave */}
+      {/* KPI Cards — Estilo dos mockups:
+          Círculo bege com ícone dourado à esquerda, número em Bitter com numerais tabulares, label superior em Mulish uppercase tracking */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card Clientes */}
         <div className="bg-[#FDFAF5] border border-[#E8DEC8] rounded-2xl p-5 shadow-card hover:shadow-subtle transition-shadow">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#8A7A66]">
+            <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#8A7A66] font-sans">
               CLIENTES CADASTRADOS
             </span>
             <div className="w-10 h-10 rounded-full bg-[#F4EEDA] flex items-center justify-center text-[#B08A3E]">
               <Users size={18} />
             </div>
           </div>
-          <div className="font-serif text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
+          <div className="font-data tabular-nums text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
             {stats.clientes}
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#6E7A55] font-medium">
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#6E7A55] font-medium font-sans">
             <TrendingUp size={13} />
             <span>cadastros totais no sistema</span>
           </div>
@@ -114,17 +114,17 @@ const Dashboard = () => {
         {/* Card Oportunidades / Pedidos */}
         <div className="bg-[#FDFAF5] border border-[#E8DEC8] rounded-2xl p-5 shadow-card hover:shadow-subtle transition-shadow">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#8A7A66]">
+            <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#8A7A66] font-sans">
               OPORTUNIDADES / PEDIDOS
             </span>
             <div className="w-10 h-10 rounded-full bg-[#F4EEDA] flex items-center justify-center text-[#B08A3E]">
               <ShoppingBag size={18} />
             </div>
           </div>
-          <div className="font-serif text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
+          <div className="font-data tabular-nums text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
             {stats.oportunidades}
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#B08A3E] font-medium">
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#B08A3E] font-medium font-sans">
             <TrendingUp size={13} />
             <span>pedidos registrados</span>
           </div>
@@ -133,17 +133,17 @@ const Dashboard = () => {
         {/* Card Pendências */}
         <div className="bg-[#FDFAF5] border border-[#E8DEC8] rounded-2xl p-5 shadow-card hover:shadow-subtle transition-shadow">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#8A7A66]">
+            <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#8A7A66] font-sans">
               PENDÊNCIAS EM ABERTO
             </span>
             <div className="w-10 h-10 rounded-full bg-[#F4EEDA] flex items-center justify-center text-[#B08A3E]">
               <Clock size={18} />
             </div>
           </div>
-          <div className="font-serif text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
+          <div className="font-data tabular-nums text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
             {stats.pendencias}
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#8A7A66] font-medium">
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#8A7A66] font-medium font-sans">
             <span>itens aguardando ação</span>
           </div>
         </div>
@@ -154,14 +154,14 @@ const Dashboard = () => {
         <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              <CardTitle className="font-serif text-title-min font-semibold text-[#5C4A32]">
                 Ações Rápidas
               </CardTitle>
               <p className="text-xs text-[#8A7A66] mt-0.5">
                 Cadastre um novo cliente ou oportunidade, ou consulte o catálogo
               </p>
             </div>
-            <span className="hidden sm:inline-block font-serif italic text-xs text-[#B08A3E]">
+            <span className="hidden sm:inline-block font-sans text-xs text-[#B08A3E] font-medium">
               Gestão ágil
             </span>
           </div>
@@ -236,14 +236,14 @@ const Dashboard = () => {
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50 flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              <CardTitle className="font-serif text-title-min font-semibold text-[#5C4A32]">
                 Clientes recentes
               </CardTitle>
               <p className="text-xs text-[#8A7A66] mt-0.5">Consulta dos cadastros mais recentes</p>
             </div>
             <button
               onClick={() => navigate('/clientes/novo')}
-              className="text-xs font-serif italic text-[#B08A3E] hover:underline inline-flex items-center gap-1"
+              className="text-xs font-sans text-[#B08A3E] hover:underline inline-flex items-center gap-1 font-medium"
             >
               Ver todos <ArrowRight size={12} />
             </button>
@@ -277,7 +277,7 @@ const Dashboard = () => {
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50 flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              <CardTitle className="font-serif text-title-min font-semibold text-[#5C4A32]">
                 Oportunidades recentes
               </CardTitle>
               <p className="text-xs text-[#8A7A66] mt-0.5">
@@ -286,7 +286,7 @@ const Dashboard = () => {
             </div>
             <button
               onClick={() => navigate('/oportunidades/nova')}
-              className="text-xs font-serif italic text-[#B08A3E] hover:underline inline-flex items-center gap-1"
+              className="text-xs font-sans text-[#B08A3E] hover:underline inline-flex items-center gap-1 font-medium"
             >
               Ver todos <ArrowRight size={12} />
             </button>

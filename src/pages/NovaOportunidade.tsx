@@ -502,9 +502,9 @@ const NovaOportunidade = () => {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader className="pb-4 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-xl font-semibold text-[#5C4A32]">
-              Registro de Oportunidade
-            </CardTitle>
+            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+              Registro de Oportunidade & Pedido
+            </CardTitle>{' '}
           </CardHeader>
           <CardContent className="pt-5">
             <form onSubmit={handleSubmit} className="space-y-4">

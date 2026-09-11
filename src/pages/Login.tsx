@@ -52,12 +52,12 @@ const Login = () => {
           <EmiliaLogo size="lg" className="mb-2" />
           <div className="mt-3 flex items-center justify-center gap-2">
             <span className="h-[1px] w-8 bg-[#E8DEC8]" />
-            <span className="text-[10px] tracking-[0.24em] uppercase text-[#8A7A66] font-medium">
+            <span className="text-[10px] tracking-[0.24em] uppercase font-sans text-[#8A7A66] font-semibold">
               SISTEMA DE GESTÃO
             </span>
             <span className="h-[1px] w-8 bg-[#E8DEC8]" />
           </div>
-          <p className="font-serif italic text-xs text-[#B08A3E] mt-2">
+          <p className="font-serif italic text-title-min text-[#B08A3E] mt-2">
             "Tradição que celebra histórias."
           </p>
         </CardHeader>

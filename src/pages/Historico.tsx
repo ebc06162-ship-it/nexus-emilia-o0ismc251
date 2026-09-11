@@ -123,15 +123,15 @@ export default function Historico() {
             >
               <CardContent className="p-4">
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#B08A3E]" />
-                      <p className="font-semibold text-sm text-[#5C4A32]">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#B08A3E]" />
+                      <p className="font-semibold text-base text-[#5C4A32]">
                         {item.descricao ||
                           `${actionLabel[item.acao] || item.acao} · ${objectLabel[item.objeto_tipo] || item.objeto_tipo}`}
                       </p>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                           item.resultado === 'permitido'
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             : 'bg-rose-50 text-rose-800 border-rose-200'
@@ -141,18 +141,18 @@ export default function Historico() {
                       </span>
                     </div>
 
-                    <p className="text-xs text-[#5C4A32]">
+                    <p className="text-sm text-[#5C4A32]">
                       Objeto: <span className="font-sans font-medium">{item.objeto_tipo}</span>
                       {item.objeto_id ? ` · ID: ${item.objeto_id}` : ''}
                     </p>
 
-                    <p className="text-[11px] text-[#8A7A66]">
+                    <p className="text-xs text-[#8A7A66]">
                       Motivo: {item.motivo || 'não informado'} · Origem:{' '}
                       {item.origem || 'não informada'}
                     </p>
                   </div>
 
-                  <div className="text-[11px] text-[#8A7A66] md:text-right bg-[#FBF7F0] p-2 rounded-xl border border-[#E8DEC8]/50">
+                  <div className="text-xs md:text-sm text-[#8A7A66] md:text-right bg-[#FBF7F0] p-2.5 rounded-xl border border-[#E8DEC8]/50">
                     <p>
                       <strong>Ator:</strong> {item.ator_nome || 'não informado'}
                     </p>
@@ -160,7 +160,7 @@ export default function Historico() {
                       <strong>Papel:</strong>{' '}
                       {roleLabels[item.papel] || item.papel || 'não informado'}
                     </p>
-                    <p className="font-medium text-[#5C4A32] mt-0.5 font-data tabular-nums">
+                    <p className="font-medium text-[#5C4A32] mt-1 font-data tabular-nums">
                       {new Date(item.created).toLocaleString('pt-BR')}
                     </p>
                   </div>

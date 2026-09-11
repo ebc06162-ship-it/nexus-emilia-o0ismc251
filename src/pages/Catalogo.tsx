@@ -141,18 +141,18 @@ export default function Catalogo() {
           <Button
             variant="outline"
             onClick={() => navigate('/')}
-            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm rounded-xl flex items-center gap-1.5 px-4 py-2"
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={16} />
             Voltar ao painel
           </Button>
 
           {canManage && (
             <Button
               onClick={openNew}
-              className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-xs rounded-xl flex items-center gap-1.5"
+              className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-sm rounded-xl flex items-center gap-1.5 px-4 py-2"
             >
-              <Plus size={14} />
+              <Plus size={16} />
               Novo Item
             </Button>
           )}
@@ -160,10 +160,10 @@ export default function Catalogo() {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               Opções Internas Aprovadas
             </CardTitle>
-            <p className="text-xs text-[#8A7A66]">
+            <p className="text-xs md:text-sm text-[#8A7A66]">
               Fornecedores são apenas fundamento técnico interno. Esta tela exibe somente itens e
               nomes canônicos do catálogo da Emília.
             </p>
@@ -175,27 +175,27 @@ export default function Catalogo() {
                 className="rounded-2xl border border-[#D6BC7E] bg-[#F8F3EA] p-4 space-y-3"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="font-serif text-title-min font-semibold text-[#5C4A32]">
+                  <h3 className="font-serif text-lg md:text-xl font-semibold text-[#5C4A32]">
                     {editing ? 'Editar item do catálogo' : 'Novo item do catálogo'}
                   </h3>
-                  <span className="text-[10px] text-[#8A7A66] uppercase font-sans tracking-[0.18em] font-semibold">
+                  <span className="text-xs text-[#8A7A66] uppercase font-sans tracking-[0.18em] font-semibold">
                     Formulário de gestão
                   </span>
                 </div>
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
-                    <Label htmlFor="catalogo-codigo" className="text-xs text-[#5C4A32]">
+                    <Label htmlFor="catalogo-codigo" className="text-xs md:text-sm text-[#5C4A32]">
                       Código
                     </Label>
                     <Input
                       id="catalogo-codigo"
                       value={draft.codigo}
                       onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-nome" className="text-xs text-[#5C4A32]">
+                    <Label htmlFor="catalogo-nome" className="text-xs md:text-sm text-[#5C4A32]">
                       Nome *
                     </Label>
                     <Input
@@ -203,29 +203,32 @@ export default function Catalogo() {
                       required
                       value={draft.nome}
                       onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-label" className="text-xs text-[#5C4A32]">
+                    <Label htmlFor="catalogo-label" className="text-xs md:text-sm text-[#5C4A32]">
                       Label de exibição
                     </Label>
                     <Input
                       id="catalogo-label"
                       value={draft.display_label}
                       onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-categoria" className="text-xs text-[#5C4A32]">
+                    <Label
+                      htmlFor="catalogo-categoria"
+                      className="text-xs md:text-sm text-[#5C4A32]"
+                    >
                       Categoria
                     </Label>
                     <select
                       id="catalogo-categoria"
                       value={draft.categoria}
                       onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
-                      className="flex h-9 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-1.5 text-xs text-[#5C4A32]"
+                      className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-sm text-[#5C4A32]"
                     >
                       <option value="papel">Papel</option>
                       <option value="fita">Fita</option>
@@ -235,43 +238,46 @@ export default function Catalogo() {
                     </select>
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-fonte" className="text-xs text-[#5C4A32]">
+                    <Label htmlFor="catalogo-fonte" className="text-xs md:text-sm text-[#5C4A32]">
                       Documento fonte
                     </Label>
                     <Input
                       id="catalogo-fonte"
                       value={draft.source_document}
                       onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-versao" className="text-xs text-[#5C4A32]">
+                    <Label htmlFor="catalogo-versao" className="text-xs md:text-sm text-[#5C4A32]">
                       Versão da fonte
                     </Label>
                     <Input
                       id="catalogo-versao"
                       value={draft.source_version}
                       onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label htmlFor="catalogo-localizador" className="text-xs text-[#5C4A32]">
+                    <Label
+                      htmlFor="catalogo-localizador"
+                      className="text-xs md:text-sm text-[#5C4A32]"
+                    >
                       Localizador
                     </Label>
                     <Input
                       id="catalogo-localizador"
                       value={draft.source_locator}
                       onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2 pt-2">
                   <Button
                     type="submit"
-                    className="bg-[#5C4A32] text-white hover:bg-[#473926] text-xs rounded-xl"
+                    className="bg-[#5C4A32] text-white hover:bg-[#473926] text-sm rounded-xl px-4 py-2"
                   >
                     Salvar item
                   </Button>
@@ -279,7 +285,7 @@ export default function Catalogo() {
                     type="button"
                     variant="outline"
                     onClick={openNew}
-                    className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
+                    className="border-[#E8DEC8] text-[#5C4A32] text-sm rounded-xl px-4 py-2"
                   >
                     Limpar
                   </Button>
@@ -290,7 +296,7 @@ export default function Catalogo() {
             {/* Barra de busca arredondada */}
             <div className="relative">
               <Search
-                size={16}
+                size={18}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A7A66]/70 pointer-events-none"
               />
               <Input
@@ -298,24 +304,24 @@ export default function Catalogo() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Buscar por código, nome, categoria ou cor..."
                 aria-label="Buscar no catálogo"
-                className="pl-10 rounded-full bg-[#FDFAF5] border-[#E8DEC8] text-xs py-2 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+                className="pl-10 rounded-full bg-[#FDFAF5] border-[#E8DEC8] text-sm py-2.5 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
               />
             </div>
 
             {/* Badges de contagem estilo suave */}
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="px-3 py-1 rounded-full bg-[#F4EEDA] text-[#5C4A32] border border-[#E5D7B7] text-[11px] font-medium">
+            <div className="flex flex-wrap gap-2 text-sm">
+              <span className="px-3.5 py-1.5 rounded-full bg-[#F4EEDA] text-[#5C4A32] border border-[#E5D7B7] text-xs font-medium">
                 Total: <span className="font-data tabular-nums font-semibold">{items.length}</span>
               </span>
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-medium">
+              <span className="px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium">
                 Aprovados:{' '}
                 <span className="font-data tabular-nums font-semibold">{counts.aprovado || 0}</span>
               </span>
-              <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-medium">
+              <span className="px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-medium">
                 Rascunhos:{' '}
                 <span className="font-data tabular-nums font-semibold">{counts.rascunho || 0}</span>
               </span>
-              <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-medium">
+              <span className="px-3.5 py-1.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-xs font-medium">
                 Conflitos:{' '}
                 <span className="font-data tabular-nums font-semibold">{counts.conflito || 0}</span>
               </span>
@@ -346,11 +352,11 @@ export default function Catalogo() {
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                      <span className="font-data tabular-nums text-xs text-[#8A7A66] bg-[#F4EEDA] px-2 py-0.5 rounded-md border border-[#E5D7B7]">
+                      <span className="font-data tabular-nums text-sm text-[#8A7A66] bg-[#F4EEDA] px-2.5 py-0.5 rounded-md border border-[#E5D7B7]">
                         {item.codigo || 'Sem código'}
                       </span>
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium border ${
+                        className={`px-3 py-0.5 rounded-full text-xs font-medium border ${
                           item.review_status === 'aprovado'
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             : 'bg-amber-50 text-amber-800 border-amber-200'
@@ -358,22 +364,22 @@ export default function Catalogo() {
                       >
                         {statusLabel[item.review_status] || item.review_status}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#EFE8DC] text-[#5C4A32] border border-[#DDD0BC]">
+                      <span className="px-3 py-0.5 rounded-full text-xs font-medium bg-[#EFE8DC] text-[#5C4A32] border border-[#DDD0BC]">
                         {categoryLabel[item.categoria] || item.categoria}
                       </span>
                     </div>
 
-                    <h2 className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+                    <h2 className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
                       {item.display_label}
                     </h2>
-                    <p className="text-xs text-[#8A7A66] mt-0.5">
+                    <p className="text-sm text-[#8A7A66] mt-0.5">
                       {item.tipo || 'Tipo não informado'}
                       {item.cor ? ` · ${item.cor}` : ''}
                       {item.largura ? ` · ${item.largura}` : ''}
                     </p>
                   </div>
 
-                  <div className="text-[11px] text-[#8A7A66] md:text-right space-y-0.5 bg-[#FBF7F0] p-2.5 rounded-xl border border-[#E8DEC8]/60">
+                  <div className="text-xs md:text-sm text-[#8A7A66] md:text-right space-y-0.5 bg-[#FBF7F0] p-3 rounded-xl border border-[#E8DEC8]/60">
                     <p>
                       <strong>Fonte:</strong> {item.source_document || 'Não informada'}
                     </p>
@@ -393,7 +399,7 @@ export default function Catalogo() {
                       variant="outline"
                       size="sm"
                       onClick={() => openEdit(item)}
-                      className="border-[#D6BC7E] text-[#5C4A32] hover:bg-[#F4EEDA] text-xs rounded-xl"
+                      className="border-[#D6BC7E] text-[#5C4A32] hover:bg-[#F4EEDA] text-sm rounded-xl px-3.5 py-1.5"
                     >
                       Editar item
                     </Button>

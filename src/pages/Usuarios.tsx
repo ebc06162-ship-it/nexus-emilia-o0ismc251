@@ -110,11 +110,11 @@ export default function Usuarios() {
               <CardContent className="p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold text-sm text-[#5C4A32]">
+                    <p className="font-semibold text-base text-[#5C4A32]">
                       {user.name || 'Sem nome'}
                     </p>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                         user.ativo
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                           : 'bg-rose-50 text-rose-800 border-rose-200'
@@ -123,8 +123,8 @@ export default function Usuarios() {
                       {user.ativo ? 'Ativo' : 'Revogado'}
                     </span>
                   </div>
-                  <p className="text-xs text-[#8A7A66] mt-0.5">{user.email}</p>
-                  <p className="text-[11px] text-[#B08A3E] font-medium mt-1">
+                  <p className="text-sm text-[#8A7A66] mt-0.5">{user.email}</p>
+                  <p className="text-xs md:text-sm text-[#B08A3E] font-medium mt-1">
                     Perfil: {roleLabels[user.papel] || user.papel}
                   </p>
                 </div>
@@ -134,9 +134,9 @@ export default function Usuarios() {
                   size="sm"
                   disabled={!user.ativo || user.id === current?.id}
                   onClick={() => revoke(user)}
-                  className="border-red-200 text-red-700 hover:bg-red-50 text-xs rounded-xl flex items-center gap-1.5"
+                  className="border-red-200 text-red-700 hover:bg-red-50 text-sm rounded-xl flex items-center gap-1.5 px-3.5 py-1.5"
                 >
-                  <UserX size={14} />
+                  <UserX size={16} />
                   Revogar acesso
                 </Button>
               </CardContent>

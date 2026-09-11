@@ -227,24 +227,24 @@ export default function IntegrationHarness() {
           <Button
             variant="outline"
             onClick={() => navigate('/')}
-            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm rounded-xl flex items-center gap-1.5 px-4 py-2"
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={16} />
             Voltar ao painel
           </Button>
 
-          <span className="text-xs font-sans text-[#B08A3E] flex items-center gap-1 font-medium">
-            <ShieldAlert size={14} />
+          <span className="text-sm font-sans text-[#B08A3E] flex items-center gap-1.5 font-medium">
+            <ShieldAlert size={16} />
             Ambiente de Homologação
           </span>
         </div>
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               Fixtures de Teste
             </CardTitle>
-            <p className="text-xs text-[#8A7A66]">
+            <p className="text-xs md:text-sm text-[#8A7A66]">
               Modo de teste, acesso restrito ao Administrador. Nenhuma conexão externa é ativada.
             </p>
           </CardHeader>
@@ -262,17 +262,17 @@ export default function IntegrationHarness() {
               {fixtures.map(([id, label]) => (
                 <div key={id} className="py-3 flex items-center justify-between">
                   <div>
-                    <p className="font-data tabular-nums text-xs font-semibold text-[#5C4A32]">
+                    <p className="font-data tabular-nums text-sm font-semibold text-[#5C4A32]">
                       {id}
                     </p>
-                    <p className="text-xs text-[#8A7A66]">{label}</p>
+                    <p className="text-sm text-[#8A7A66]">{label}</p>
                   </div>
                   <Button
                     disabled={running}
                     onClick={() => runFixture(id)}
-                    className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-xs rounded-xl flex items-center gap-1"
+                    className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-sm rounded-xl flex items-center gap-1 px-3.5 py-1.5"
                   >
-                    <Play size={12} /> Executar
+                    <Play size={14} /> Executar
                   </Button>
                 </div>
               ))}

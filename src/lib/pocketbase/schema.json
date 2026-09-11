@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T21:14:26.754Z",
+  "generatedAt": "2026-09-11T21:16:55.026Z",
   "collections": [
     {
       "name": "users",
@@ -3503,7 +3503,7 @@
       "apiRules": {
         "list": "@request.auth.id != \"\" && @request.auth.ativo = true && @request.auth.papel != \"\" && ((@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"financeiro\") || (@request.auth.papel = \"atendimento\" && pedido_id.convertido_por = @request.auth.id))",
         "view": "@request.auth.id != \"\" && @request.auth.ativo = true && @request.auth.papel != \"\" && ((@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"financeiro\") || (@request.auth.papel = \"atendimento\" && pedido_id.convertido_por = @request.auth.id))",
-        "create": "@request.auth.id != \"\" && @request.auth.ativo = true && @request.auth.papel != \"\" && ((@request.auth.papel = \"administrador\" || @request.auth.papel = \"gestao\" || @request.auth.papel = \"financeiro\") || (@request.auth.papel = \"atendimento\" && pedido_id.convertido_por = @request.auth.id))",
+        "create": null,
         "update": null,
         "delete": null
       },

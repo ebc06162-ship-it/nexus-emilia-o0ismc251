@@ -150,6 +150,27 @@ export default function NovaProposta() {
     }
   }
 
+  const responderProposta = async (acao) => {
+    if (!saved) return
+    setError('')
+    setSaving(true)
+    try {
+      const resposta = await pb.send(`/backend/v1/propostas/${saved.id}/resposta`, {
+        method: 'POST',
+        body: { acao },
+      })
+      setSaved((current) => ({
+        ...current,
+        status: resposta.status,
+        pedido_id: resposta.pedido_id || current.pedido_id,
+      }))
+    } catch (err) {
+      setError(err.message || 'Não foi possível responder à proposta.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <header className="bg-[#3D2314] text-white p-4">
@@ -176,11 +197,41 @@ export default function NovaProposta() {
         )}
         {saved && (
           <Card className="border-green-700">
-            <CardContent className="p-4">
-              <p className="font-semibold text-green-800">Rascunho salvo</p>
+            <CardContent className="p-4 space-y-3">
+              <p className="font-semibold text-green-800">Proposta registrada</p>
               <p className="text-sm">
                 Proposta {saved.id}, versão {saved.versao}. Nenhum preço foi calculado.
               </p>
+              <p className="text-sm">
+                Status comercial: <strong>{saved.status}</strong>
+                {saved.pedido_id ? ` · Pedido: ${saved.pedido_id}` : ''}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => responderProposta('aprovar')}
+                  className="bg-[#C69D5F] text-white"
+                >
+                  Aprovar e converter
+                </Button>
+                <Button
+                  type="button"
+                  disabled={saving}
+                  variant="outline"
+                  onClick={() => responderProposta('devolver')}
+                >
+                  Devolver para alteração
+                </Button>
+                <Button
+                  type="button"
+                  disabled={saving}
+                  variant="outline"
+                  onClick={() => responderProposta('recusar')}
+                >
+                  Recusar
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}

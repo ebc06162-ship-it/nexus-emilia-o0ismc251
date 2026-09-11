@@ -415,7 +415,7 @@ export default function NovaProposta() {
                       {item.label_snapshot}
                     </p>
                     <p className="text-xs md:text-sm text-[#8A7A66]">
-                      {item.tipo} · quantidade{' '}
+                      ordem {item.ordem} · {item.tipo} · quantidade{' '}
                       <span className="font-data tabular-nums font-semibold">
                         {item.quantidade}
                       </span>

@@ -133,7 +133,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
 
-            <NavLink to="/" className="flex items-center gap-3">
+            <NavLink to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
               <EmiliaLogo size="md" />
             </NavLink>
 
@@ -268,9 +268,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
           </div>
 
           {/* Bloco decorativo do rodapé da sidebar (fiel ao mockup: "MOMENTOS QUE ADOÇAM HISTÓRIAS") */}
-          <div className="pt-6 border-t border-[#E8DEC8]/60 px-3 pb-2 text-center">
-            <p className="font-script text-xl text-[#B08A3E] select-none leading-none">Emília</p>
-            <p className="text-[9px] tracking-[0.2em] uppercase text-[#8A7A66] font-light mt-1">
+          <div className="pt-6 border-t border-[#E8DEC8]/60 px-3 pb-2 flex flex-col items-center text-center">
+            <EmiliaLogo size="sm" className="items-center" />
+            <p className="text-[9px] tracking-[0.2em] uppercase text-[#8A7A66] font-light mt-1.5">
               MOMENTOS QUE ADOÇAM HISTÓRIAS
             </p>
           </div>

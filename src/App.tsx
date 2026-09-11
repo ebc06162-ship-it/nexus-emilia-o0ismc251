@@ -6,18 +6,15 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import NovoCliente from './pages/NovoCliente'
 import NovaOportunidade from './pages/NovaOportunidade'
+import NovaProposta from './pages/NovaProposta'
 import Catalogo from './pages/Catalogo'
 import Historico from './pages/Historico'
 import Usuarios from './pages/Usuarios'
 import IntegrationHarness from './pages/IntegrationHarness'
-import Layout from './components/Layout'
 import pb from '@/lib/pocketbase/client'
 
-// Rota protegida: redireciona para login se não autenticado
 const ProtectedRoute = ({ children, roles }) => {
-  if (!pb.authStore.isValid) {
-    return <Navigate to="/login" replace />
-  }
+  if (!pb.authStore.isValid) return <Navigate to="/login" replace />
   if (roles && !roles.includes(pb.authStore.record?.papel)) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] p-8">
@@ -45,10 +42,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <Routes>
-        {/* Rota pública */}
         <Route path="/login" element={<Login />} />
-
-        {/* Rotas protegidas */}
         <Route
           path="/"
           element={
@@ -62,6 +56,22 @@ const App = () => (
           element={
             <ProtectedRoute>
               <NovoCliente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/oportunidades/nova"
+          element={
+            <ProtectedRoute>
+              <NovaOportunidade />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/propostas/nova"
+          element={
+            <ProtectedRoute>
+              <NovaProposta />
             </ProtectedRoute>
           }
         />
@@ -97,16 +107,6 @@ const App = () => (
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/oportunidades/nova"
-          element={
-            <ProtectedRoute>
-              <NovaOportunidade />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </TooltipProvider>

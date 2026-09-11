@@ -50,7 +50,15 @@ routerAdd(
         pagamentoTx.set('confirmado_por', auth.id)
         pagamentoTx.set('confirmado_em', new Date().toISOString())
         pagamentoTx.set('observacoes', 'Pagamento conferido explicitamente pelo Financeiro.')
-        pedido.set('status_financeiro', 'pago')
+        const demais = txApp.findRecordsByFilter(
+          'pagamentos',
+          'pedido_id = {:pedido} && id != {:pagamento} && status != "conferido" && status != "cancelado"',
+          '',
+          1,
+          0,
+          { pedido: pedido.id, pagamento: pagamentoId },
+        )
+        pedido.set('status_financeiro', demais.length ? 'parcial_em_dia' : 'pago')
       } else {
         pagamentoTx.set('observacoes', 'Pagamento marcado como divergente: ' + motivo)
         pedido.set('status_financeiro', 'divergente')

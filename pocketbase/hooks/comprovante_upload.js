@@ -23,6 +23,9 @@ routerAdd(
     }
     const pedidoId = pagamento.getString('pedido_id')
     const pedido = $app.findRecordById('pedidos', pedidoId)
+    if (pagamento.getString('status') === 'conferido') {
+      throw e.badRequestError('Pagamento confirmado não pode receber novo comprovante.')
+    }
     if (papel === 'atendimento' && pedido.getString('convertido_por') !== auth.id) {
       throw e.forbiddenError('Você só pode incluir comprovantes nos seus próprios pedidos.')
     }

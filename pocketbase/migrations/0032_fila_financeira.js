@@ -10,6 +10,7 @@ migrate(
     const ownOrder = 'pedido_id.convertido_por = @request.auth.id'
     const financialRead = `${active} && (${financialRoles} || (@request.auth.papel = "atendimento" && ${ownOrder}))`
     const operationalWrite = `${active} && (${financialRoles} || (@request.auth.papel = "atendimento" && ${ownOrder}))`
+    const pedidosFinancialRead = `${active} && (${financialRoles} || (@request.auth.papel = "atendimento" && convertido_por = @request.auth.id))`
 
     const planos = new Collection({
       name: 'planos_pagamento',
@@ -273,8 +274,8 @@ migrate(
     app.save(auditoria)
 
     const pedidosExistentes = app.findCollectionByNameOrId('pedidos')
-    pedidosExistentes.listRule = `${active} && (${financialRoles} || @request.auth.papel = "atendimento")`
-    pedidosExistentes.viewRule = pedidosExistentes.listRule
+    pedidosExistentes.listRule = pedidosFinancialRead
+    pedidosExistentes.viewRule = pedidosFinancialRead
     app.save(pedidosExistentes)
 
     const auditoriaPedidos = app.findCollectionByNameOrId('auditoria_pedidos')

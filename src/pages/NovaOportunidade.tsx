@@ -510,7 +510,10 @@ const NovaOportunidade = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="cliente_busca" className="text-base font-semibold text-[#5C4A32]">
+                  <Label
+                    htmlFor="cliente_busca"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
+                  >
                     Cliente *
                   </Label>
                   <Input
@@ -519,7 +522,7 @@ const NovaOportunidade = () => {
                     onChange={(e) => handleClienteBusca(e.target.value)}
                     placeholder="Digite para buscar"
                     autoComplete="off"
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   {buscandoClientes && <p className="text-sm text-muted-foreground">Buscando...</p>}
                   {!clienteSelecionado && clienteBusca.trim() && (
@@ -529,7 +532,7 @@ const NovaOportunidade = () => {
                           key={cliente.id}
                           type="button"
                           onClick={() => selecionarCliente(cliente)}
-                          className="w-full text-left px-3.5 py-2.5 text-base hover:bg-[#F5EEE7]"
+                          className="w-full text-left px-3.5 py-2 text-[15px] hover:bg-[#F5EEE7]"
                         >
                           <span className="font-medium">{cliente.nome}</span>
                           <span className="block text-sm text-muted-foreground">
@@ -540,7 +543,7 @@ const NovaOportunidade = () => {
                       <button
                         type="button"
                         onClick={abrirNovoClienteDaBusca}
-                        className="w-full text-left px-3.5 py-2.5 text-base font-medium text-[#3D2314] bg-[#F5EEE7] border-t"
+                        className="w-full text-left px-3.5 py-2 text-[15px] font-medium text-[#3D2314] bg-[#F5EEE7] border-t"
                       >
                         + Adicionar novo
                       </button>
@@ -548,9 +551,11 @@ const NovaOportunidade = () => {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-base font-semibold text-[#5C4A32]">Tipo de Evento *</Label>
+                  <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                    Tipo de Evento *
+                  </Label>
                   <Select onValueChange={handleEventTypeChange} required>
-                    <SelectTrigger className="h-11 text-base px-3.5">
+                    <SelectTrigger className="h-10 text-[15px] px-3.5">
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
@@ -579,18 +584,18 @@ const NovaOportunidade = () => {
               </div>
               {showNovoCliente && (
                 <div className="rounded-xl border p-4 space-y-3 bg-[#FDFAF5]">
-                  <p className="text-base font-semibold text-[#5C4A32]">Cadastrar novo cliente</p>
+                  <p className="text-[15px] font-semibold text-[#5C4A32]">Cadastrar novo cliente</p>
                   <Input
                     value={novoCliente.nome}
                     onChange={(e) => setNovoCliente((p) => ({ ...p, nome: e.target.value }))}
                     placeholder="Nome do cliente"
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Input
                     value={novoCliente.telefone}
                     onChange={(e) => setNovoCliente((p) => ({ ...p, telefone: e.target.value }))}
                     placeholder="Telefone"
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Button
                     type="button"
@@ -605,56 +610,60 @@ const NovaOportunidade = () => {
 
               {formData.tipo_evento === 'casamento' && (
                 <div className="space-y-1.5">
-                  <Label className="text-base font-semibold text-[#5C4A32]">Nome dos noivos</Label>
+                  <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                    Nome dos noivos
+                  </Label>
                   <Input
                     value={formData.nome_noivos}
                     onChange={(e) => handleChange('nome_noivos', e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                 </div>
               )}
               {formData.tipo_evento === 'aniversario' && (
                 <div className="space-y-1.5">
-                  <Label className="text-base font-semibold text-[#5C4A32]">
+                  <Label className="text-[15px] font-semibold text-[#5C4A32]">
                     Tipo de aniversário *
                   </Label>
                   <Input
                     value={formData.subtipo_evento}
                     onChange={(e) => handleChange('subtipo_evento', e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                 </div>
               )}
               {formData.tipo_evento === 'outros' && (
                 <div className="space-y-1.5">
-                  <Label className="text-base font-semibold text-[#5C4A32]">Justificativa *</Label>
+                  <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                    Justificativa *
+                  </Label>
                   <Input
                     value={formData.justificativa_outros}
                     onChange={(e) => handleChange('justificativa_outros', e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                 </div>
               )}
               {formData.tipo_evento === 'degustacao' && (
                 <div className="border border-[#E8DEC8] rounded-xl p-4 space-y-3 bg-[#FDFAF5]">
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
                       Modalidade de entrega
                     </Label>
                     <Input
                       value={formData.modalidade_entrega}
                       onChange={(e) => handleChange('modalidade_entrega', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
                       Referência / paleta
                     </Label>
                     <Input
                       value={formData.referencia_paleta}
                       onChange={(e) => handleChange('referencia_paleta', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                 </div>
@@ -662,23 +671,23 @@ const NovaOportunidade = () => {
               {formData.tipo_evento === 'revendedor' && (
                 <div className="border border-[#E8DEC8] rounded-xl p-4 space-y-3 bg-[#FDFAF5]">
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
                       Datas de entrega
                     </Label>
                     <Input
                       value={formData.datas_entrega}
                       onChange={(e) => handleChange('datas_entrega', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
                       Tipo de cliente
                     </Label>
                     <Input
                       value={formData.tipo_cliente}
                       onChange={(e) => handleChange('tipo_cliente', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                 </div>
@@ -686,53 +695,55 @@ const NovaOportunidade = () => {
               {formData.tipo_evento === 'bem_nascido' && (
                 <div className="border border-[#E8DEC8] rounded-xl p-4 space-y-3 bg-[#FDFAF5]">
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
                       Data estimada do parto
                     </Label>
                     <Input
                       type="date"
                       value={formData.data_estimada_parto}
                       onChange={(e) => handleChange('data_estimada_parto', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">Maternidade</Label>
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">Maternidade</Label>
                     <Input
                       value={formData.maternidade}
                       onChange={(e) => handleChange('maternidade', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">Tipo de parto</Label>
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                      Tipo de parto
+                    </Label>
                     <Input
                       value={formData.tipo_parto}
                       onChange={(e) => handleChange('tipo_parto', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
                       Responsável pelo acompanhamento
                     </Label>
                     <Input
                       value={formData.responsavel_acompanhamento}
                       onChange={(e) => handleChange('responsavel_acompanhamento', e.target.value)}
-                      className="h-11 text-base px-3.5"
+                      className="h-10 text-[15px] px-3.5"
                     />
                   </div>
                 </div>
               )}
               <div className="border-dashed border border-[#E8DEC8] rounded-xl p-3.5 space-y-2">
-                <Label className="text-base font-semibold text-[#5C4A32]">
+                <Label className="text-[15px] font-semibold text-[#5C4A32]">
                   Identificador de origem
                 </Label>
                 <div className="flex gap-2">
                   <Input
                     value={formData.source_ref}
                     onChange={(e) => handleChange('source_ref', e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Button
                     type="button"
@@ -746,36 +757,39 @@ const NovaOportunidade = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-base font-semibold text-[#5C4A32]">Próxima Ação</Label>
+                  <Label className="text-[15px] font-semibold text-[#5C4A32]">Próxima Ação</Label>
                   <Input
                     value={formData.proxima_acao}
                     onChange={(e) => handleChange('proxima_acao', e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-base font-semibold text-[#5C4A32]">
+                  <Label className="text-[15px] font-semibold text-[#5C4A32]">
                     Prazo Próxima Ação
                   </Label>
                   <Input
                     type="date"
                     value={formData.prazo_proxima_acao}
                     onChange={(e) => handleChange('prazo_proxima_acao', e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-base font-semibold text-[#5C4A32]">Observações</Label>
+                <Label className="text-[15px] font-semibold text-[#5C4A32]">Observações</Label>
                 <Input
                   value={formData.observacoes}
                   onChange={(e) => handleChange('observacoes', e.target.value)}
-                  className="h-11 text-base px-3.5"
+                  className="h-10 text-[15px] px-3.5"
                 />
               </div>
               <div className="rounded-xl border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3">
                 <div>
-                  <Label htmlFor="catalogo_item" className="text-base font-semibold text-[#5C4A32]">
+                  <Label
+                    htmlFor="catalogo_item"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
+                  >
                     Opção aprovada do catálogo
                   </Label>
                   <p className="text-sm text-[#8A7A66]">
@@ -787,7 +801,7 @@ const NovaOportunidade = () => {
                   value={catalogItemId}
                   onChange={(e) => selecionarItemCatalogo(e.target.value)}
                   disabled={catalogLoading}
-                  className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-background px-3.5 py-2.5 text-base text-[#5C4A32]"
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-background px-3.5 py-2 text-[15px] text-[#5C4A32]"
                 >
                   <option value="">Selecione uma opção (opcional)</option>
                   {catalogItems.map((item) => (
@@ -803,7 +817,7 @@ const NovaOportunidade = () => {
                 )}
               </div>
               <div className="rounded-xl border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3">
-                <p className="text-base font-semibold text-[#5C4A32]">
+                <p className="text-[15px] font-semibold text-[#5C4A32]">
                   Registrar informação faltante
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -811,31 +825,31 @@ const NovaOportunidade = () => {
                     placeholder="Campo faltante"
                     value={pendingField}
                     onChange={(e) => setPendingField(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Input
                     placeholder="Motivo"
                     value={pendingReason}
                     onChange={(e) => setPendingReason(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Input
                     placeholder="ID do responsável"
                     value={pendingOwner}
                     onChange={(e) => setPendingOwner(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Input
                     type="date"
                     value={pendingDue}
                     onChange={(e) => setPendingDue(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Input
                     placeholder="Próxima ação"
                     value={pendingAction}
                     onChange={(e) => setPendingAction(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                 </div>
                 <Button
@@ -850,7 +864,7 @@ const NovaOportunidade = () => {
               </div>
 
               <div className="rounded-xl border border-[#7A2E2E] bg-[#FAF1F1] p-4 space-y-3">
-                <p className="text-base font-semibold text-[#7A2E2E]">
+                <p className="text-[15px] font-semibold text-[#7A2E2E]">
                   Registrar valor contraditório
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -858,19 +872,19 @@ const NovaOportunidade = () => {
                     placeholder="Campo"
                     value={conflictField}
                     onChange={(e) => setConflictField(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Input
                     placeholder="Valor informado antes"
                     value={conflictOld}
                     onChange={(e) => setConflictOld(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                   <Input
                     placeholder="Novo valor informado"
                     value={conflictNew}
                     onChange={(e) => setConflictNew(e.target.value)}
-                    className="h-11 text-base px-3.5"
+                    className="h-10 text-[15px] px-3.5"
                   />
                 </div>
                 <p className="text-sm text-[#7A2E2E]">
@@ -892,7 +906,7 @@ const NovaOportunidade = () => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-sm md:text-base px-6 py-2.5 rounded-xl shadow-xs"
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-sm md:text-[15px] px-6 py-2.5 rounded-xl shadow-xs"
                 >
                   {loading || verificandoDuplicata ? 'Verificando...' : 'Salvar Oportunidade'}
                 </Button>
@@ -900,7 +914,7 @@ const NovaOportunidade = () => {
                   type="button"
                   variant="outline"
                   onClick={() => navigate('/')}
-                  className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm md:text-base rounded-xl px-4 py-2.5"
+                  className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm md:text-[15px] rounded-xl px-4 py-2.5"
                 >
                   Cancelar
                 </Button>

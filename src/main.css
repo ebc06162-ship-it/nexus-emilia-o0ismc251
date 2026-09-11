@@ -85,15 +85,15 @@
   }
 
   /* Calibragem tipográfica dos formulários Emília:
-     Labels e campos confortavelmente legíveis em pelo menos 15-16px, Mulish,
-     com texto digitado e selecionado em 16px e placeholders/ajuda em 14-15px. */
+     Labels e campos confortavelmente legíveis em 15px, Mulish semibold #5C4A32,
+     com texto digitado e selecionado em 15px e placeholders/ajuda em 14px. */
   label {
     font-family:
       'Mulish',
       system-ui,
       -apple-system,
       sans-serif;
-    font-size: 1rem; /* 16px */
+    font-size: 0.9375rem; /* 15px */
     font-weight: 600;
     color: #5c4a32;
   }
@@ -106,13 +106,13 @@
       system-ui,
       -apple-system,
       sans-serif;
-    font-size: 1rem; /* 16px */
+    font-size: 0.9375rem; /* 15px */
     line-height: 1.5;
   }
 
   input::placeholder,
   textarea::placeholder {
-    font-size: 0.9375rem; /* 15px */
+    font-size: 0.875rem; /* 14px */
     opacity: 0.75;
   }
 

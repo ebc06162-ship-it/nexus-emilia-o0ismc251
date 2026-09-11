@@ -211,7 +211,7 @@ export default function NovaProposta() {
                   type="button"
                   disabled={saving}
                   onClick={() => responderProposta('aprovar')}
-                  className="bg-[#5C4A32] hover:bg-[#473926] text-white text-base rounded-xl px-4 py-2.5"
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-white text-[15px] rounded-xl px-4 py-2"
                 >
                   Aprovar e converter em pedido
                 </Button>
@@ -220,7 +220,7 @@ export default function NovaProposta() {
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('devolver')}
-                  className="border-[#E8DEC8] text-[#5C4A32] text-base rounded-xl px-4 py-2.5"
+                  className="border-[#E8DEC8] text-[#5C4A32] text-[15px] rounded-xl px-4 py-2"
                 >
                   Devolver orçamento para alteração
                 </Button>
@@ -229,7 +229,7 @@ export default function NovaProposta() {
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('recusar')}
-                  className="border-red-200 text-red-700 text-base rounded-xl px-4 py-2.5"
+                  className="border-red-200 text-red-700 text-[15px] rounded-xl px-4 py-2"
                 >
                   Recusar orçamento
                 </Button>
@@ -245,7 +245,7 @@ export default function NovaProposta() {
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="cliente" className="text-base font-semibold text-[#5C4A32]">
+              <Label htmlFor="cliente" className="text-[15px] font-semibold text-[#5C4A32]">
                 Cliente
               </Label>
               <select
@@ -255,7 +255,7 @@ export default function NovaProposta() {
                   setClienteId(e.target.value)
                   setOportunidadeId('')
                 }}
-                className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
+                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32]"
               >
                 <option value="">Selecione</option>
                 {clientes.map((c: any) => (
@@ -266,14 +266,14 @@ export default function NovaProposta() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="oportunidade" className="text-base font-semibold text-[#5C4A32]">
+              <Label htmlFor="oportunidade" className="text-[15px] font-semibold text-[#5C4A32]">
                 Oportunidade
               </Label>
               <select
                 id="oportunidade"
                 value={oportunidadeId}
                 onChange={(e) => setOportunidadeId(e.target.value)}
-                className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
+                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32]"
               >
                 <option value="">Selecione</option>
                 {oportunidadesVisiveis.map((o: any) => (
@@ -297,14 +297,14 @@ export default function NovaProposta() {
           <CardContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-5 items-end">
               <div className="md:col-span-2 space-y-1.5">
-                <Label htmlFor="item" className="text-base font-semibold text-[#5C4A32]">
+                <Label htmlFor="item" className="text-[15px] font-semibold text-[#5C4A32]">
                   Item aprovado
                 </Label>
                 <select
                   id="item"
                   value={novoItem.catalogo_item_id}
                   onChange={(e) => setNovoItem({ ...novoItem, catalogo_item_id: e.target.value })}
-                  className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32]"
                 >
                   <option value="">Selecione</option>
                   {catalogo.map((item: any) => (
@@ -315,14 +315,14 @@ export default function NovaProposta() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="tipo" className="text-base font-semibold text-[#5C4A32]">
+                <Label htmlFor="tipo" className="text-[15px] font-semibold text-[#5C4A32]">
                   Tipo
                 </Label>
                 <select
                   id="tipo"
                   value={novoItem.tipo}
                   onChange={(e) => setNovoItem({ ...novoItem, tipo: e.target.value })}
-                  className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32]"
                 >
                   {tipos.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -332,7 +332,7 @@ export default function NovaProposta() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="quantidade" className="text-base font-semibold text-[#5C4A32]">
+                <Label htmlFor="quantidade" className="text-[15px] font-semibold text-[#5C4A32]">
                   Quantidade
                 </Label>
                 <Input
@@ -341,19 +341,19 @@ export default function NovaProposta() {
                   min="1"
                   value={novoItem.quantidade}
                   onChange={(e) => setNovoItem({ ...novoItem, quantidade: Number(e.target.value) })}
-                  className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                  className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
                 />
               </div>
               <Button
                 type="button"
                 onClick={addItem}
-                className="bg-[#5C4A32] text-white hover:bg-[#473926] text-sm md:text-base rounded-xl h-11 px-4"
+                className="bg-[#5C4A32] text-white hover:bg-[#473926] text-sm md:text-[15px] rounded-xl h-10 px-4"
               >
                 Adicionar
               </Button>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="grupo" className="text-base font-semibold text-[#5C4A32]">
+              <Label htmlFor="grupo" className="text-[15px] font-semibold text-[#5C4A32]">
                 Grupo de alternativa (obrigatório para alternativa)
               </Label>
               <Input
@@ -361,7 +361,7 @@ export default function NovaProposta() {
                 value={novoItem.grupo_alternativa}
                 onChange={(e) => setNovoItem({ ...novoItem, grupo_alternativa: e.target.value })}
                 placeholder="Ex.: embalagem"
-                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
               />
             </div>
             <div className="space-y-2">
@@ -431,7 +431,7 @@ export default function NovaProposta() {
               </p>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="observacoes" className="text-base font-semibold text-[#5C4A32]">
+              <Label htmlFor="observacoes" className="text-[15px] font-semibold text-[#5C4A32]">
                 Observações
               </Label>
               <Input
@@ -439,7 +439,7 @@ export default function NovaProposta() {
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
                 placeholder="Observações da revisão"
-                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
               />
             </div>
             <div className="flex flex-wrap gap-3 pt-2">

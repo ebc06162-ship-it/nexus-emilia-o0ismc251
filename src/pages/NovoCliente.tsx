@@ -70,7 +70,7 @@ const Field = ({
   placeholder = '',
 }: FieldProps) => (
   <div className="space-y-1.5">
-    <Label htmlFor={id} className="text-base font-semibold text-[#5C4A32]">
+    <Label htmlFor={id} className="text-[15px] font-semibold text-[#5C4A32]">
       {label}
     </Label>
     <Input
@@ -80,7 +80,7 @@ const Field = ({
       onChange={(e) => onChange(e.target.value)}
       required={required}
       placeholder={placeholder}
-      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5 py-2.5 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5 py-2 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
     />
   </div>
 )
@@ -254,7 +254,7 @@ export default function NovoCliente() {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="natureza-cadastral"
-                    className="text-base font-semibold text-[#5C4A32]"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
                   >
                     Natureza cadastral *
                   </Label>
@@ -262,7 +262,7 @@ export default function NovoCliente() {
                     id="natureza-cadastral"
                     value={natureza}
                     onChange={(e) => setNatureza(e.target.value)}
-                    className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+                    className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
                   >
                     <option value="pessoa_fisica">Pessoa Física</option>
                     <option value="pessoa_juridica">Pessoa Jurídica</option>
@@ -271,7 +271,7 @@ export default function NovoCliente() {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="classificacao-comercial"
-                    className="text-base font-semibold text-[#5C4A32]"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
                   >
                     Classificação comercial *
                   </Label>
@@ -279,7 +279,7 @@ export default function NovoCliente() {
                     id="classificacao-comercial"
                     value={classificacao}
                     onChange={(e) => setClassificacao(e.target.value)}
-                    className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+                    className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
                   >
                     {CLASSIFICATIONS.map(([v, l]) => (
                       <option key={v} value={v}>
@@ -299,7 +299,7 @@ export default function NovoCliente() {
               />
 
               <div className="space-y-1.5">
-                <Label htmlFor="telefone" className="text-base font-semibold text-[#5C4A32]">
+                <Label htmlFor="telefone" className="text-[15px] font-semibold text-[#5C4A32]">
                   Telefone principal *
                 </Label>
                 <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
@@ -310,7 +310,7 @@ export default function NovoCliente() {
                       setTelefone(formatPhone(telefone, v))
                     }}
                   >
-                    <SelectTrigger className="w-36 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-base h-11">
+                    <SelectTrigger className="w-36 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-[15px] h-10">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#FDFAF5] border-[#E8DEC8]">
@@ -321,7 +321,7 @@ export default function NovoCliente() {
                   <Input
                     id="telefone"
                     type="tel"
-                    className="min-w-0 w-full rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5 py-2.5 text-[#5C4A32]"
+                    className="min-w-0 w-full rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5 py-2 text-[#5C4A32]"
                     value={telefone}
                     onChange={(e) => setTelefone(formatPhone(e.target.value, pais))}
                     required
@@ -374,9 +374,11 @@ export default function NovoCliente() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-base font-semibold text-[#5C4A32]">Origem do cliente</Label>
+                <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                  Origem do cliente
+                </Label>
                 <Select value={origem} onValueChange={setOrigem}>
-                  <SelectTrigger className="h-11 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-base text-[#5C4A32] px-3.5 py-2.5">
+                  <SelectTrigger className="h-10 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-[15px] text-[#5C4A32] px-3.5 py-2">
                     <SelectValue placeholder="Selecione, se souber" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#FDFAF5] border-[#E8DEC8]">
@@ -392,11 +394,11 @@ export default function NovoCliente() {
               {origem === 'indicacao' && (
                 <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-4 space-y-3">
                   <div className="space-y-1.5">
-                    <Label className="text-base font-semibold text-[#5C4A32]">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
                       Categoria da indicação *
                     </Label>
                     <Select value={categoria} onValueChange={setCategoria}>
-                      <SelectTrigger className="h-11 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-base px-3.5 py-2.5">
+                      <SelectTrigger className="h-10 rounded-xl border-[#E8DEC8] bg-[#FDFAF5] text-[15px] px-3.5 py-2">
                         <SelectValue placeholder="Selecione" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#FDFAF5] border-[#E8DEC8]">
@@ -413,7 +415,7 @@ export default function NovoCliente() {
                       value={indicadorBusca}
                       onChange={(e) => setIndicadorBusca(e.target.value)}
                       placeholder="Buscar quem indicou (nome ou telefone)"
-                      className="h-11 rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base px-3.5"
+                      className="h-10 rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] px-3.5"
                     />
                     <Button
                       type="button"
@@ -463,7 +465,7 @@ export default function NovoCliente() {
                 <Button
                   type="button"
                   onClick={submit}
-                  className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-sm md:text-base px-6 py-2.5 rounded-xl shadow-xs"
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-sm md:text-[15px] px-6 py-2.5 rounded-xl shadow-xs"
                   disabled={loading}
                 >
                   {loading ? 'Salvando...' : 'Salvar Cliente'}

@@ -186,7 +186,7 @@ export default function Catalogo() {
                   <div className="space-y-1.5">
                     <Label
                       htmlFor="catalogo-codigo"
-                      className="text-base font-semibold text-[#5C4A32]"
+                      className="text-[15px] font-semibold text-[#5C4A32]"
                     >
                       Código
                     </Label>
@@ -194,13 +194,13 @@ export default function Catalogo() {
                       id="catalogo-codigo"
                       value={draft.codigo}
                       onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <Label
                       htmlFor="catalogo-nome"
-                      className="text-base font-semibold text-[#5C4A32]"
+                      className="text-[15px] font-semibold text-[#5C4A32]"
                     >
                       Nome *
                     </Label>
@@ -209,13 +209,13 @@ export default function Catalogo() {
                       required
                       value={draft.nome}
                       onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <Label
                       htmlFor="catalogo-label"
-                      className="text-base font-semibold text-[#5C4A32]"
+                      className="text-[15px] font-semibold text-[#5C4A32]"
                     >
                       Label de exibição
                     </Label>
@@ -223,13 +223,13 @@ export default function Catalogo() {
                       id="catalogo-label"
                       value={draft.display_label}
                       onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <Label
                       htmlFor="catalogo-categoria"
-                      className="text-base font-semibold text-[#5C4A32]"
+                      className="text-[15px] font-semibold text-[#5C4A32]"
                     >
                       Categoria
                     </Label>
@@ -237,7 +237,7 @@ export default function Catalogo() {
                       id="catalogo-categoria"
                       value={draft.categoria}
                       onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
-                      className="flex h-11 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2.5 text-base text-[#5C4A32]"
+                      className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32]"
                     >
                       <option value="papel">Papel</option>
                       <option value="fita">Fita</option>
@@ -249,7 +249,7 @@ export default function Catalogo() {
                   <div className="space-y-1.5">
                     <Label
                       htmlFor="catalogo-fonte"
-                      className="text-base font-semibold text-[#5C4A32]"
+                      className="text-[15px] font-semibold text-[#5C4A32]"
                     >
                       Documento fonte
                     </Label>
@@ -257,13 +257,13 @@ export default function Catalogo() {
                       id="catalogo-fonte"
                       value={draft.source_document}
                       onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <Label
                       htmlFor="catalogo-versao"
-                      className="text-base font-semibold text-[#5C4A32]"
+                      className="text-[15px] font-semibold text-[#5C4A32]"
                     >
                       Versão da fonte
                     </Label>
@@ -271,13 +271,13 @@ export default function Catalogo() {
                       id="catalogo-versao"
                       value={draft.source_version}
                       onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
                     />
                   </div>
                   <div className="md:col-span-2 space-y-1.5">
                     <Label
                       htmlFor="catalogo-localizador"
-                      className="text-base font-semibold text-[#5C4A32]"
+                      className="text-[15px] font-semibold text-[#5C4A32]"
                     >
                       Localizador
                     </Label>
@@ -285,14 +285,14 @@ export default function Catalogo() {
                       id="catalogo-localizador"
                       value={draft.source_locator}
                       onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
-                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 px-3.5"
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 px-3.5"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2 pt-2">
                   <Button
                     type="submit"
-                    className="bg-[#5C4A32] text-white hover:bg-[#473926] text-base rounded-xl px-5 py-2.5"
+                    className="bg-[#5C4A32] text-white hover:bg-[#473926] text-[15px] rounded-xl px-5 py-2"
                   >
                     Salvar item
                   </Button>
@@ -300,7 +300,7 @@ export default function Catalogo() {
                     type="button"
                     variant="outline"
                     onClick={openNew}
-                    className="border-[#E8DEC8] text-[#5C4A32] text-base rounded-xl px-4 py-2.5"
+                    className="border-[#E8DEC8] text-[#5C4A32] text-[15px] rounded-xl px-4 py-2"
                   >
                     Limpar
                   </Button>
@@ -319,7 +319,7 @@ export default function Catalogo() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Buscar por código, nome, categoria ou cor..."
                 aria-label="Buscar no catálogo"
-                className="pl-11 rounded-full bg-[#FDFAF5] border-[#E8DEC8] text-base h-11 py-2.5 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+                className="pl-11 rounded-full bg-[#FDFAF5] border-[#E8DEC8] text-[15px] h-10 py-2 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
               />
             </div>
 

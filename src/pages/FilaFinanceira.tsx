@@ -248,8 +248,12 @@ export default function FilaFinanceira() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {pagamento.status === 'conferido' && pedido?.status_financeiro === 'pago' && (
+                    <p className="text-sm font-semibold text-emerald-800">Pago</p>
+                  )}
+                  {pagamento.status === 'conferido' && pedido?.status_financeiro !== 'pago' && (
                     <p className="text-sm text-emerald-800">
-                      Pagamento conferido pelo Financeiro · pedido pago.
+                      Pagamento conferido pelo Financeiro · pedido{' '}
+                      {pedidoStatusLabels[statusPedido] || statusPedido}.
                     </p>
                   )}
                   <div className="grid gap-3 md:grid-cols-3 text-sm">

@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import pb from '@/lib/pocketbase/client'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/hooks/use-toast'
+import EmiliaLogo from '@/components/EmiliaLogo'
+import { Lock, Mail, Sparkles } from 'lucide-react'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -15,7 +17,7 @@ const Login = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
@@ -26,7 +28,7 @@ const Login = () => {
         description: 'Bem-vinda ao Nexus Emília',
       })
       window.location.assign('/')
-    } catch (error) {
+    } catch {
       toast({
         title: 'Erro no login',
         description: 'Email ou senha incorretos',
@@ -38,46 +40,91 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-[#3D2314]">Nexus Emília</CardTitle>
-          <CardDescription>Sistema de Gestão de Clientes</CardDescription>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F1E8] px-4 py-12 relative overflow-hidden">
+      {/* Detalhes de fundo suaves em tom bege e dourado */}
+      <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-[#EFE5D3]/60 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-[#E5D7B7]/40 blur-3xl pointer-events-none" />
+
+      {/* Card central */}
+      <Card className="w-full max-w-md bg-[#FDFAF5] border-[#E8DEC8] rounded-3xl shadow-elevation relative z-10 overflow-hidden">
+        {/* Topo com logotipo oficial Emília Bem-Casados */}
+        <CardHeader className="text-center pt-8 pb-4 flex flex-col items-center">
+          <EmiliaLogo size="lg" className="mb-2" />
+          <div className="mt-3 flex items-center justify-center gap-2">
+            <span className="h-[1px] w-8 bg-[#E8DEC8]" />
+            <span className="text-[10px] tracking-[0.24em] uppercase text-[#8A7A66] font-medium">
+              SISTEMA DE GESTÃO
+            </span>
+            <span className="h-[1px] w-8 bg-[#E8DEC8]" />
+          </div>
+          <p className="font-serif italic text-xs text-[#B08A3E] mt-2">
+            "Tradição que celebra histórias."
+          </p>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="px-6 md:px-8 pb-8 pt-2">
           <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-medium text-[#5C4A32]">
+                E-mail de acesso
+              </Label>
+              <div className="relative">
+                <Mail
+                  size={16}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A7A66]/70 pointer-events-none"
+                />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@emilia.com.br"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 rounded-xl bg-white/80 border-[#E8DEC8] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30 text-xs py-2"
+                  required
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-xs font-medium text-[#5C4A32]">
+                Senha
+              </Label>
+              <div className="relative">
+                <Lock
+                  size={16}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A7A66]/70 pointer-events-none"
+                />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 rounded-xl bg-white/80 border-[#E8DEC8] text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30 text-xs py-2"
+                  required
+                />
+              </div>
             </div>
+
             <Button
               type="submit"
-              className="w-full bg-[#C69D5F] hover:bg-[#DCC39E] text-white"
+              className="w-full bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] rounded-xl py-2.5 font-medium text-xs shadow-xs transition-colors mt-2"
               disabled={loading}
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? 'Entrando...' : 'Entrar no sistema'}
             </Button>
           </form>
+
+          {/* Dica de rodapé */}
+          <div className="mt-6 pt-4 border-t border-[#E8DEC8]/60 text-center">
+            <p className="text-[11px] text-[#8A7A66] flex items-center justify-center gap-1.5">
+              <Sparkles size={12} className="text-[#B08A3E]" />
+              Emília Bem-Casados · Acesso restrito
+            </p>
+          </div>
         </CardContent>
       </Card>
+
       <Toaster />
     </div>
   )

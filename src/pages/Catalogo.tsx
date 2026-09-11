@@ -6,14 +6,16 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import pb from '@/lib/pocketbase/client'
+import AppShell from '@/components/AppShell'
+import { ArrowLeft, Plus, Search, Tag, CheckCircle2, AlertTriangle } from 'lucide-react'
 
-const statusLabel = {
+const statusLabel: Record<string, string> = {
   rascunho: 'Rascunho',
   aprovado: 'Aprovado',
   conflito: 'Conflito',
   inativo: 'Inativo',
 }
-const categoryLabel = {
+const categoryLabel: Record<string, string> = {
   produto: 'Produto',
   sabor: 'Sabor',
   papel: 'Papel',
@@ -42,11 +44,11 @@ const emptyDraft = {
 
 export default function Catalogo() {
   const navigate = useNavigate()
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState<any[]>([])
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [editing, setEditing] = useState(null)
+  const [editing, setEditing] = useState<any>(null)
   const [draft, setDraft] = useState(emptyDraft)
   const canManage = ['administrador', 'gestao'].includes(pb.authStore.record?.papel)
 
@@ -67,7 +69,7 @@ export default function Catalogo() {
     setEditing(null)
     setDraft(emptyDraft)
   }
-  const openEdit = (item) => {
+  const openEdit = (item: any) => {
     setEditing(item)
     setDraft({
       codigo: item.codigo || '',
@@ -81,7 +83,7 @@ export default function Catalogo() {
     })
   }
 
-  const saveItem = async (event) => {
+  const saveItem = async (event: React.FormEvent) => {
     event.preventDefault()
     setError('')
     try {
@@ -91,7 +93,7 @@ export default function Catalogo() {
       await load()
       setEditing(null)
       setDraft(emptyDraft)
-    } catch (err) {
+    } catch (err: any) {
       if ((err?.status === 403 || err?.status === 400) && pb.authStore.isValid && !canManage) {
         try {
           await pb.send('/backend/v1/auditoria/negacao', {
@@ -123,80 +125,107 @@ export default function Catalogo() {
   const counts = useMemo(
     () =>
       items.reduce(
-        (acc, item) => ({ ...acc, [item.review_status]: (acc[item.review_status] || 0) + 1 }),
+        (acc: any, item) => ({ ...acc, [item.review_status]: (acc[item.review_status] || 0) + 1 }),
         {},
       ),
     [items],
   )
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
-      <header className="bg-[#3D2314] text-white p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-[#DCC39E]">Nexus Emília</p>
-            <h1 className="text-2xl font-semibold">Catálogo versionado</h1>
-          </div>
+    <AppShell
+      title="Catálogo de Produtos & Acabamentos"
+      subtitle="Opções canônicas aprovadas pela Emília Bem-Casados para propostas e pedidos"
+    >
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
           <Button
             variant="outline"
-            className="text-white border-white hover:bg-white hover:text-[#3D2314]"
             onClick={() => navigate('/')}
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
           >
-            Voltar
+            <ArrowLeft size={14} />
+            Voltar ao painel
           </Button>
+
+          {canManage && (
+            <Button
+              onClick={openNew}
+              className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-xs rounded-xl flex items-center gap-1.5"
+            >
+              <Plus size={14} />
+              Novo Item
+            </Button>
+          )}
         </div>
-      </header>
-      <main className="container mx-auto py-8 px-4 space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Opções internas aprovadas pela Emília</CardTitle>
-            <p className="text-sm text-gray-600">
+
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
+          <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
+            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              Opções Internas Aprovadas
+            </CardTitle>
+            <p className="text-xs text-[#8A7A66]">
               Fornecedores são apenas fundamento técnico interno. Esta tela exibe somente itens e
               nomes canônicos do catálogo da Emília.
             </p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {canManage && (
+          <CardContent className="pt-4 space-y-4">
+            {canManage && (editing || draft.nome) && (
               <form
                 onSubmit={saveItem}
-                className="rounded-md border border-[#C69D5F] bg-[#F5EEE7] p-4 space-y-3"
+                className="rounded-2xl border border-[#D6BC7E] bg-[#F8F3EA] p-4 space-y-3"
               >
-                <h2 className="font-semibold text-[#3D2314]">
-                  {editing ? 'Editar item' : 'Novo item'}
-                </h2>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-serif font-semibold text-[#5C4A32]">
+                    {editing ? 'Editar item do catálogo' : 'Novo item do catálogo'}
+                  </h3>
+                  <span className="text-[10px] text-[#8A7A66] uppercase tracking-wider">
+                    Formulário de gestão
+                  </span>
+                </div>
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
-                    <Label htmlFor="catalogo-codigo">Código</Label>
+                    <Label htmlFor="catalogo-codigo" className="text-xs text-[#5C4A32]">
+                      Código
+                    </Label>
                     <Input
                       id="catalogo-codigo"
                       value={draft.codigo}
                       onChange={(e) => setDraft({ ...draft, codigo: e.target.value })}
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-nome">Nome</Label>
+                    <Label htmlFor="catalogo-nome" className="text-xs text-[#5C4A32]">
+                      Nome *
+                    </Label>
                     <Input
                       id="catalogo-nome"
                       required
                       value={draft.nome}
                       onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-label">Label de exibição</Label>
+                    <Label htmlFor="catalogo-label" className="text-xs text-[#5C4A32]">
+                      Label de exibição
+                    </Label>
                     <Input
                       id="catalogo-label"
                       value={draft.display_label}
                       onChange={(e) => setDraft({ ...draft, display_label: e.target.value })}
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-categoria">Categoria</Label>
+                    <Label htmlFor="catalogo-categoria" className="text-xs text-[#5C4A32]">
+                      Categoria
+                    </Label>
                     <select
                       id="catalogo-categoria"
                       value={draft.categoria}
                       onChange={(e) => setDraft({ ...draft, categoria: e.target.value })}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex h-9 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-1.5 text-xs text-[#5C4A32]"
                     >
                       <option value="papel">Papel</option>
                       <option value="fita">Fita</option>
@@ -206,112 +235,179 @@ export default function Catalogo() {
                     </select>
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-fonte">Documento fonte</Label>
+                    <Label htmlFor="catalogo-fonte" className="text-xs text-[#5C4A32]">
+                      Documento fonte
+                    </Label>
                     <Input
                       id="catalogo-fonte"
                       value={draft.source_document}
                       onChange={(e) => setDraft({ ...draft, source_document: e.target.value })}
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="catalogo-versao">Versão da fonte</Label>
+                    <Label htmlFor="catalogo-versao" className="text-xs text-[#5C4A32]">
+                      Versão da fonte
+                    </Label>
                     <Input
                       id="catalogo-versao"
                       value={draft.source_version}
                       onChange={(e) => setDraft({ ...draft, source_version: e.target.value })}
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label htmlFor="catalogo-localizador">Localizador</Label>
+                    <Label htmlFor="catalogo-localizador" className="text-xs text-[#5C4A32]">
+                      Localizador
+                    </Label>
                     <Input
                       id="catalogo-localizador"
                       value={draft.source_locator}
                       onChange={(e) => setDraft({ ...draft, source_locator: e.target.value })}
+                      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
                     />
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button type="submit" className="bg-[#C69D5F] text-white">
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="submit"
+                    className="bg-[#5C4A32] text-white hover:bg-[#473926] text-xs rounded-xl"
+                  >
                     Salvar item
                   </Button>
-                  {editing && (
-                    <Button type="button" variant="outline" onClick={openNew}>
-                      Cancelar edição
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={openNew}
+                    className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
+                  >
+                    Limpar
+                  </Button>
                 </div>
               </form>
             )}
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por código, nome, categoria ou cor"
-              aria-label="Buscar no catálogo"
-            />
-            <div className="flex flex-wrap gap-2 text-sm">
-              <Badge variant="outline">Total: {items.length}</Badge>
-              <Badge variant="outline">Aprovados: {counts.aprovado || 0}</Badge>
-              <Badge variant="outline">Rascunhos: {counts.rascunho || 0}</Badge>
-              <Badge variant="outline">Conflitos: {counts.conflito || 0}</Badge>
+
+            {/* Barra de busca arredondada */}
+            <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A7A66]/70 pointer-events-none"
+              />
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar por código, nome, categoria ou cor..."
+                aria-label="Buscar no catálogo"
+                className="pl-10 rounded-full bg-[#FDFAF5] border-[#E8DEC8] text-xs py-2 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+              />
+            </div>
+
+            {/* Badges de contagem estilo suave */}
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="px-3 py-1 rounded-full bg-[#F4EEDA] text-[#5C4A32] border border-[#E5D7B7] text-[11px] font-medium">
+                Total: {items.length}
+              </span>
+              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-medium">
+                Aprovados: {counts.aprovado || 0}
+              </span>
+              <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-medium">
+                Rascunhos: {counts.rascunho || 0}
+              </span>
+              <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-medium">
+                Conflitos: {counts.conflito || 0}
+              </span>
             </div>
           </CardContent>
         </Card>
-        {loading && <p className="text-gray-600">Carregando catálogo...</p>}
+
+        {loading && <p className="text-xs text-[#8A7A66]">Carregando catálogo...</p>}
         {error && (
-          <p role="alert" className="text-[#7A2E2E]">
+          <p
+            role="alert"
+            className="text-xs text-red-700 bg-red-50 p-3 rounded-xl border border-red-200"
+          >
             {error}
           </p>
         )}
         {!loading && !error && filtered.length === 0 && (
-          <p className="text-gray-600">Nenhum item encontrado.</p>
+          <p className="text-xs text-[#8A7A66] py-6 text-center">Nenhum item encontrado.</p>
         )}
-        <div className="grid gap-4">
+
+        <div className="grid gap-3">
           {filtered.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-5">
+            <Card
+              key={item.id}
+              className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card hover:shadow-subtle transition-shadow overflow-hidden"
+            >
+              <CardContent className="p-4 md:p-5">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="font-mono text-sm text-[#3D2314]">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <span className="font-mono text-xs text-[#8A7A66] bg-[#F4EEDA] px-2 py-0.5 rounded-md border border-[#E5D7B7]">
                         {item.codigo || 'Sem código'}
                       </span>
-                      <Badge variant={item.review_status === 'aprovado' ? 'default' : 'outline'}>
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium border ${
+                          item.review_status === 'aprovado'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                        }`}
+                      >
                         {statusLabel[item.review_status] || item.review_status}
-                      </Badge>
-                      <Badge variant="outline">
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#EFE8DC] text-[#5C4A32] border border-[#DDD0BC]">
                         {categoryLabel[item.categoria] || item.categoria}
-                      </Badge>
+                      </span>
                     </div>
-                    <h2 className="text-lg font-semibold text-[#3D2314]">{item.display_label}</h2>
-                    <p className="text-sm text-gray-600 mt-1">
+
+                    <h2 className="font-serif text-lg font-semibold text-[#5C4A32]">
+                      {item.display_label}
+                    </h2>
+                    <p className="text-xs text-[#8A7A66] mt-0.5">
                       {item.tipo || 'Tipo não informado'}
                       {item.cor ? ` · ${item.cor}` : ''}
                       {item.largura ? ` · ${item.largura}` : ''}
                     </p>
                   </div>
-                  <div className="text-xs text-gray-600 md:text-right">
-                    <p>Fonte: {item.source_document || 'Não informada'}</p>
-                    <p>Versão: {item.source_version || 'Não informada'}</p>
-                    <p>Localizador: {item.source_locator || 'Não informado'}</p>
+
+                  <div className="text-[11px] text-[#8A7A66] md:text-right space-y-0.5 bg-[#FBF7F0] p-2.5 rounded-xl border border-[#E8DEC8]/60">
+                    <p>
+                      <strong>Fonte:</strong> {item.source_document || 'Não informada'}
+                    </p>
+                    <p>
+                      <strong>Versão:</strong> {item.source_version || 'Não informada'}
+                    </p>
+                    <p>
+                      <strong>Localizador:</strong> {item.source_locator || 'Não informado'}
+                    </p>
                   </div>
                 </div>
+
                 {canManage && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button type="button" variant="outline" onClick={() => openEdit(item)}>
+                  <div className="mt-3 pt-3 border-t border-[#E8DEC8]/60 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openEdit(item)}
+                      className="border-[#D6BC7E] text-[#5C4A32] hover:bg-[#F4EEDA] text-xs rounded-xl"
+                    >
                       Editar item
                     </Button>
                   </div>
                 )}
+
                 {item.review_status === 'rascunho' && (
-                  <p className="mt-4 text-sm text-[#7A2E2E]">
-                    Este item não pode ser tratado como opção aprovada sem códig, fonte e versão.
+                  <p className="mt-2 text-[11px] text-[#A6792E] flex items-center gap-1">
+                    <AlertTriangle size={12} />
+                    Este item não pode ser tratado como opção aprovada sem código, fonte e versão.
                   </p>
                 )}
               </CardContent>
             </Card>
           ))}
         </div>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   )
 }

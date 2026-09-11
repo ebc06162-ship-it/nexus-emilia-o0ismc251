@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import pb from '@/lib/pocketbase/client'
+import AppShell from '@/components/AppShell'
+import { ArrowLeft } from 'lucide-react'
 
 const tipos = [
   ['cumulativo', 'Cumulativo'],
@@ -172,23 +174,21 @@ export default function NovaProposta() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
-      <header className="bg-[#3D2314] text-white p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-[#DCC39E]">Nexus Emília</p>
-            <h1 className="text-2xl font-semibold">Montador de proposta</h1>
-          </div>
+    <AppShell
+      title="Montador de Proposta"
+      subtitle="Composição de itens aprovados do catálogo e amarração à política comercial"
+    >
+      <div className="space-y-5 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between">
           <Button
             variant="outline"
-            className="text-white border-white"
             onClick={() => navigate('/')}
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
           >
-            Voltar
+            <ArrowLeft size={14} />
+            Voltar ao painel
           </Button>
         </div>
-      </header>
-      <main className="container mx-auto py-8 px-4 space-y-6 max-w-5xl">
         {loading && <p>Carregando dados aprovados...</p>}
         {error && (
           <p role="alert" className="text-[#7A2E2E]">
@@ -211,7 +211,7 @@ export default function NovaProposta() {
                   type="button"
                   disabled={saving}
                   onClick={() => responderProposta('aprovar')}
-                  className="bg-[#C69D5F] text-white"
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-white text-xs rounded-xl"
                 >
                   Aprovar e converter
                 </Button>
@@ -220,6 +220,7 @@ export default function NovaProposta() {
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('devolver')}
+                  className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
                 >
                   Devolver para alteração
                 </Button>
@@ -228,6 +229,7 @@ export default function NovaProposta() {
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('recusar')}
+                  className="border-red-200 text-red-700 text-xs rounded-xl"
                 >
                   Recusar
                 </Button>
@@ -235,13 +237,17 @@ export default function NovaProposta() {
             </CardContent>
           </Card>
         )}
-        <Card>
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle>1. Contexto da proposta</CardTitle>
+            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              1. Contexto da proposta
+            </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <div>
-              <Label htmlFor="cliente">Cliente</Label>
+              <Label htmlFor="cliente" className="text-xs text-[#5C4A32]">
+                Cliente
+              </Label>
               <select
                 id="cliente"
                 value={clienteId}
@@ -249,10 +255,10 @@ export default function NovaProposta() {
                   setClienteId(e.target.value)
                   setOportunidadeId('')
                 }}
-                className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
               >
                 <option value="">Selecione</option>
-                {clientes.map((c) => (
+                {clientes.map((c: any) => (
                   <option key={c.id} value={c.id}>
                     {c.nome}
                   </option>
@@ -260,15 +266,17 @@ export default function NovaProposta() {
               </select>
             </div>
             <div>
-              <Label htmlFor="oportunidade">Oportunidade</Label>
+              <Label htmlFor="oportunidade" className="text-xs text-[#5C4A32]">
+                Oportunidade
+              </Label>
               <select
                 id="oportunidade"
                 value={oportunidadeId}
                 onChange={(e) => setOportunidadeId(e.target.value)}
-                className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
               >
                 <option value="">Selecione</option>
-                {oportunidadesVisiveis.map((o) => (
+                {oportunidadesVisiveis.map((o: any) => (
                   <option key={o.id} value={o.id}>
                     {o.tipo_evento || o.tipo_pedido || 'Oportunidade'} · {o.status}
                   </option>
@@ -277,25 +285,29 @@ export default function NovaProposta() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle>2. Itens da proposta</CardTitle>
-            <p className="text-sm text-gray-600">
+            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              2. Itens da proposta
+            </CardTitle>
+            <p className="text-xs text-[#8A7A66]">
               Itens aprovados do catálogo. Alternativas do mesmo grupo não são somadas.
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-5 items-end">
               <div className="md:col-span-2">
-                <Label htmlFor="item">Item aprovado</Label>
+                <Label htmlFor="item" className="text-xs text-[#5C4A32]">
+                  Item aprovado
+                </Label>
                 <select
                   id="item"
                   value={novoItem.catalogo_item_id}
                   onChange={(e) => setNovoItem({ ...novoItem, catalogo_item_id: e.target.value })}
-                  className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
                 >
                   <option value="">Selecione</option>
-                  {catalogo.map((item) => (
+                  {catalogo.map((item: any) => (
                     <option key={item.id} value={item.id}>
                       {item.codigo || 'Sem código'} · {item.display_label}
                     </option>
@@ -303,12 +315,14 @@ export default function NovaProposta() {
                 </select>
               </div>
               <div>
-                <Label htmlFor="tipo">Tipo</Label>
+                <Label htmlFor="tipo" className="text-xs text-[#5C4A32]">
+                  Tipo
+                </Label>
                 <select
                   id="tipo"
                   value={novoItem.tipo}
                   onChange={(e) => setNovoItem({ ...novoItem, tipo: e.target.value })}
-                  className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3 py-2 text-xs text-[#5C4A32]"
                 >
                   {tipos.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -318,44 +332,60 @@ export default function NovaProposta() {
                 </select>
               </div>
               <div>
-                <Label htmlFor="quantidade">Quantidade</Label>
+                <Label htmlFor="quantidade" className="text-xs text-[#5C4A32]">
+                  Quantidade
+                </Label>
                 <Input
                   id="quantidade"
                   type="number"
                   min="1"
                   value={novoItem.quantidade}
                   onChange={(e) => setNovoItem({ ...novoItem, quantidade: Number(e.target.value) })}
+                  className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
                 />
               </div>
-              <Button type="button" onClick={addItem} className="bg-[#C69D5F] text-white">
+              <Button
+                type="button"
+                onClick={addItem}
+                className="bg-[#5C4A32] text-white hover:bg-[#473926] text-xs rounded-xl"
+              >
                 Adicionar
               </Button>
             </div>
             <div>
-              <Label htmlFor="grupo">Grupo de alternativa (obrigatório para alternativa)</Label>
+              <Label htmlFor="grupo" className="text-xs text-[#5C4A32]">
+                Grupo de alternativa (obrigatório para alternativa)
+              </Label>
               <Input
                 id="grupo"
                 value={novoItem.grupo_alternativa}
                 onChange={(e) => setNovoItem({ ...novoItem, grupo_alternativa: e.target.value })}
                 placeholder="Ex.: embalagem"
+                className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
               />
             </div>
             <div className="space-y-2">
-              {!itens.length && <p className="text-sm text-gray-600">Nenhum item adicionado.</p>}
-              {itens.map((item, index) => (
+              {!itens.length && <p className="text-xs text-[#8A7A66]">Nenhum item adicionado.</p>}
+              {itens.map((item: any, index: number) => (
                 <div
                   key={`${item.catalogo_item_id}-${index}`}
-                  className="flex items-center justify-between rounded-md border p-3"
+                  className="flex items-center justify-between rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3"
                 >
                   <div>
-                    <p className="font-medium text-[#3D2314]">{item.label_snapshot}</p>
-                    <p className="text-xs text-gray-600">
+                    <p className="font-medium text-xs text-[#5C4A32]">{item.label_snapshot}</p>
+                    <p className="text-[11px] text-[#8A7A66]">
                       {item.tipo} · quantidade {item.quantidade}
                       {item.grupo_alternativa ? ` · grupo: ${item.grupo_alternativa}` : ''} ·
                       catálogo {item.catalogo_versao_snapshot || 'sem versão'}
                     </p>
                   </div>
-                  <Button type="button" variant="outline" onClick={() => removeItem(index)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeItem(index)}
+                    className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
+                  >
                     Remover
                   </Button>
                 </div>
@@ -363,44 +393,55 @@ export default function NovaProposta() {
             </div>
             {groups.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                <span className="text-sm">Grupos exclusivos:</span>
+                <span className="text-xs text-[#8A7A66]">Grupos exclusivos:</span>
                 {groups.map((group) => (
-                  <Badge key={group} variant="outline">
+                  <Badge
+                    key={group}
+                    variant="outline"
+                    className="border-[#D6BC7E] text-[#5C4A32] bg-[#F4EEDA] text-[11px]"
+                  >
                     {group}:{' '}
-                    {alternatives.filter((item) => item.grupo_alternativa === group).length} opções
+                    {alternatives.filter((item: any) => item.grupo_alternativa === group).length}{' '}
+                    opções
                   </Badge>
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle>3. Revisão e política</CardTitle>
+            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              3. Revisão e política
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm">
+            <p className="text-xs text-[#5C4A32]">
               Políticas aprovadas disponíveis: <strong>{politicas.length}</strong>
             </p>
             {!politicas.length && (
-              <p className="rounded-md bg-[#F5EEE7] p-3 text-sm text-[#7A2E2E]">
+              <p className="rounded-xl bg-[#F4EEDA] border border-[#E5D7B7] p-3 text-xs text-[#8A7A66]">
                 A proposta pode ser salva como rascunho, mas a revisão/emissão está bloqueada até
                 existir política aprovada e vigente. Nenhum valor será calculado silenciosamente.
               </p>
             )}
-            <Label htmlFor="observacoes">Observações</Label>
+            <Label htmlFor="observacoes" className="text-xs text-[#5C4A32]">
+              Observações
+            </Label>
             <Input
               id="observacoes"
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
               placeholder="Observações da revisão"
+              className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
             />
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
                 disabled={saving}
                 onClick={() => saveDraft('rascunho')}
+                className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
               >
                 Salvar rascunho
               </Button>
@@ -408,14 +449,14 @@ export default function NovaProposta() {
                 type="button"
                 disabled={saving || !politicas.length}
                 onClick={() => saveDraft('em_revisao')}
-                className="bg-[#C69D5F] text-white"
+                className="bg-[#5C4A32] hover:bg-[#473926] text-white text-xs rounded-xl"
               >
                 Enviar para revisão
               </Button>
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   )
 }

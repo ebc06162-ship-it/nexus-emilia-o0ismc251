@@ -1,10 +1,21 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import pb from '@/lib/pocketbase/client'
 import { Toaster } from '@/components/ui/toaster'
-import { useToast } from '@/hooks/use-toast'
+import AppShell from '@/components/AppShell'
+import {
+  Users,
+  ShoppingBag,
+  Clock,
+  UserPlus,
+  FilePlus,
+  BookOpen,
+  ArrowRight,
+  TrendingUp,
+  Calendar,
+} from 'lucide-react'
 
 const Dashboard = () => {
   const [user, setUser] = useState(null)
@@ -16,7 +27,6 @@ const Dashboard = () => {
   const [clientesRecentes, setClientesRecentes] = useState([])
   const [oportunidadesRecentes, setOportunidadesRecentes] = useState([])
   const navigate = useNavigate()
-  const { toast } = useToast()
 
   useEffect(() => {
     if (!pb.authStore.isValid) {
@@ -49,181 +59,270 @@ const Dashboard = () => {
     }
   }
 
-  const handleLogout = () => {
-    pb.authStore.clear()
-    toast({
-      title: 'Logout realizado',
-      description: 'Até logo!',
-    })
-    navigate('/login')
-  }
+  // Nome formatado para a saudação estilo mock: "Olá, Fernanda!"
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Fernanda'
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
-      {/* Header */}
-      <header className="bg-[#3D2314] text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold">Nexus Emília</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm">Olá, {user?.name}</span>
-            <Button
-              variant="outline"
-              onClick={handleLogout}
-              className="text-white border-white hover:bg-white hover:text-[#3D2314]"
-            >
-              Sair
-            </Button>
+    <AppShell>
+      {/* Banner de Saudação estilo referência */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-[#E8DEC8]/60">
+        <div>
+          <h1 className="font-serif text-2xl md:text-3xl font-semibold text-[#5C4A32] tracking-tight">
+            Olá, {firstName}!
+          </h1>
+          <p className="text-xs md:text-sm text-[#8A7A66] mt-0.5">
+            Aqui está o panorama em tempo real da Emília Bem-Casados.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FDFAF5] border border-[#E8DEC8] text-xs text-[#5C4A32] shadow-xs">
+            <Calendar size={13} className="text-[#B08A3E]" />
+            <span className="font-medium">
+              {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            </span>
+          </div>
+
+          <p className="hidden xl:block font-serif italic text-xs text-[#8A7A66]">
+            "Mais que bem-casados, entregamos celebrações."
+          </p>
+        </div>
+      </div>
+
+      {/* KPI Cards — Estilo dos mockups anexos:
+          Círculo bege com ícone dourado à esquerda, número grande em serif, label superior e variação suave */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card Clientes */}
+        <div className="bg-[#FDFAF5] border border-[#E8DEC8] rounded-2xl p-5 shadow-card hover:shadow-subtle transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#8A7A66]">
+              CLIENTES CADASTRADOS
+            </span>
+            <div className="w-10 h-10 rounded-full bg-[#F4EEDA] flex items-center justify-center text-[#B08A3E]">
+              <Users size={18} />
+            </div>
+          </div>
+          <div className="font-serif text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
+            {stats.clientes}
+          </div>
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#6E7A55] font-medium">
+            <TrendingUp size={13} />
+            <span>cadastros totais no sistema</span>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto py-8 px-4">
-        <h2 className="text-2xl font-bold mb-6 text-[#3D2314]">Painel de Controle</h2>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Clientes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#C69D5F]">{stats.clientes}</div>
-              <p className="text-xs text-gray-500 mt-1">cadastros totais</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Oportunidades</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#C69D5F]">{stats.oportunidades}</div>
-              <p className="text-xs text-gray-500 mt-1">pedidos registrados</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Pendências</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#C69D5F]">{stats.pendencias}</div>
-              <p className="text-xs text-gray-500 mt-1">itens em aberto</p>
-            </CardContent>
-          </Card>
+        {/* Card Oportunidades / Pedidos */}
+        <div className="bg-[#FDFAF5] border border-[#E8DEC8] rounded-2xl p-5 shadow-card hover:shadow-subtle transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#8A7A66]">
+              OPORTUNIDADES / PEDIDOS
+            </span>
+            <div className="w-10 h-10 rounded-full bg-[#F4EEDA] flex items-center justify-center text-[#B08A3E]">
+              <ShoppingBag size={18} />
+            </div>
+          </div>
+          <div className="font-serif text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
+            {stats.oportunidades}
+          </div>
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#B08A3E] font-medium">
+            <TrendingUp size={13} />
+            <span>pedidos registrados</span>
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ações Rápidas</CardTitle>
-            <CardDescription>Cadastre um novo cliente ou oportunidade</CardDescription>
-          </CardHeader>
-          <CardContent className="flex gap-4">
-            <Button
-              className="bg-[#C69D5F] hover:bg-[#DCC39E] text-white"
+        {/* Card Pendências */}
+        <div className="bg-[#FDFAF5] border border-[#E8DEC8] rounded-2xl p-5 shadow-card hover:shadow-subtle transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#8A7A66]">
+              PENDÊNCIAS EM ABERTO
+            </span>
+            <div className="w-10 h-10 rounded-full bg-[#F4EEDA] flex items-center justify-center text-[#B08A3E]">
+              <Clock size={18} />
+            </div>
+          </div>
+          <div className="font-serif text-3xl md:text-4xl font-semibold text-[#5C4A32] tracking-tight">
+            {stats.pendencias}
+          </div>
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#8A7A66] font-medium">
+            <span>itens aguardando ação</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Ações Rápidas — Com estética clássica e botões elegantes */}
+      <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
+        <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+                Ações Rápidas
+              </CardTitle>
+              <p className="text-xs text-[#8A7A66] mt-0.5">
+                Cadastre um novo cliente ou oportunidade, ou consulte o catálogo
+              </p>
+            </div>
+            <span className="hidden sm:inline-block font-serif italic text-xs text-[#B08A3E]">
+              Gestão ágil
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-4 flex flex-wrap gap-3">
+          <Button
+            className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] font-medium text-xs px-4 py-2.5 rounded-xl shadow-xs transition-colors flex items-center gap-2"
+            onClick={() => navigate('/clientes/novo')}
+          >
+            <UserPlus size={15} className="text-[#D6BC7E]" />+ Novo Cliente
+          </Button>
+
+          <Button
+            className="bg-[#B08A3E] hover:bg-[#967431] text-white font-medium text-xs px-4 py-2.5 rounded-xl shadow-xs transition-colors flex items-center gap-2"
+            onClick={() => navigate('/oportunidades/nova')}
+          >
+            <FilePlus size={15} />+ Nova Oportunidade
+          </Button>
+
+          <Button
+            variant="outline"
+            className="border-[#D6BC7E] text-[#5C4A32] hover:bg-[#F4EEDA] hover:text-[#5C4A32] font-medium text-xs px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+            onClick={() => navigate('/catalogo')}
+          >
+            <BookOpen size={15} className="text-[#B08A3E]" />
+            Ver catálogo
+          </Button>
+
+          <Button
+            variant="outline"
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] font-medium text-xs px-4 py-2.5 rounded-xl transition-colors"
+            onClick={() => navigate('/propostas/nova')}
+          >
+            Montador de propostas
+          </Button>
+
+          {['administrador', 'gestao'].includes(user?.papel) && (
+            <>
+              <Button
+                variant="outline"
+                className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] font-medium text-xs px-4 py-2.5 rounded-xl transition-colors"
+                onClick={() => navigate('/historico')}
+              >
+                Ver histórico
+              </Button>
+              {user?.papel === 'administrador' && (
+                <>
+                  <Button
+                    variant="outline"
+                    className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] font-medium text-xs px-4 py-2.5 rounded-xl transition-colors"
+                    onClick={() => navigate('/usuarios')}
+                  >
+                    Gerir usuários
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] font-medium text-xs px-4 py-2.5 rounded-xl transition-colors"
+                    onClick={() => navigate('/integracoes/homologacao')}
+                  >
+                    Harness de integração
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Listas Recentes: Clientes e Oportunidades com acabamento elegante */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Clientes recentes */}
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
+          <CardHeader className="pb-3 border-b border-[#E8DEC8]/50 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+                Clientes recentes
+              </CardTitle>
+              <p className="text-xs text-[#8A7A66] mt-0.5">Consulta dos cadastros mais recentes</p>
+            </div>
+            <button
               onClick={() => navigate('/clientes/novo')}
+              className="text-xs font-serif italic text-[#B08A3E] hover:underline inline-flex items-center gap-1"
             >
-              + Novo Cliente
-            </Button>
-            <Button
-              className="bg-[#C69D5F] hover:bg-[#DCC39E] text-white"
-              onClick={() => navigate('/oportunidades/nova')}
-            >
-              + Nova Oportunidade
-            </Button>
-            <Button
-              variant="outline"
-              className="border-[#C69D5F] text-[#3D2314]"
-              onClick={() => navigate('/catalogo')}
-            >
-              Ver catálogo
-            </Button>
-            {['administrador', 'gestao'].includes(user?.papel) && (
-              <>
-                <Button
-                  variant="outline"
-                  className="border-[#C69D5F] text-[#3D2314]"
-                  onClick={() => navigate('/historico')}
-                >
-                  Ver histórico
-                </Button>
-                {user?.papel === 'administrador' && (
-                  <>
-                    <Button
-                      variant="outline"
-                      className="border-[#C69D5F] text-[#3D2314]"
-                      onClick={() => navigate('/usuarios')}
-                    >
-                      Gerir usuários
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="border-[#C69D5F] text-[#3D2314]"
-                      onClick={() => navigate('/integracoes/homologacao')}
-                    >
-                      Harness de integração
-                    </Button>{' '}
-                  </>
-                )}
-              </>
+              Ver todos <ArrowRight size={12} />
+            </button>
+          </CardHeader>
+          <CardContent className="pt-3 divide-y divide-[#E8DEC8]/60">
+            {clientesRecentes.length === 0 && (
+              <p className="text-xs text-[#8A7A66] py-4 text-center">Nenhum cliente cadastrado.</p>
             )}
+            {clientesRecentes.map((cliente) => (
+              <div
+                key={cliente.id}
+                className="py-3 px-2 flex items-center justify-between hover:bg-[#F8F3EA] rounded-xl transition-colors"
+              >
+                <div>
+                  <p className="font-medium text-sm text-[#5C4A32]">{cliente.nome}</p>
+                  <p className="text-xs text-[#8A7A66]">
+                    {cliente.telefone_principal || 'Telefone não informado'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-medium bg-[#F4EEDA] text-[#8A6A2C] border border-[#E5D7B7]">
+                    {cliente.classificacao_comercial || 'Padrão'}
+                  </span>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Clientes recentes</CardTitle>
-              <CardDescription>Consulta dos cadastros mais recentes</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {clientesRecentes.length === 0 && (
-                <p className="text-sm text-gray-600">Nenhum cliente cadastrado.</p>
-              )}
-              {clientesRecentes.map((cliente) => (
-                <div key={cliente.id} className="border-b pb-2 last:border-0">
-                  <p className="font-medium text-[#3D2314]">{cliente.nome}</p>
-                  <p className="text-sm text-gray-600">
-                    {cliente.telefone_principal || 'Telefone não informado'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {cliente.classificacao_comercial || 'Classificação não informada'}
-                  </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Oportunidades recentes</CardTitle>
-              <CardDescription>Consulta dos pedidos-base mais recentes</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {oportunidadesRecentes.length === 0 && (
-                <p className="text-sm text-gray-600">Nenhuma oportunidade cadastrada.</p>
-              )}
-              {oportunidadesRecentes.map((oportunidade) => (
-                <div key={oportunidade.id} className="border-b pb-2 last:border-0">
-                  <p className="font-medium text-[#3D2314]">
+        {/* Oportunidades recentes */}
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
+          <CardHeader className="pb-3 border-b border-[#E8DEC8]/50 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+                Oportunidades recentes
+              </CardTitle>
+              <p className="text-xs text-[#8A7A66] mt-0.5">
+                Consulta dos pedidos-base mais recentes
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/oportunidades/nova')}
+              className="text-xs font-serif italic text-[#B08A3E] hover:underline inline-flex items-center gap-1"
+            >
+              Ver todos <ArrowRight size={12} />
+            </button>
+          </CardHeader>
+          <CardContent className="pt-3 divide-y divide-[#E8DEC8]/60">
+            {oportunidadesRecentes.length === 0 && (
+              <p className="text-xs text-[#8A7A66] py-4 text-center">
+                Nenhuma oportunidade cadastrada.
+              </p>
+            )}
+            {oportunidadesRecentes.map((oportunidade) => (
+              <div
+                key={oportunidade.id}
+                className="py-3 px-2 flex items-center justify-between hover:bg-[#F8F3EA] rounded-xl transition-colors"
+              >
+                <div>
+                  <p className="font-medium text-sm text-[#5C4A32]">
                     {oportunidade.expand?.cliente_id?.nome || 'Cliente não identificado'}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-[#8A7A66]">
                     {oportunidade.tipo_evento || oportunidade.tipo_pedido || 'Tipo não informado'}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    Status: {oportunidade.status || 'Não informado'}
-                  </p>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                <div className="text-right">
+                  <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-medium bg-[#EFE8DC] text-[#5C4A32] border border-[#DDD0BC]">
+                    {oportunidade.status || 'Não informado'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
 
       <Toaster />
-    </div>
+    </AppShell>
   )
 }
 

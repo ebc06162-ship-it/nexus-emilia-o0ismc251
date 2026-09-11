@@ -1,0 +1,364 @@
+import React, { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  BookOpen,
+  History,
+  UserCheck,
+  Cpu,
+  Search,
+  Bell,
+  LogOut,
+  Menu,
+  X,
+  ChevronDown,
+} from 'lucide-react'
+import pb from '@/lib/pocketbase/client'
+import EmiliaLogo from './EmiliaLogo'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+interface AppShellProps {
+  children: React.ReactNode
+  title?: string
+  subtitle?: string
+}
+
+export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle }) => {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const navigate = useNavigate()
+  const user = pb.authStore.record
+  const userRole = user?.papel || ''
+
+  const handleLogout = () => {
+    pb.authStore.clear()
+    navigate('/login')
+  }
+
+  const navItems = [
+    {
+      to: '/',
+      label: 'Visão Geral',
+      icon: LayoutDashboard,
+      roles: ['*'],
+    },
+    {
+      to: '/clientes/novo',
+      label: 'Clientes (CRM)',
+      icon: Users,
+      roles: ['*'],
+    },
+    {
+      to: '/oportunidades/nova',
+      label: 'Pedidos & Oportunidades',
+      icon: FileText,
+      roles: ['*'],
+    },
+    {
+      to: '/catalogo',
+      label: 'Catálogo',
+      icon: BookOpen,
+      roles: ['*'],
+    },
+    {
+      to: '/propostas/nova',
+      label: 'Propostas',
+      icon: FileText,
+      roles: ['*'],
+    },
+    {
+      to: '/historico',
+      label: 'Auditoria & Histórico',
+      icon: History,
+      roles: ['administrador', 'gestao'],
+    },
+    {
+      to: '/usuarios',
+      label: 'Usuários',
+      icon: UserCheck,
+      roles: ['administrador'],
+    },
+    {
+      to: '/integracoes/homologacao',
+      label: 'Integrações',
+      icon: Cpu,
+      roles: ['administrador'],
+    },
+  ]
+
+  const visibleNav = navItems.filter((item) => {
+    if (item.roles.includes('*')) return true
+    return item.roles.includes(userRole)
+  })
+
+  // Iniciais para o avatar estilo mock
+  const userInitials = (user?.name || user?.email || 'FM')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0].toUpperCase())
+    .join('')
+
+  const roleLabel =
+    {
+      administrador: 'Administradora',
+      gestao: 'Gestão',
+      atendimento: 'Atendimento',
+      financeiro: 'Financeiro',
+      producao: 'Produção',
+      cliente_externo: 'Cliente',
+    }[userRole] || 'Usuária'
+
+  return (
+    <div className="min-h-screen bg-[#F7F1E8] text-[#5C4A32] flex flex-col font-sans">
+      {/* Topbar unificada */}
+      <header className="sticky top-0 z-30 bg-[#FBF7F0]/95 backdrop-blur-md border-b border-[#E8DEC8] px-4 md:px-6 py-2.5 transition-all">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          {/* Logo & tag da marca */}
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="md:hidden p-1.5 rounded-lg text-[#5C4A32] hover:bg-[#F2E8D8] transition-colors"
+              aria-label="Abrir menu"
+            >
+              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+
+            <NavLink to="/" className="flex items-center gap-3">
+              <EmiliaLogo size="md" />
+            </NavLink>
+
+            <div className="hidden lg:flex flex-col border-l border-[#E8DEC8] pl-5 py-0.5">
+              <span className="text-[10px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-medium leading-tight">
+                TRADIÇÃO QUE
+              </span>
+              <span className="text-[10px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-medium leading-tight">
+                CELEBRA HISTÓRIAS
+              </span>
+            </div>
+          </div>
+
+          {/* Campo de busca arredondado da referência */}
+          <div className="hidden md:flex flex-1 max-w-md mx-4">
+            <div className="relative w-full">
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A7A66]/70 pointer-events-none"
+              />
+              <input
+                type="text"
+                placeholder="Buscar clientes, pedidos, produtos, relatórios..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-full bg-[#FDFAF5] border border-[#E8DEC8] text-[#5C4A32] placeholder:text-[#8A7A66]/60 focus:outline-none focus:ring-2 focus:ring-[#B08A3E]/30 focus:border-[#B08A3E] transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Notificações & Perfil */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="relative p-2 rounded-full text-[#5C4A32] hover:bg-[#F2E8D8] transition-colors"
+              title="Notificações"
+            >
+              <Bell size={18} />
+              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#B08A3E] text-white text-[10px] flex items-center justify-center font-medium">
+                3
+              </span>
+            </button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-2.5 p-1 rounded-full hover:bg-[#F2E8D8] transition-colors text-left"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#E8DEC8] text-[#5C4A32] flex items-center justify-center font-serif text-sm font-semibold border border-[#D6BC7E]">
+                    {userInitials}
+                  </div>
+                  <div className="hidden sm:flex flex-col pr-1">
+                    <span className="text-xs font-semibold text-[#5C4A32] leading-tight">
+                      {user?.name || 'Fernanda Mathias'}
+                    </span>
+                    <span className="text-[11px] text-[#8A7A66] leading-tight">{roleLabel}</span>
+                  </div>
+                  <ChevronDown size={14} className="text-[#8A7A66] hidden sm:block" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-[#FDFAF5] border-[#E8DEC8]">
+                <DropdownMenuLabel className="font-serif text-[#5C4A32]">
+                  Minha Conta
+                </DropdownMenuLabel>
+                <div className="px-2 py-1 text-xs text-[#8A7A66]">
+                  {user?.email || 'usuario@emilia.com.br'}
+                </div>
+                <DropdownMenuSeparator className="bg-[#E8DEC8]" />
+                <DropdownMenuItem
+                  onClick={() => navigate('/')}
+                  className="text-xs text-[#5C4A32] cursor-pointer hover:bg-[#F5EFE6]"
+                >
+                  <LayoutDashboard size={14} className="mr-2 text-[#B08A3E]" />
+                  Visão Geral
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/catalogo')}
+                  className="text-xs text-[#5C4A32] cursor-pointer hover:bg-[#F5EFE6]"
+                >
+                  <BookOpen size={14} className="mr-2 text-[#B08A3E]" />
+                  Catálogo
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-[#E8DEC8]" />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-xs text-red-700 cursor-pointer hover:bg-red-50"
+                >
+                  <LogOut size={14} className="mr-2" />
+                  Sair do sistema
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </header>
+
+      {/* Container Principal: Sidebar + Conteúdo */}
+      <div className="flex-1 flex max-w-7xl w-full mx-auto px-2 md:px-4 py-4 md:py-6 gap-5">
+        {/* Sidebar desktop */}
+        <aside className="hidden md:flex flex-col w-56 shrink-0 bg-[#FBF7F0] border border-[#E8DEC8] rounded-2xl p-3 shadow-subtle justify-between">
+          <div className="space-y-1">
+            <div className="px-3 py-2 mb-1">
+              <span className="text-[10px] tracking-[0.18em] uppercase text-[#8A7A66] font-semibold">
+                Navegação
+              </span>
+            </div>
+            {visibleNav.map((item) => {
+              const Icon = item.icon
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                      isActive
+                        ? 'bg-[#EFE5D3] text-[#5C4A32] font-semibold shadow-xs border border-[#E2D5BE]'
+                        : 'text-[#7D7060] hover:text-[#5C4A32] hover:bg-[#F4EEDA]'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Icon size={17} className={isActive ? 'text-[#B08A3E]' : 'text-[#8A7A66]'} />
+                      <span>{item.label}</span>
+                    </>
+                  )}
+                </NavLink>
+              )
+            })}
+          </div>
+
+          {/* Bloco decorativo do rodapé da sidebar (fiel ao mockup: "MOMENTOS QUE ADOÇAM HISTÓRIAS") */}
+          <div className="pt-6 border-t border-[#E8DEC8]/60 px-3 pb-2 text-center">
+            <p className="font-script text-xl text-[#B08A3E] select-none leading-none">Emília</p>
+            <p className="text-[9px] tracking-[0.2em] uppercase text-[#8A7A66] font-light mt-1">
+              MOMENTOS QUE ADOÇAM HISTÓRIAS
+            </p>
+          </div>
+        </aside>
+
+        {/* Sidebar mobile */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs md:hidden flex">
+            <div className="w-64 bg-[#FBF7F0] p-4 flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-200">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E8DEC8]">
+                  <EmiliaLogo size="sm" />
+                  <button
+                    onClick={() => setMobileOpen(false)}
+                    className="p-1 rounded-lg text-[#5C4A32]"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="space-y-1 pt-2">
+                  {visibleNav.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        end={item.to === '/'}
+                        onClick={() => setMobileOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                            isActive
+                              ? 'bg-[#EFE5D3] text-[#5C4A32] font-semibold border border-[#E2D5BE]'
+                              : 'text-[#7D7060] hover:text-[#5C4A32] hover:bg-[#F4EEDA]'
+                          }`
+                        }
+                      >
+                        <Icon size={17} className="text-[#B08A3E]" />
+                        <span>{item.label}</span>
+                      </NavLink>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-[#E8DEC8]">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 py-2 text-xs text-red-700 bg-red-50 rounded-xl"
+                >
+                  <LogOut size={14} />
+                  Sair do sistema
+                </button>
+              </div>
+            </div>
+            <div className="flex-1" onClick={() => setMobileOpen(false)} />
+          </div>
+        )}
+
+        {/* Área central com título opcional e conteúdo da rota */}
+        <main className="flex-1 min-w-0 space-y-6">
+          {(title || subtitle) && (
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-1">
+              <div>
+                {title && (
+                  <h1 className="font-serif text-2xl md:text-3xl font-semibold text-[#5C4A32] tracking-tight">
+                    {title}
+                  </h1>
+                )}
+                {subtitle && <p className="text-xs md:text-sm text-[#8A7A66] mt-0.5">{subtitle}</p>}
+              </div>
+            </div>
+          )}
+          {children}
+        </main>
+      </div>
+
+      {/* Rodapé institucional discreto (estilo mockup) */}
+      <footer className="mt-auto border-t border-[#E8DEC8] bg-[#FBF7F0]/60 py-3 px-4 text-center">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#8A7A66]">
+          <span>Emília Bem-Casados · ERP integrado para um negócio mais doce.</span>
+          <span className="font-serif italic text-[#B08A3E]">
+            "Mais que bem-casados, entregamos celebrações."
+          </span>
+          <span>Versão 1.0.0</span>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+export default AppShell

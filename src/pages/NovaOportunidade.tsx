@@ -14,6 +14,8 @@ import {
 import pb from '@/lib/pocketbase/client'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/hooks/use-toast'
+import AppShell from '@/components/AppShell'
+import { ArrowLeft } from 'lucide-react'
 
 const NovaOportunidade = () => {
   const [formData, setFormData] = useState({
@@ -460,15 +462,14 @@ const NovaOportunidade = () => {
           )
         }
       }
-      if (dataToSend.valor_estimado)
-        dataToSend.valor_estimado = parseFloat(dataToSend.valor_estimado)
-      if (dataToSend.qtd_convidados) dataToSend.qtd_convidados = parseInt(dataToSend.qtd_convidados)
-      if (dataToSend.qtd_bem_casados)
-        dataToSend.qtd_bem_casados = parseInt(dataToSend.qtd_bem_casados)
-      Object.keys(dataToSend).forEach((key) => {
-        if (dataToSend[key] === '') delete dataToSend[key]
+      const payload: Record<string, any> = { ...dataToSend }
+      if (payload.valor_estimado) payload.valor_estimado = parseFloat(payload.valor_estimado)
+      if (payload.qtd_convidados) payload.qtd_convidados = parseInt(payload.qtd_convidados)
+      if (payload.qtd_bem_casados) payload.qtd_bem_casados = parseInt(payload.qtd_bem_casados)
+      Object.keys(payload).forEach((key) => {
+        if (payload[key] === '') delete payload[key]
       })
-      await pb.collection('oportunidades').create(dataToSend)
+      await pb.collection('oportunidades').create(payload)
       toast({
         title: 'Oportunidade criada com sucesso!',
         description: 'O registro foi salvo no sistema',
@@ -485,18 +486,27 @@ const NovaOportunidade = () => {
     }
   }
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
-      <header className="bg-[#3D2314] text-white p-4">
-        <div className="container mx-auto">
-          <h1 className="text-xl font-bold">Nova Oportunidade</h1>
-        </div>
-      </header>
-      <main className="container mx-auto py-8 px-4">
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Registro de Oportunidade</CardTitle>
+    <AppShell
+      title="Nova Oportunidade / Pedido"
+      subtitle="Registro de novos eventos, datas de entrega e preferências do cliente"
+    >
+      <div className="max-w-3xl mx-auto space-y-4">
+        <Button
+          variant="outline"
+          onClick={() => navigate('/')}
+          className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
+        >
+          <ArrowLeft size={14} />
+          Voltar ao painel
+        </Button>
+
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
+          <CardHeader className="pb-4 border-b border-[#E8DEC8]/50">
+            <CardTitle className="font-serif text-xl font-semibold text-[#5C4A32]">
+              Registro de Oportunidade
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-5">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -796,20 +806,29 @@ const NovaOportunidade = () => {
                 </Button>
               </div>
 
-              <div className="flex gap-4">
-                <Button type="submit" disabled={loading}>
+              <div className="flex gap-4 pt-3 border-t border-[#E8DEC8]">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-xs px-5 py-2.5 rounded-xl shadow-xs"
+                >
                   {loading || verificandoDuplicata ? 'Verificando...' : 'Salvar Oportunidade'}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => navigate('/')}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate('/')}
+                  className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl"
+                >
                   Cancelar
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
-      </main>
+      </div>
       <Toaster />
-    </div>
+    </AppShell>
   )
 }
 

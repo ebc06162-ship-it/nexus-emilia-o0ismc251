@@ -13,18 +13,23 @@ import Usuarios from './pages/Usuarios'
 import IntegrationHarness from './pages/IntegrationHarness'
 import pb from '@/lib/pocketbase/client'
 
-const ProtectedRoute = ({ children, roles }) => {
+interface ProtectedRouteProps {
+  children: React.ReactNode
+  roles?: string[]
+}
+
+const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
   if (!pb.authStore.isValid) return <Navigate to="/login" replace />
   if (roles && !roles.includes(pb.authStore.record?.papel)) {
     return (
-      <div className="min-h-screen bg-[#FAF8F5] p-8">
-        <div className="mx-auto max-w-xl rounded-lg border bg-white p-6">
-          <h1 className="text-xl font-semibold text-[#3D2314]">Acesso não permitido</h1>
-          <p className="mt-2 text-gray-600">
+      <div className="min-h-screen bg-[#F7F1E8] flex items-center justify-center p-6">
+        <div className="mx-auto max-w-md rounded-2xl border border-[#E8DEC8] bg-[#FDFAF5] p-6 text-center shadow-card">
+          <h1 className="font-serif text-xl font-semibold text-[#5C4A32]">Acesso não permitido</h1>
+          <p className="mt-2 text-xs text-[#8A7A66]">
             Seu perfil não tem permissão para consultar esta área.
           </p>
           <button
-            className="mt-4 rounded-md bg-[#C69D5F] px-4 py-2 text-white"
+            className="mt-4 rounded-xl bg-[#5C4A32] hover:bg-[#473926] px-5 py-2.5 text-xs text-[#FDFAF5] font-medium transition-colors"
             onClick={() => window.location.assign('/')}
           >
             Voltar ao início

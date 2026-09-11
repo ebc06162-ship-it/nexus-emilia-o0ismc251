@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import pb from '@/lib/pocketbase/client'
+import AppShell from '@/components/AppShell'
+import { ArrowLeft, ShieldCheck, History as HistoryIcon } from 'lucide-react'
 
-const roleLabels = {
+const roleLabels: Record<string, string> = {
   administrador: 'Administrador',
   gestao: 'Gestão',
   atendimento: 'Atendimento',
@@ -12,14 +14,14 @@ const roleLabels = {
   producao: 'Produção',
   cliente_externo: 'Cliente/externo',
 }
-const actionLabel = {
+const actionLabel: Record<string, string> = {
   criacao: 'Criação',
   edicao: 'Edição',
   revogacao: 'Revogação',
   acesso: 'Acesso',
   exclusao: 'Exclusão',
 }
-const objectLabel = {
+const objectLabel: Record<string, string> = {
   clientes: 'Cliente',
   oportunidades: 'Oportunidade/pedido',
   catalogo_itens: 'Item de catálogo',
@@ -30,9 +32,10 @@ const objectLabel = {
 
 export default function Historico() {
   const navigate = useNavigate()
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState<any[]>([])
   const [error, setError] = useState('')
   const canRead = ['administrador', 'gestao'].includes(pb.authStore.record?.papel)
+
   useEffect(() => {
     if (!canRead) return
     pb.collection('auditoria')
@@ -43,86 +46,130 @@ export default function Historico() {
 
   if (!canRead) {
     return (
-      <div className="min-h-screen bg-[#FAF8F5] p-8">
-        <Card>
-          <CardContent className="p-6">
-            <p role="alert" className="text-[#7A2E2E]">
-              Você não tem permissão para consultar o histórico.
+      <AppShell>
+        <div className="max-w-xl mx-auto py-12">
+          <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card p-6 text-center">
+            <p role="alert" className="text-sm text-red-700">
+              Você não tem permissão para consultar o histórico de auditoria.
             </p>
-            <Button className="mt-4" onClick={() => navigate('/')}>
-              Voltar
+            <Button
+              className="mt-4 bg-[#5C4A32] text-white hover:bg-[#473926] text-xs rounded-xl"
+              onClick={() => navigate('/')}
+            >
+              Voltar ao início
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </Card>
+        </div>
+      </AppShell>
     )
   }
 
-  const resultLabel = (r) => (r === 'permitido' ? 'Permitida' : r === 'negado' ? 'Negada' : 'Falha')
+  const resultLabel = (r: string) =>
+    r === 'permitido' ? 'Permitida' : r === 'negado' ? 'Negada' : 'Falha'
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
-      <header className="bg-[#3D2314] text-white p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-[#DCC39E]">Nexus Emília</p>
-            <h1 className="text-2xl font-semibold">Histórico de auditoria</h1>
-          </div>
+    <AppShell
+      title="Histórico de Auditoria"
+      subtitle="Consulta somente leitura de eventos e rastreabilidade de ações no sistema"
+    >
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <Button
             variant="outline"
-            className="text-white border-white"
             onClick={() => navigate('/')}
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
           >
-            Voltar
+            <ArrowLeft size={14} />
+            Voltar ao painel
           </Button>
+
+          <span className="text-xs font-serif italic text-[#B08A3E] flex items-center gap-1">
+            <ShieldCheck size={14} />
+            Rastreabilidade canônica
+          </span>
         </div>
-      </header>
-      <main className="container mx-auto py-8 px-4 space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Eventos registrados</CardTitle>
-            <p className="text-sm text-gray-600">
-              Consulta somente leitura. Registros não podem ser alterados ou excluídos.
+
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
+          <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
+            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              Eventos Registrados
+            </CardTitle>
+            <p className="text-xs text-[#8A7A66]">
+              Consulta somente leitura. Registros são imutáveis e auditáveis.
             </p>
           </CardHeader>
         </Card>
+
         {error && (
-          <p role="alert" className="text-[#7A2E2E]">
+          <p
+            role="alert"
+            className="text-xs text-red-700 bg-red-50 p-3 rounded-xl border border-red-200"
+          >
             {error}
           </p>
         )}
+
         {!error && items.length === 0 && (
-          <p className="text-gray-600">Nenhum evento registrado ainda.</p>
+          <p className="text-xs text-[#8A7A66] py-8 text-center bg-[#FDFAF5] rounded-2xl border border-[#E8DEC8]">
+            Nenhum evento registrado ainda.
+          </p>
         )}
-        {items.map((item) => (
-          <Card key={item.id}>
-            <CardContent className="p-4">
-              <div className="flex flex-col gap-1 md:flex-row md:justify-between">
-                <div>
-                  <p className="font-semibold text-[#3D2314]">
-                    {item.descricao ||
-                      `${actionLabel[item.acao] || item.acao} · ${objectLabel[item.objeto_tipo] || item.objeto_tipo}`}{' '}
-                    · {resultLabel(item.resultado)}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    {item.objeto_tipo}
-                    {item.objeto_id ? ` · ${item.objeto_id}` : ''}
-                  </p>
-                  <p className="text-xs text-gray-600">
-                    Motivo: {item.motivo || 'não informado'} · Origem:{' '}
-                    {item.origem || 'não informada'}
-                  </p>
+
+        <div className="space-y-2.5">
+          {items.map((item) => (
+            <Card
+              key={item.id}
+              className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card hover:shadow-subtle transition-shadow overflow-hidden"
+            >
+              <CardContent className="p-4">
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#B08A3E]" />
+                      <p className="font-semibold text-sm text-[#5C4A32]">
+                        {item.descricao ||
+                          `${actionLabel[item.acao] || item.acao} · ${objectLabel[item.objeto_tipo] || item.objeto_tipo}`}
+                      </p>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                          item.resultado === 'permitido'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-rose-50 text-rose-800 border-rose-200'
+                        }`}
+                      >
+                        {resultLabel(item.resultado)}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[#5C4A32]">
+                      Objeto: <span className="font-mono">{item.objeto_tipo}</span>
+                      {item.objeto_id ? ` · ID: ${item.objeto_id}` : ''}
+                    </p>
+
+                    <p className="text-[11px] text-[#8A7A66]">
+                      Motivo: {item.motivo || 'não informado'} · Origem:{' '}
+                      {item.origem || 'não informada'}
+                    </p>
+                  </div>
+
+                  <div className="text-[11px] text-[#8A7A66] md:text-right bg-[#FBF7F0] p-2 rounded-xl border border-[#E8DEC8]/50">
+                    <p>
+                      <strong>Ator:</strong> {item.ator_nome || 'não informado'}
+                    </p>
+                    <p>
+                      <strong>Papel:</strong>{' '}
+                      {roleLabels[item.papel] || item.papel || 'não informado'}
+                    </p>
+                    <p className="font-medium text-[#5C4A32] mt-0.5">
+                      {new Date(item.created).toLocaleString('pt-BR')}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-600 md:text-right">
-                  <p>Ator: {item.ator_nome || 'não informado'}</p>
-                  <p>Papel: {roleLabels[item.papel] || item.papel || 'não informado'}</p>
-                  <p>{new Date(item.created).toLocaleString('pt-BR')}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </main>
-    </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </AppShell>
   )
 }

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import pb from '@/lib/pocketbase/client'
+import AppShell from '@/components/AppShell'
+import { ArrowLeft, Play, ShieldAlert } from 'lucide-react'
 
 const fixtures = [
   ['FIX-1-401', 'Válida, novo event_id'],
@@ -12,7 +14,7 @@ const fixtures = [
   ['FIX-1-405', 'Destino indisponível simulado'],
 ]
 
-const hashPayload = (value) => {
+const hashPayload = (value: any) => {
   const raw = JSON.stringify(value)
   let hash = 7
   for (let i = 0; i < raw.length; i += 1) hash = (hash * 33 + raw.charCodeAt(i)) >>> 0
@@ -21,14 +23,14 @@ const hashPayload = (value) => {
 
 export default function IntegrationHarness() {
   const navigate = useNavigate()
-  const [results, setResults] = useState([])
+  const [results, setResults] = useState<any[]>([])
   const [running, setRunning] = useState(false)
   const [error, setError] = useState('')
 
-  const loadExisting = async (eventId) => {
+  const loadExisting = async (eventId: string) => {
     try {
       return await pb.collection('integration_events').getFirstListItem(`event_id = "${eventId}"`)
-    } catch (err) {
+    } catch (err: any) {
       if (err.status === 404) return null
       throw err
     }
@@ -36,7 +38,19 @@ export default function IntegrationHarness() {
 
   // Eventos de integração são append-only (updateRule null): reexecução não reescreve
   // registro existente, apenas devolve o estado já confirmado.
-  const saveEvent = async ({ event, status, errorCode = '', lastState = 'nenhum', nextAction }) => {
+  const saveEvent = async ({
+    event,
+    status,
+    errorCode = '',
+    lastState = 'nenhum',
+    nextAction,
+  }: {
+    event: any
+    status: string
+    errorCode?: string
+    lastState?: string
+    nextAction?: string
+  }) => {
     const existing = await loadExisting(event.event_id)
     if (existing) return existing
     return pb.collection('integration_events').create({
@@ -59,7 +73,12 @@ export default function IntegrationHarness() {
 
   // Fila de fallback é a "ocorrência" reconciliável: permite atualização para registrar
   // reexecução e reprocessamento com o mesmo event_id.
-  const saveFallback = async (event, errorCode, lastState, nextAction) => {
+  const saveFallback = async (
+    event: any,
+    errorCode: string,
+    lastState: string,
+    nextAction: string,
+  ) => {
     const existing = await pb
       .collection('integration_fallbacks')
       .getFirstListItem(`event_id = "${event.event_id}"`)
@@ -80,11 +99,11 @@ export default function IntegrationHarness() {
     return pb.collection('integration_fallbacks').create(payload)
   }
 
-  const runFixture = async (fixtureId) => {
+  const runFixture = async (fixtureId: string) => {
     setRunning(true)
     setError('')
     try {
-      let event = {
+      let event: any = {
         event_id: 'fixture-401',
         name: 'Cliente Fixture 401',
         source_ref: 'fixture:customer:401',
@@ -191,7 +210,7 @@ export default function IntegrationHarness() {
         ...items.filter((item) => item.fixture_id !== fixtureId),
         { fixture_id: fixtureId, result: 'processed', wrote_canonical: true },
       ])
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || 'Não foi possível executar a fixture.')
     } finally {
       setRunning(false)
@@ -199,58 +218,83 @@ export default function IntegrationHarness() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
-      <header className="bg-[#3D2314] text-white p-4">
-        <div className="container mx-auto flex justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-[#DCC39E]">Nexus Emília</p>
-            <h1 className="text-2xl font-semibold">Harness de integração</h1>
-          </div>
+    <AppShell
+      title="Harness de Integração"
+      subtitle="Ambiente de homologação técnica e testes de idempotência"
+    >
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <Button
             variant="outline"
-            className="text-white border-white"
             onClick={() => navigate('/')}
+            className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs rounded-xl flex items-center gap-1.5"
           >
-            Voltar
+            <ArrowLeft size={14} />
+            Voltar ao painel
           </Button>
+
+          <span className="text-xs font-serif italic text-[#B08A3E] flex items-center gap-1">
+            <ShieldAlert size={14} />
+            Ambiente de Homologação
+          </span>
         </div>
-      </header>
-      <main className="container mx-auto py-8 px-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Fixtures de homologação</CardTitle>
-            <p className="text-sm text-gray-600">
-              Modo de teste, acesso exclusivo do Administrador. Nenhuma conexão externa é ativada.
+
+        <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
+          <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
+            <CardTitle className="font-serif text-lg font-semibold text-[#5C4A32]">
+              Fixtures de Teste
+            </CardTitle>
+            <p className="text-xs text-[#8A7A66]">
+              Modo de teste, acesso restrito ao Administrador. Nenhuma conexão externa é ativada.
             </p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="pt-4 space-y-3">
             {error && (
-              <p role="alert" className="text-[#7A2E2E]">
+              <p
+                role="alert"
+                className="text-xs text-red-700 bg-red-50 p-3 rounded-xl border border-red-200"
+              >
                 {error}
               </p>
             )}
-            {fixtures.map(([id, label]) => (
-              <div key={id} className="flex items-center justify-between border-b pb-3">
-                <div>
-                  <p className="font-medium">{id}</p>
-                  <p className="text-sm text-gray-600">{label}</p>
-                </div>
-                <Button disabled={running} onClick={() => runFixture(id)}>
-                  Executar
-                </Button>
-              </div>
-            ))}
-            <div className="pt-4 space-y-2">
-              {results.map((result) => (
-                <div key={result.fixture_id + result.result} className="rounded border p-3">
-                  <b>{result.fixture_id}</b>: {result.result} · escrita canônica:{' '}
-                  {result.wrote_canonical ? 'sim' : 'não'}
+
+            <div className="divide-y divide-[#E8DEC8]/60">
+              {fixtures.map(([id, label]) => (
+                <div key={id} className="py-3 flex items-center justify-between">
+                  <div>
+                    <p className="font-mono text-xs font-semibold text-[#5C4A32]">{id}</p>
+                    <p className="text-xs text-[#8A7A66]">{label}</p>
+                  </div>
+                  <Button
+                    disabled={running}
+                    onClick={() => runFixture(id)}
+                    className="bg-[#5C4A32] hover:bg-[#473926] text-[#FDFAF5] text-xs rounded-xl flex items-center gap-1"
+                  >
+                    <Play size={12} /> Executar
+                  </Button>
                 </div>
               ))}
             </div>
+
+            {results.length > 0 && (
+              <div className="pt-4 space-y-2 border-t border-[#E8DEC8]">
+                <h4 className="text-xs font-semibold text-[#5C4A32] uppercase tracking-wider">
+                  Resultados da sessão
+                </h4>
+                {results.map((result) => (
+                  <div
+                    key={result.fixture_id + result.result}
+                    className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3 text-xs text-[#5C4A32]"
+                  >
+                    <b className="font-mono text-[#B08A3E]">{result.fixture_id}</b>: {result.result}{' '}
+                    · escrita canônica: {result.wrote_canonical ? 'sim' : 'não'}
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   )
 }

@@ -27,10 +27,26 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter var', 'SF Pro Display', 'system-ui', 'sans-serif'],
-        display: ['SF Pro Display', 'Inter var', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Playfair Display', 'Georgia', 'serif'],
+        script: ['Great Vibes', 'cursive'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
       },
       colors: {
+        emilia: {
+          bg: '#F7F1E8',
+          card: '#FDFAF5',
+          sidebar: '#FBF7F0',
+          dark: '#5C4A32',
+          gold: '#B08A3E',
+          'gold-light': '#D6BC7E',
+          'gold-subtle': '#F4EEDA',
+          border: '#E8DEC8',
+          muted: '#8A7A66',
+          accent: '#A6792E',
+          terracotta: '#B86F52',
+          olive: '#6E7A55',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -92,8 +108,9 @@ export default {
         height: 'height',
       },
       boxShadow: {
-        subtle: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
-        elevation: '0 4px 20px rgba(0, 0, 0, 0.05)',
+        subtle: '0 1px 3px 0 rgba(92, 74, 50, 0.04), 0 1px 2px 0 rgba(92, 74, 50, 0.02)',
+        card: '0 2px 8px -2px rgba(92, 74, 50, 0.04), 0 1px 3px -1px rgba(92, 74, 50, 0.03)',
+        elevation: '0 4px 20px rgba(92, 74, 50, 0.06)',
       },
       transitionTimingFunction: {
         apple: 'cubic-bezier(0.42, 0, 0.58, 1)',

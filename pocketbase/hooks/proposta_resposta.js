@@ -186,7 +186,6 @@ routerAdd(
     if (politica.getString('estado') !== 'aprovada') {
       throw e.badRequestError('A política comercial da proposta não está aprovada.')
     }
-    const hoje = Date.now()
     const inicio = politica.getString('vigencia_inicio')
     const fim = politica.getString('vigencia_fim')
     const politicaVersao = politica.getString('versao').trim()
@@ -198,11 +197,24 @@ routerAdd(
         'A política comercial está incompleta: exige versão, fonte, aprovador, vigência e alçada.',
       )
     }
-    if (Number.isNaN(Date.parse(inicio)) || Number.isNaN(Date.parse(fim))) {
-      throw e.badRequestError('A vigência da política comercial é inválida.')
+    const agora = new Date()
+    const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate()).getTime()
+    const diaDaData = (valor) => {
+      const texto = String(valor || '').slice(0, 10)
+      const partes = texto.split('-').map((parte) => Number(parte))
+      if (partes.length !== 3 || partes.some((parte) => !Number.isFinite(parte))) return NaN
+      return new Date(partes[0], partes[1] - 1, partes[2]).getTime()
     }
-    if (Date.parse(inicio) > Date.parse(fim)) {
-      throw e.badRequestError('A vigência da política comercial está invertida.')
+    const inicioDia = diaDaData(inicio)
+    const fimDia = diaDaData(fim)
+    if (!Number.isFinite(inicioDia) || !Number.isFinite(fimDia)) {
+      throw e.badRequestError('A vigência da política comercial não é uma data válida.')
+    }
+    if (inicioDia > hoje) {
+      throw e.badRequestError('A política comercial ainda não está vigente.')
+    }
+    if (fimDia < hoje) {
+      throw e.badRequestError('A política comercial está expirada.')
     }
     if (inicio && Date.parse(inicio) > hoje) {
       throw e.badRequestError('A política comercial ainda não está vigente.')

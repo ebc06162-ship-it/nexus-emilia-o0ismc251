@@ -21,7 +21,7 @@ const emptyItem = {
   quantidade: 1,
   tipo: 'cumulativo',
   grupo_alternativa: '',
-  ordem: 0,
+  ordem: 1,
 }
 
 export default function NovaProposta() {
@@ -52,19 +52,27 @@ export default function NovaProposta() {
         .getList(1, 200, { filter: 'estado = "aprovada"', sort: '-created' }),
     ])
       .then(([c, o, cat, pol]) => {
+        const agora = Date.now()
         setClientes(c.items)
         setOportunidades(o.items)
         setCatalogo(cat.items)
         setPoliticas(
-          pol.items.filter(
-            (policy: any) =>
+          pol.items.filter((policy: any) => {
+            const inicio = Date.parse(String(policy.vigencia_inicio || ''))
+            const fim = Date.parse(String(policy.vigencia_fim || ''))
+            return (
               String(policy.versao || '').trim() &&
               String(policy.fonte || '').trim() &&
               String(policy.aprovador || '').trim() &&
               String(policy.vigencia_inicio || '').trim() &&
               String(policy.vigencia_fim || '').trim() &&
-              String(policy.alcada || '').trim(),
-          ),
+              String(policy.alcada || '').trim() &&
+              Number.isFinite(inicio) &&
+              Number.isFinite(fim) &&
+              inicio <= agora &&
+              fim >= agora
+            )
+          }),
         )
       })
       .catch((err) => setError(err.message || 'Não foi possível carregar os dados.'))
@@ -122,6 +130,24 @@ export default function NovaProposta() {
       return setError('Não é possível revisar: não há política comercial aprovada e vigente.')
     }
     const oportunidade = oportunidades.find((item) => item.id === oportunidadeId)
+    const politicaSelecionada = status !== 'rascunho' ? politicas[0] : null
+    const politicaSnapshot = politicaSelecionada
+      ? {
+          id: politicaSelecionada.id,
+          nome: politicaSelecionada.nome || '',
+          tipo: politicaSelecionada.tipo || '',
+          versao: politicaSelecionada.versao || '',
+          moeda: politicaSelecionada.moeda || '',
+          vigencia_inicio: politicaSelecionada.vigencia_inicio || '',
+          vigencia_fim: politicaSelecionada.vigencia_fim || '',
+          fonte: politicaSelecionada.fonte || '',
+          aprovador: politicaSelecionada.aprovador || '',
+          estado: politicaSelecionada.estado || '',
+          alcada: politicaSelecionada.alcada || '',
+          precedencia: politicaSelecionada.precedencia ?? null,
+          formula_ou_valor: politicaSelecionada.formula_ou_valor ?? null,
+        }
+      : null
     setSaving(true)
     try {
       const proposta = await pb.collection('propostas').create({
@@ -130,15 +156,16 @@ export default function NovaProposta() {
         versao: 1,
         status,
         moeda: 'BRL',
-        politica_id: status !== 'rascunho' ? politicas[0].id : '',
-        politica_versao_snapshot: status !== 'rascunho' ? politicas[0].versao : '',
+        politica_id: politicaSelecionada?.id || '',
+        politica_versao_snapshot: politicaSnapshot?.versao || '',
         tabela_comercial_snapshot: {
           estado: 'pendente',
           observacao: 'Tabela/preço não calculados nesta task.',
         },
         condicoes_snapshot: {
           origem: 'montador_f2_t006',
-          politica_aplicada: status !== 'rascunho',
+          politica_aplicada: Boolean(politicaSnapshot),
+          politica_snapshot: politicaSnapshot,
         },
         criada_por: pb.authStore.record.id,
         observacoes: observacoes || 'Orçamento criado pelo montador.',

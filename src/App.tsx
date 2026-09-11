@@ -11,6 +11,7 @@ import Catalogo from './pages/Catalogo'
 import Historico from './pages/Historico'
 import Usuarios from './pages/Usuarios'
 import IntegrationHarness from './pages/IntegrationHarness'
+import FilaFinanceira from './pages/FilaFinanceira'
 import pb from '@/lib/pocketbase/client'
 
 interface ProtectedRouteProps {
@@ -103,6 +104,14 @@ const App = () => (
           element={
             <ProtectedRoute roles={['administrador']}>
               <Usuarios />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/financeiro/fila"
+          element={
+            <ProtectedRoute roles={['administrador', 'gestao', 'financeiro', 'atendimento']}>
+              <FilaFinanceira />
             </ProtectedRoute>
           }
         />

@@ -8,6 +8,7 @@ import {
   History,
   UserCheck,
   Cpu,
+  WalletCards,
   Search,
   Bell,
   LogOut,
@@ -74,6 +75,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
       label: 'Orçamentos',
       icon: FileText,
       roles: ['*'],
+    },
+    {
+      to: '/financeiro/fila',
+      label: 'Fila Financeira',
+      icon: WalletCards,
+      roles: ['administrador', 'gestao', 'financeiro', 'atendimento'],
     },
     {
       to: '/historico',

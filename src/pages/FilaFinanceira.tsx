@@ -13,7 +13,7 @@ const statusLabels: Record<string, string> = {
   aguardando_pagamento: 'Aguardando pagamento',
   comprovante_recebido: 'Comprovante recebido',
   em_conferencia: 'Em conferência',
-  conferido: 'Pagamento conferido',
+  conferido: 'Pago',
   divergente: 'Divergente',
   pago: 'Pago',
 }
@@ -220,6 +220,7 @@ export default function FilaFinanceira() {
           {pagamentos.map((pagamento) => {
             const pedido =
               pedidos.find((item) => item.id === pagamento.pedido_id) || pagamento.expand?.pedido_id
+            const statusPagamento = pagamento.status
             const statusPedido = pedido?.status_financeiro || pagamento.status
             const selected = arquivos[pagamento.id] || []
             const canUpload = ['aguardando_pagamento', 'divergente'].includes(pagamento.status)
@@ -241,9 +242,16 @@ export default function FilaFinanceira() {
                         {new Date(pagamento.vencimento).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
-                    <Badge variant="outline" className="w-fit border-[#D6BC7E] text-[#5C4A32]">
-                      {pedidoStatusLabels[statusPedido] || statusPedido}
-                    </Badge>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="w-fit border-[#D6BC7E] text-[#5C4A32]">
+                        {statusLabels[statusPagamento] || statusPagamento}
+                      </Badge>
+                      {statusPedido !== statusPagamento && (
+                        <Badge variant="outline" className="w-fit border-[#E8DEC8] text-[#8A7A66]">
+                          Pedido: {pedidoStatusLabels[statusPedido] || statusPedido}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">

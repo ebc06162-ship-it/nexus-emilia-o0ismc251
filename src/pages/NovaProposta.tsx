@@ -198,13 +198,16 @@ export default function NovaProposta() {
         method: 'POST',
         body: { acao },
       })
-      setSaved((current) => ({
-        ...current,
-        id: resposta.proposta_id || current.id,
-        versao: resposta.versao || current.versao,
-        status: resposta.status,
-        pedido_id: resposta.pedido_id || current.pedido_id,
-      }))
+      setSaved((current) => {
+        const foiCriadaNovaVersao = Boolean(resposta.proposta_anterior_id && resposta.proposta_id)
+        return {
+          ...current,
+          id: resposta.proposta_id || current.id,
+          versao: resposta.versao || current.versao,
+          status: resposta.status,
+          pedido_id: foiCriadaNovaVersao ? undefined : resposta.pedido_id || current.pedido_id,
+        }
+      })
     } catch (err) {
       setError(err.message || 'Não foi possível responder ao orçamento.')
     } finally {

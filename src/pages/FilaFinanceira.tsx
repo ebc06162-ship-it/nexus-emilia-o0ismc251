@@ -13,7 +13,7 @@ const statusLabels: Record<string, string> = {
   aguardando_pagamento: 'Aguardando pagamento',
   comprovante_recebido: 'Comprovante recebido',
   em_conferencia: 'Em conferência',
-  conferido: 'Conferido',
+  conferido: 'Pagamento conferido',
   divergente: 'Divergente',
   pago: 'Pago',
 }
@@ -209,6 +209,7 @@ export default function FilaFinanceira() {
           {pagamentos.map((pagamento) => {
             const pedido =
               pedidos.find((item) => item.id === pagamento.pedido_id) || pagamento.expand?.pedido_id
+            const statusExibicao = pedido?.status_financeiro === 'pago' ? 'pago' : pagamento.status
             const selected = arquivos[pagamento.id] || []
             const canUpload = ['aguardando_pagamento', 'divergente'].includes(pagamento.status)
             const canDecide =
@@ -230,11 +231,16 @@ export default function FilaFinanceira() {
                       </p>
                     </div>
                     <Badge variant="outline" className="w-fit border-[#D6BC7E] text-[#5C4A32]">
-                      {statusLabels[pagamento.status] || pagamento.status}
+                      {statusLabels[statusExibicao] || statusExibicao}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {pagamento.status === 'conferido' && pedido?.status_financeiro === 'pago' && (
+                    <p className="text-sm text-emerald-800">
+                      Pagamento conferido pelo Financeiro · pedido pago.
+                    </p>
+                  )}
                   <div className="grid gap-3 md:grid-cols-3 text-sm">
                     <div>
                       <span className="text-[#8A7A66]">Previsto</span>

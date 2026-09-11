@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom'
 const statusLabels: Record<string, string> = {
   aguardando_pagamento: 'Aguardando pagamento',
   comprovante_recebido: 'Comprovante recebido',
-  em_conferencia: 'Em conferência',
+  em_conferencia: 'Aguardando decisão',
   conferido: 'Pago',
   divergente: 'Divergente',
   pago: 'Pago',
@@ -137,7 +137,7 @@ export default function FilaFinanceira() {
       })
       setMensagem(
         acao === 'conferir'
-          ? 'Pagamento conferido.'
+          ? 'Pagamento marcado como pago.'
           : 'Divergência registrada e pendência enviada ao Atendimento.',
       )
       await carregar()
@@ -221,7 +221,9 @@ export default function FilaFinanceira() {
             const pedido =
               pedidos.find((item) => item.id === pagamento.pedido_id) || pagamento.expand?.pedido_id
             const statusPagamento = pagamento.status
+            const statusPagamentoExibicao = statusLabels[statusPagamento] || statusPagamento
             const statusPedido = pedido?.status_financeiro || pagamento.status
+            const statusPedidoExibicao = pedidoStatusLabels[statusPedido] || statusPedido
             const selected = arquivos[pagamento.id] || []
             const canUpload = ['aguardando_pagamento', 'divergente'].includes(pagamento.status)
             const canDecide =
@@ -244,24 +246,23 @@ export default function FilaFinanceira() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="outline" className="w-fit border-[#D6BC7E] text-[#5C4A32]">
-                        {statusLabels[statusPagamento] || statusPagamento}
+                        Pagamento: {statusPagamentoExibicao}
                       </Badge>
-                      {statusPedido !== statusPagamento && (
+                      {statusPedidoExibicao !== statusPagamentoExibicao && (
                         <Badge variant="outline" className="w-fit border-[#E8DEC8] text-[#8A7A66]">
-                          Pedido: {pedidoStatusLabels[statusPedido] || statusPedido}
+                          Pedido: {statusPedidoExibicao}
                         </Badge>
                       )}
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {pagamento.status === 'conferido' && pedido?.status_financeiro === 'pago' && (
-                    <p className="text-sm font-semibold text-emerald-800">Pago</p>
-                  )}
-                  {pagamento.status === 'conferido' && pedido?.status_financeiro !== 'pago' && (
-                    <p className="text-sm text-emerald-800">
-                      Pagamento conferido pelo Financeiro · pedido{' '}
-                      {pedidoStatusLabels[statusPedido] || statusPedido}.
+                  {pagamento.status === 'conferido' && (
+                    <p className="text-sm font-semibold text-emerald-800">
+                      Pagamento: Pago
+                      {statusPedido !== 'pago'
+                        ? ` · Pedido: ${statusPedidoExibicao}.`
+                        : ' · Pedido: Pago.'}
                     </p>
                   )}
                   <div className="grid gap-3 md:grid-cols-3 text-sm">
@@ -332,7 +333,7 @@ export default function FilaFinanceira() {
                           onClick={() => decidir(pagamento.id, 'conferir')}
                           className="bg-emerald-700 text-white rounded-xl"
                         >
-                          <CheckCircle2 size={15} /> Conferir pagamento
+                          <CheckCircle2 size={15} /> Marcar como pago
                         </Button>
                         <Button
                           type="button"

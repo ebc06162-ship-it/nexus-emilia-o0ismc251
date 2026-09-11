@@ -51,9 +51,6 @@ routerAdd(
       })
     }
 
-    proposta.set('status', 'aprovada')
-    proposta.set('aprovada_em', new Date().toISOString())
-
     let resposta = null
     $app.runInTransaction((txApp) => {
       const propostaTx = txApp.findRecordById('propostas', propostaId)
@@ -83,7 +80,7 @@ routerAdd(
         'ordem',
         0,
         0,
-        propostaId,
+        { proposta: propostaId },
       )
       const itensSnapshot = []
       for (const item of itens) {

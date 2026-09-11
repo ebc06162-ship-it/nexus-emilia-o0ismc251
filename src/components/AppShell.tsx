@@ -71,7 +71,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
     },
     {
       to: '/propostas/nova',
-      label: 'Propostas',
+      label: 'Orçamentos',
       icon: FileText,
       roles: ['*'],
     },
@@ -121,8 +121,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
   return (
     <div className="min-h-screen bg-[#F7F1E8] text-[#5C4A32] flex flex-col font-sans">
       {/* Topbar unificada */}
-      <header className="sticky top-0 z-30 bg-[#FBF7F0]/95 backdrop-blur-md border-b border-[#E8DEC8] px-4 md:px-6 py-2.5 transition-all">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-30 bg-[#FBF7F0]/95 backdrop-blur-md border-b border-[#E8DEC8] px-3 sm:px-4 md:px-6 py-2.5 transition-all">
+        <div className="w-full mx-auto flex items-center justify-between gap-4">
           {/* Logo & tag da marca */}
           <div className="flex items-center gap-6">
             <button
@@ -232,9 +232,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
       </header>
 
       {/* Container Principal: Sidebar + Conteúdo */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto px-2 md:px-4 py-4 md:py-6 gap-5">
+      <div className="flex-1 flex w-full mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-6 gap-5">
         {/* Sidebar desktop */}
-        <aside className="hidden md:flex flex-col w-56 shrink-0 bg-[#FBF7F0] border border-[#E8DEC8] rounded-2xl p-3 shadow-subtle justify-between">
+        <aside className="hidden md:flex flex-col w-60 shrink-0 bg-[#FBF7F0] border border-[#E8DEC8] rounded-2xl p-3.5 shadow-subtle justify-between">
           <div className="space-y-1">
             <div className="px-3 py-2 mb-1">
               <span className="text-[10px] tracking-[0.18em] uppercase font-sans text-[#8A7A66] font-semibold">
@@ -349,7 +349,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
 
       {/* Rodapé institucional discreto (estilo mockup) */}
       <footer className="mt-auto border-t border-[#E8DEC8] bg-[#FBF7F0]/60 py-3 px-4 text-center">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#8A7A66]">
+        <div className="w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#8A7A66]">
           <span>Emília Bem-Casados · ERP integrado para um negócio mais doce.</span>
           <span className="font-serif italic text-title-min text-[#B08A3E]">
             "Mais que bem-casados, entregamos celebrações."

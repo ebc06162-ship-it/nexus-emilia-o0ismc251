@@ -76,7 +76,7 @@ export default function NovaProposta() {
       ...current,
       {
         ...novoItem,
-        ordem: current.length,
+        ordem: current.length + 1,
         codigo_snapshot: catalogoItem.codigo || '',
         label_snapshot: catalogoItem.display_label,
         catalogo_versao_snapshot: catalogoItem.source_version || '',
@@ -107,7 +107,7 @@ export default function NovaProposta() {
   const saveDraft = async (status = 'rascunho') => {
     setError('')
     if (!clienteId || !oportunidadeId) return setError('Selecione cliente e oportunidade.')
-    if (!itens.length) return setError('Adicione pelo menos um item à proposta.')
+    if (!itens.length) return setError('Adicione pelo menos um item ao orçamento.')
     if (status !== 'rascunho' && !politicas.length) {
       return setError('Não é possível revisar: não há política comercial aprovada e vigente.')
     }
@@ -131,7 +131,7 @@ export default function NovaProposta() {
           politica_aplicada: status !== 'rascunho',
         },
         criada_por: pb.authStore.record.id,
-        observacoes: observacoes || 'Proposta criada pelo montador.',
+        observacoes: observacoes || 'Orçamento criado pelo montador.',
       })
       for (const item of itens) {
         await pb.collection('itens_proposta').create({ proposta_id: proposta.id, ...item })
@@ -141,12 +141,12 @@ export default function NovaProposta() {
         tipo_evento: 'criacao',
         autor: pb.authStore.record.id,
         versao: 1,
-        resumo: `Proposta criada com ${itens.length} item(ns); ${groups.length} grupo(s) de alternativa.`,
+        resumo: `Orçamento criado com ${itens.length} item(ns); ${groups.length} grupo(s) de alternativa.`,
         depois_snapshot: { cliente_id: clienteId, oportunidade_id: oportunidadeId, itens },
       })
       setSaved(proposta)
     } catch (err) {
-      setError(err.message || 'Não foi possível salvar a proposta.')
+      setError(err.message || 'Não foi possível salvar o orçamento.')
     } finally {
       setSaving(false)
     }
@@ -167,7 +167,7 @@ export default function NovaProposta() {
         pedido_id: resposta.pedido_id || current.pedido_id,
       }))
     } catch (err) {
-      setError(err.message || 'Não foi possível responder à proposta.')
+      setError(err.message || 'Não foi possível responder ao orçamento.')
     } finally {
       setSaving(false)
     }
@@ -175,10 +175,10 @@ export default function NovaProposta() {
 
   return (
     <AppShell
-      title="Montador de Proposta"
+      title="Orçamentos"
       subtitle="Composição de itens aprovados do catálogo e amarração à política comercial"
     >
-      <div className="space-y-5 max-w-4xl mx-auto">
+      <div className="space-y-5 w-full mx-auto">
         <div className="flex items-center justify-between">
           <Button
             variant="outline"
@@ -197,12 +197,12 @@ export default function NovaProposta() {
         )}
         {saved && (
           <Card className="border-green-700">
-            <CardContent className="p-4 space-y-3">
-              <p className="font-semibold text-green-800">Proposta registrada</p>
-              <p className="text-sm">
-                Proposta {saved.id}, versão {saved.versao}. Nenhum preço foi calculado.
+            <CardContent className="p-4 md:p-5 space-y-3">
+              <p className="font-semibold text-base text-green-800">Orçamento registrado</p>
+              <p className="text-sm md:text-base">
+                Orçamento {saved.id}, versão {saved.versao}. Nenhum preço foi calculado.
               </p>
-              <p className="text-sm">
+              <p className="text-sm md:text-base">
                 Status comercial: <strong>{saved.status}</strong>
                 {saved.pedido_id ? ` · Pedido: ${saved.pedido_id}` : ''}
               </p>
@@ -211,27 +211,27 @@ export default function NovaProposta() {
                   type="button"
                   disabled={saving}
                   onClick={() => responderProposta('aprovar')}
-                  className="bg-[#5C4A32] hover:bg-[#473926] text-white text-xs rounded-xl"
+                  className="bg-[#5C4A32] hover:bg-[#473926] text-white text-sm rounded-xl px-4 py-2"
                 >
-                  Aprovar e converter
+                  Aprovar e converter em pedido
                 </Button>
                 <Button
                   type="button"
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('devolver')}
-                  className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
+                  className="border-[#E8DEC8] text-[#5C4A32] text-sm rounded-xl px-4 py-2"
                 >
-                  Devolver para alteração
+                  Devolver orçamento para alteração
                 </Button>
                 <Button
                   type="button"
                   disabled={saving}
                   variant="outline"
                   onClick={() => responderProposta('recusar')}
-                  className="border-red-200 text-red-700 text-xs rounded-xl"
+                  className="border-red-200 text-red-700 text-sm rounded-xl px-4 py-2"
                 >
-                  Recusar
+                  Recusar orçamento
                 </Button>
               </div>
             </CardContent>
@@ -239,8 +239,8 @@ export default function NovaProposta() {
         )}
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
-              1. Contexto da proposta
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
+              1. Contexto do orçamento
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
@@ -287,11 +287,11 @@ export default function NovaProposta() {
         </Card>
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
-              2. Itens da proposta
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
+              2. Itens do orçamento
             </CardTitle>
-            <p className="text-xs text-[#8A7A66]">
-              Itens aprovados do catálogo. Alternativas do mesmo grupo não são somadas.
+            <p className="text-xs md:text-sm text-[#8A7A66]">
+              Itens aprovados do catálogo. Alternativas do mesmo grupo não são somadas.{' '}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -414,21 +414,21 @@ export default function NovaProposta() {
         </Card>
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               3. Revisão e política
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-xs text-[#5C4A32]">
+            <p className="text-sm md:text-base text-[#5C4A32]">
               Políticas aprovadas disponíveis: <strong>{politicas.length}</strong>
             </p>
             {!politicas.length && (
-              <p className="rounded-xl bg-[#F4EEDA] border border-[#E5D7B7] p-3 text-xs text-[#8A7A66]">
-                A proposta pode ser salva como rascunho, mas a revisão/emissão está bloqueada até
+              <p className="rounded-xl bg-[#F4EEDA] border border-[#E5D7B7] p-3 text-xs md:text-sm text-[#8A7A66]">
+                O orçamento pode ser salvo como rascunho, mas a revisão/emissão está bloqueada até
                 existir política aprovada e vigente. Nenhum valor será calculado silenciosamente.
               </p>
             )}
-            <Label htmlFor="observacoes" className="text-xs text-[#5C4A32]">
+            <Label htmlFor="observacoes" className="text-xs md:text-sm text-[#5C4A32]">
               Observações
             </Label>
             <Input
@@ -436,7 +436,7 @@ export default function NovaProposta() {
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
               placeholder="Observações da revisão"
-              className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs"
+              className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm"
             />
             <div className="flex flex-wrap gap-3 pt-2">
               <Button
@@ -444,7 +444,7 @@ export default function NovaProposta() {
                 variant="outline"
                 disabled={saving}
                 onClick={() => saveDraft('rascunho')}
-                className="border-[#E8DEC8] text-[#5C4A32] text-xs rounded-xl"
+                className="border-[#E8DEC8] text-[#5C4A32] text-sm rounded-xl px-4 py-2"
               >
                 Salvar rascunho
               </Button>
@@ -452,7 +452,7 @@ export default function NovaProposta() {
                 type="button"
                 disabled={saving || !politicas.length}
                 onClick={() => saveDraft('em_revisao')}
-                className="bg-[#5C4A32] hover:bg-[#473926] text-white text-xs rounded-xl"
+                className="bg-[#5C4A32] hover:bg-[#473926] text-white text-sm rounded-xl px-4 py-2"
               >
                 Enviar para revisão
               </Button>

@@ -47,13 +47,13 @@ export default function Historico() {
   if (!canRead) {
     return (
       <AppShell>
-        <div className="max-w-xl mx-auto py-12">
+        <div className="w-full max-w-2xl mx-auto py-12">
           <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card p-6 text-center">
-            <p role="alert" className="text-sm text-red-700">
+            <p role="alert" className="text-sm md:text-base text-red-700">
               Você não tem permissão para consultar o histórico de auditoria.
             </p>
             <Button
-              className="mt-4 bg-[#5C4A32] text-white hover:bg-[#473926] text-xs rounded-xl"
+              className="mt-4 bg-[#5C4A32] text-white hover:bg-[#473926] text-sm rounded-xl px-4 py-2"
               onClick={() => navigate('/')}
             >
               Voltar ao início
@@ -91,10 +91,10 @@ export default function Historico() {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-3 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               Eventos Registrados
             </CardTitle>
-            <p className="text-xs text-[#8A7A66]">
+            <p className="text-xs md:text-sm text-[#8A7A66]">
               Consulta somente leitura. Registros são imutáveis e auditáveis.
             </p>
           </CardHeader>

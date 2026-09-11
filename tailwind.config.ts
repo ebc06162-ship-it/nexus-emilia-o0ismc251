@@ -35,7 +35,7 @@ export default {
         display: ['"EB Garamond"', 'Georgia', 'serif'],
       },
       fontSize: {
-        'title-min': ['19px', { lineHeight: '1.3' }],
+        'title-min': ['20px', { lineHeight: '1.3' }],
       },
       colors: {
         emilia: {

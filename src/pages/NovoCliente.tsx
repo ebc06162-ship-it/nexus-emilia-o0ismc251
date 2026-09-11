@@ -70,7 +70,7 @@ const Field = ({
   placeholder = '',
 }: FieldProps) => (
   <div className="space-y-1.5">
-    <Label htmlFor={id} className="text-xs font-medium text-[#5C4A32]">
+    <Label htmlFor={id} className="text-xs md:text-sm font-medium text-[#5C4A32]">
       {label}
     </Label>
     <Input
@@ -80,7 +80,7 @@ const Field = ({
       onChange={(e) => onChange(e.target.value)}
       required={required}
       placeholder={placeholder}
-      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-xs py-2 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
+      className="rounded-xl bg-[#FDFAF5] border-[#E8DEC8] text-sm py-2 text-[#5C4A32] focus:border-[#B08A3E] focus:ring-[#B08A3E]/30"
     />
   </div>
 )
@@ -229,7 +229,7 @@ export default function NovoCliente() {
       title="Novo Cliente"
       subtitle="Cadastro progressivo e qualificação comercial de clientes Emília"
     >
-      <div className="max-w-3xl mx-auto space-y-4">
+      <div className="w-full mx-auto space-y-4">
         <Button
           variant="outline"
           onClick={() => navigate('/')}
@@ -241,10 +241,10 @@ export default function NovoCliente() {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card overflow-hidden">
           <CardHeader className="pb-4 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               Ficha do Cliente
             </CardTitle>
-            <p className="text-xs text-[#8A7A66]">
+            <p className="text-xs md:text-sm text-[#8A7A66]">
               Preencha as informações básicas para iniciar o atendimento.
             </p>
           </CardHeader>

@@ -66,9 +66,15 @@
     border-color: hsl(var(--border));
   }
 
+  html {
+    font-size: 16px;
+  }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-size: 1rem;
+    line-height: 1.5;
     font-family:
       'Mulish',
       system-ui,
@@ -115,6 +121,7 @@
       sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.18em;
+    font-size: 0.8125rem; /* ~13px */
   }
 
   .tabular-nums {

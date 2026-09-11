@@ -195,7 +195,7 @@ const Dashboard = () => {
             className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] font-medium text-xs px-4 py-2.5 rounded-xl transition-colors"
             onClick={() => navigate('/propostas/nova')}
           >
-            Montador de propostas
+            Orçamentos
           </Button>
 
           {['administrador', 'gestao'].includes(user?.papel) && (

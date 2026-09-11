@@ -490,7 +490,7 @@ const NovaOportunidade = () => {
       title="Nova Oportunidade / Pedido"
       subtitle="Registro de novos eventos, datas de entrega e preferências do cliente"
     >
-      <div className="max-w-3xl mx-auto space-y-4">
+      <div className="w-full mx-auto space-y-4">
         <Button
           variant="outline"
           onClick={() => navigate('/')}
@@ -502,7 +502,7 @@ const NovaOportunidade = () => {
 
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
           <CardHeader className="pb-4 border-b border-[#E8DEC8]/50">
-            <CardTitle className="font-serif text-title-min md:text-xl font-semibold text-[#5C4A32]">
+            <CardTitle className="font-serif text-title-min md:text-2xl font-semibold text-[#5C4A32]">
               Registro de Oportunidade & Pedido
             </CardTitle>{' '}
           </CardHeader>

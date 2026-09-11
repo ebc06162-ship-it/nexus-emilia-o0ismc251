@@ -18,6 +18,17 @@ const statusLabels: Record<string, string> = {
   pago: 'Pago',
 }
 
+const pedidoStatusLabels: Record<string, string> = {
+  aguardando_pagamento: 'Aguardando pagamento',
+  parcial_em_dia: 'Parcialmente pago',
+  parcial_em_atraso: 'Parcialmente pago em atraso',
+  pago: 'Pago',
+  comprovante_recebido: 'Comprovante recebido',
+  em_conferencia: 'Em conferência',
+  divergente: 'Divergente',
+  pendente_correcao: 'Pendente de correção',
+}
+
 const formatMoney = (value: number) =>
   Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -209,7 +220,7 @@ export default function FilaFinanceira() {
           {pagamentos.map((pagamento) => {
             const pedido =
               pedidos.find((item) => item.id === pagamento.pedido_id) || pagamento.expand?.pedido_id
-            const statusExibicao = pedido?.status_financeiro === 'pago' ? 'pago' : pagamento.status
+            const statusPedido = pedido?.status_financeiro || pagamento.status
             const selected = arquivos[pagamento.id] || []
             const canUpload = ['aguardando_pagamento', 'divergente'].includes(pagamento.status)
             const canDecide =
@@ -231,7 +242,7 @@ export default function FilaFinanceira() {
                       </p>
                     </div>
                     <Badge variant="outline" className="w-fit border-[#D6BC7E] text-[#5C4A32]">
-                      {statusLabels[statusExibicao] || statusExibicao}
+                      {pedidoStatusLabels[statusPedido] || statusPedido}
                     </Badge>
                   </div>
                 </CardHeader>

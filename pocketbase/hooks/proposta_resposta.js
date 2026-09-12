@@ -173,14 +173,17 @@ routerAdd(
       })
     }
 
-    let pedidoExistenteAntesDaPolitica = null
-    try {
-      pedidoExistenteAntesDaPolitica = $app.findFirstRecordByData(
-        'pedidos',
-        'proposta_id',
-        propostaId,
-      )
-    } catch (err) {}
+    const pedidosExistentesAntesDaPolitica = $app.findRecordsByFilter(
+      'pedidos',
+      'proposta_id = {:proposta}',
+      '-created',
+      1,
+      0,
+      { proposta: propostaId },
+    )
+    const pedidoExistenteAntesDaPolitica = pedidosExistentesAntesDaPolitica.length
+      ? pedidosExistentesAntesDaPolitica[0]
+      : null
 
     if (pedidoExistenteAntesDaPolitica) {
       const auditoriaRepeticao = new Record($app.findCollectionByNameOrId('auditoria_pedidos'))

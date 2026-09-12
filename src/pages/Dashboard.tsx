@@ -15,6 +15,7 @@ import {
   ArrowRight,
   TrendingUp,
   Calendar,
+  ShieldCheck,
 } from 'lucide-react'
 
 const Dashboard = () => {
@@ -76,6 +77,16 @@ const Dashboard = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          {user?.papel === 'administrador' && (
+            <Button
+              variant="outline"
+              className="border-[#B08A3E] bg-[#F4EEDA] text-[#5C4A32] hover:bg-[#EFE5D3] font-medium text-sm px-3.5 py-2 rounded-xl transition-colors"
+              onClick={() => navigate('/regressao/f2-t010')}
+            >
+              <ShieldCheck size={16} className="mr-1.5 text-[#B08A3E]" />
+              Regressão F2-T010
+            </Button>
+          )}
           <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#FDFAF5] border border-[#E8DEC8] text-sm text-[#5C4A32] shadow-xs">
             <Calendar size={15} className="text-[#B08A3E]" />
             <span className="font-medium">

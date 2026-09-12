@@ -11,6 +11,7 @@ import {
   WalletCards,
   Search,
   Bell,
+  ShieldCheck,
   LogOut,
   Menu,
   X,
@@ -98,6 +99,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
       to: '/integracoes/homologacao',
       label: 'Integrações',
       icon: Cpu,
+      roles: ['administrador'],
+    },
+    {
+      to: '/regressao/f2-t010',
+      label: 'Regressão F2-T010',
+      icon: ShieldCheck,
       roles: ['administrador'],
     },
   ]

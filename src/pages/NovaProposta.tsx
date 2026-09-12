@@ -69,11 +69,20 @@ export default function NovaProposta() {
   const [salvandoNovoCliente, setSalvandoNovoCliente] = useState(false)
   const [modalClienteErro, setModalClienteErro] = useState('')
 
-  // Estados para complementação / edição do nome do cliente selecionado
-  const [editandoNome, setEditandoNome] = useState(false)
-  const [nomeEditado, setNomeEditado] = useState('')
-  const [salvandoNome, setSalvandoNome] = useState(false)
-  const [erroNome, setErroNome] = useState('')
+  // Estados para complementação / edição do cadastro completo do cliente selecionado
+  const [showEditarCadastroModal, setShowEditarCadastroModal] = useState(false)
+  const [editClienteNome, setEditClienteNome] = useState('')
+  const [editClienteTelefone, setEditClienteTelefone] = useState('')
+  const [editClienteCpf, setEditClienteCpf] = useState('')
+  const [editClienteEmail, setEditClienteEmail] = useState('')
+  const [editClienteNatureza, setEditClienteNatureza] = useState('pessoa_fisica')
+  const [editClienteClassificacao, setEditClienteClassificacao] = useState('cliente_padrao')
+  const [editClienteOrigem, setEditClienteOrigem] = useState('')
+  const [editClienteCategoriaIndicacao, setEditClienteCategoriaIndicacao] = useState('')
+  const [editClienteReferencia, setEditClienteReferencia] = useState('')
+  const [editClienteObservacoes, setEditClienteObservacoes] = useState('')
+  const [salvandoCadastroCliente, setSalvandoCadastroCliente] = useState(false)
+  const [erroEditarCadastro, setErroEditarCadastro] = useState('')
 
   // Fechar dropdown ao clicar fora
   useEffect(() => {
@@ -179,9 +188,7 @@ export default function NovaProposta() {
     setClienteSelecionado(cliente)
     setClienteId(cliente.id)
     setClienteBusca(cliente.nome)
-    setNomeEditado(cliente.nome || '')
-    setEditandoNome(false)
-    setErroNome('')
+    setErroEditarCadastro('')
     setClientesFiltrados([])
     setDropdownAberto(false)
     setOportunidadeId('')
@@ -191,9 +198,7 @@ export default function NovaProposta() {
     setClienteSelecionado(null)
     setClienteId('')
     setClienteBusca('')
-    setNomeEditado('')
-    setEditandoNome(false)
-    setErroNome('')
+    setErroEditarCadastro('')
     setOportunidadeId('')
     setClientesFiltrados([])
     setDropdownAberto(false)
@@ -301,9 +306,7 @@ export default function NovaProposta() {
       setClienteSelecionado(clienteCriado)
       setClienteId(clienteCriado.id)
       setClienteBusca(clienteCriado.nome)
-      setNomeEditado(clienteCriado.nome)
-      setEditandoNome(false)
-      setErroNome('')
+      setErroEditarCadastro('')
       if (novaOportunidadeCriada) {
         setOportunidadeId(novaOportunidadeCriada.id)
       } else {
@@ -323,32 +326,112 @@ export default function NovaProposta() {
     return parts.length >= 2
   }
 
-  // Complementar / salvar edição do nome do cliente
-  const salvarEdicaoNome = async () => {
-    setErroNome('')
-    const novoNome = nomeEditado.trim()
-    if (!novoNome) {
-      return setErroNome('O nome do cliente não pode ficar em branco.')
+  // Abrir modal de edição/complementação do cadastro completo do cliente
+  const abrirModalEditarCadastro = () => {
+    if (!clienteSelecionado) return
+    setEditClienteNome(clienteSelecionado.nome || '')
+    setEditClienteTelefone(clienteSelecionado.telefone_principal || '')
+    setEditClienteCpf(clienteSelecionado.cpf_cnpj || '')
+    setEditClienteEmail(clienteSelecionado.email || '')
+    setEditClienteNatureza(clienteSelecionado.natureza_cadastral || 'pessoa_fisica')
+    setEditClienteClassificacao(clienteSelecionado.classificacao_comercial || 'cliente_padrao')
+    setEditClienteOrigem(clienteSelecionado.origem_cliente || '')
+    setEditClienteCategoriaIndicacao(clienteSelecionado.categoria_indicacao || '')
+    setEditClienteReferencia(clienteSelecionado.referencia_origem || '')
+    setEditClienteObservacoes(clienteSelecionado.observacoes || '')
+    setErroEditarCadastro('')
+    setShowEditarCadastroModal(true)
+  }
+
+  // Complementar / salvar edição do cadastro completo do cliente selecionado
+  const salvarEditarCadastro = async (e?: React.FormEvent) => {
+    e?.preventDefault()
+    setErroEditarCadastro('')
+    const nomeLimpo = editClienteNome.trim()
+    const telLimpo = editClienteTelefone.replace(/\D/g, '')
+
+    if (!nomeLimpo) {
+      return setErroEditarCadastro('Informe o nome do cliente.')
     }
-    const partes = novoNome.split(/\s+/).filter(Boolean)
-    if (partes.length < 2) {
-      return setErroNome('Recomendado preencher nome e sobrenome completo antes de formalizar.')
+    const partesNome = nomeLimpo.split(/\s+/).filter(Boolean)
+    if (partesNome.length < 2) {
+      return setErroEditarCadastro('Informe ao menos nome e sobrenome do cliente.')
+    }
+    if (telLimpo && telLimpo.length < 10) {
+      return setErroEditarCadastro('Telefone inválido (deve conter DDD + número).')
+    }
+    if (editClienteOrigem === 'indicacao' && !editClienteCategoriaIndicacao) {
+      return setErroEditarCadastro('Informe a categoria da indicação.')
     }
     if (!clienteSelecionado?.id) return
 
-    setSalvandoNome(true)
+    setSalvandoCadastroCliente(true)
     try {
-      const atualizado = await pb.collection('clientes').update(clienteSelecionado.id, {
-        nome: novoNome,
-      })
+      const clienteData: Record<string, any> = {
+        nome: nomeLimpo,
+        telefone_principal: telLimpo || '',
+        cpf_cnpj: editClienteCpf.trim() || '',
+        email: editClienteEmail.trim() || '',
+        natureza_cadastral: editClienteNatureza,
+        classificacao_comercial: editClienteClassificacao,
+        origem_cliente: editClienteOrigem || '',
+        categoria_indicacao: editClienteOrigem === 'indicacao' ? editClienteCategoriaIndicacao : '',
+        referencia_origem: editClienteReferencia.trim() || '',
+        observacoes: editClienteObservacoes.trim() || '',
+      }
+
+      const atualizado = await pb.collection('clientes').update(clienteSelecionado.id, clienteData)
+
+      // Atualiza ou vincula pessoa auxiliar se houver telefone
+      if (telLimpo) {
+        try {
+          const buscaPessoa = await pb
+            .collection('pessoas')
+            .getList(1, 1, { filter: `telefone_principal = "${telLimpo}"` })
+          let pessoa = buscaPessoa.items[0] || null
+          if (!pessoa) {
+            pessoa = await pb.collection('pessoas').create({
+              nome: nomeLimpo,
+              telefone_principal: telLimpo,
+              ...(editClienteEmail.trim() ? { email: editClienteEmail.trim() } : {}),
+              ...(editClienteCpf.trim() && editClienteNatureza === 'pessoa_fisica'
+                ? { cpf: editClienteCpf.trim() }
+                : {}),
+            })
+          } else {
+            await pb.collection('pessoas').update(pessoa.id, {
+              nome: nomeLimpo,
+              ...(editClienteEmail.trim() ? { email: editClienteEmail.trim() } : {}),
+              ...(editClienteCpf.trim() && editClienteNatureza === 'pessoa_fisica'
+                ? { cpf: editClienteCpf.trim() }
+                : {}),
+            })
+          }
+          if (pessoa) {
+            const vinculo = await pb
+              .collection('clientes_pessoas')
+              .getList(1, 1, {
+                filter: `cliente_id = "${atualizado.id}" && pessoa_id = "${pessoa.id}"`,
+              })
+            if (vinculo.items.length === 0) {
+              await pb
+                .collection('clientes_pessoas')
+                .create({ cliente_id: atualizado.id, pessoa_id: pessoa.id, papel: 'titular' })
+            }
+          }
+        } catch (subErr) {
+          console.warn('Aviso: sincronização de pessoa auxiliar não concluída', subErr)
+        }
+      }
+
       setClienteSelecionado(atualizado)
       setClienteBusca(atualizado.nome)
-      setEditandoNome(false)
+      setShowEditarCadastroModal(false)
       setError('')
     } catch (err: any) {
-      setErroNome(err.message || 'Não foi possível atualizar o nome do cliente.')
+      setErroEditarCadastro(err.message || 'Não foi possível atualizar o cadastro do cliente.')
     } finally {
-      setSalvandoNome(false)
+      setSalvandoCadastroCliente(false)
     }
   }
 
@@ -397,7 +480,7 @@ export default function NovaProposta() {
     const nomeAtual = clienteSelecionado?.nome || ''
     if (!isNomeCompleto(nomeAtual)) {
       return setError(
-        'Para formalizar o orçamento, o cliente deve possuir ao menos nome e sobrenome. Utilize a opção "Complementar nome" acima.',
+        'Para formalizar o orçamento, o cliente deve possuir ao menos nome e sobrenome. Utilize a opção "Complementar cadastro" acima.',
       )
     }
     if (status !== 'rascunho' && !politicas.length) {
@@ -694,7 +777,7 @@ export default function NovaProposta() {
               </div>
             </div>
 
-            {/* Painel do cliente selecionado: detalhe e complementação/edição do nome */}
+            {/* Painel do cliente selecionado: detalhe e botão único para complementar cadastro completo */}
             {clienteSelecionado && (
               <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3.5 space-y-2.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -719,84 +802,59 @@ export default function NovaProposta() {
                     )}
                   </div>
 
-                  {!editandoNome && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setNomeEditado(clienteSelecionado.nome || '')
-                        setErroNome('')
-                        setEditandoNome(true)
-                      }}
-                      className="text-xs text-[#5C4A32] hover:text-[#3D2314] hover:bg-[#F0E6D6] h-8 px-2.5 rounded-lg flex items-center gap-1"
-                    >
-                      <Edit2 size={13} />
-                      {isNomeCompleto(clienteSelecionado.nome)
-                        ? 'Editar nome'
-                        : 'Complementar nome'}
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={abrirModalEditarCadastro}
+                    className="text-xs text-[#5C4A32] hover:text-[#3D2314] hover:bg-[#F0E6D6] h-8 px-2.5 rounded-lg flex items-center gap-1.5 font-medium"
+                  >
+                    <Edit2 size={13} />
+                    Complementar cadastro
+                  </Button>
                 </div>
 
-                {!editandoNome ? (
-                  <div className="space-y-1">
-                    <p className="text-base font-semibold text-[#5C4A32]">
-                      {clienteSelecionado.nome}
-                    </p>
-                    <p className="text-xs text-[#8A7A66]">
-                      {clienteSelecionado.telefone_principal &&
-                        `Telefone: ${clienteSelecionado.telefone_principal}`}
-                      {clienteSelecionado.cpf_cnpj && ` · CPF/CNPJ: ${clienteSelecionado.cpf_cnpj}`}
-                      {clienteSelecionado.email && ` · E-mail: ${clienteSelecionado.email}`}
-                    </p>
-                    {!isNomeCompleto(clienteSelecionado.nome) && (
-                      <p className="text-xs text-[#8D6B29] pt-1">
-                        ℹ O orçamento formal requer nome e sobrenome completo. Clique em{' '}
-                        <strong>Complementar nome</strong> para atualizar este cadastro antes de
-                        emitir a proposta.
-                      </p>
+                <div className="space-y-1">
+                  <p className="text-base font-semibold text-[#5C4A32]">
+                    {clienteSelecionado.nome}
+                  </p>
+                  <p className="text-xs text-[#8A7A66] flex flex-wrap gap-x-2 gap-y-0.5">
+                    {clienteSelecionado.telefone_principal && (
+                      <span>Telefone: {clienteSelecionado.telefone_principal}</span>
                     )}
-                  </div>
-                ) : (
-                  <div className="space-y-2 pt-1 border-t border-[#E8DEC8]/60">
-                    <Label htmlFor="nome_editado" className="text-xs font-semibold text-[#5C4A32]">
-                      Nome completo do cliente (ao menos nome + sobrenome)
-                    </Label>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Input
-                        id="nome_editado"
-                        value={nomeEditado}
-                        onChange={(e) => setNomeEditado(e.target.value)}
-                        placeholder="Ex.: Maria Silva Santos"
-                        className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl flex-1"
-                      />
-                      <div className="flex gap-1.5">
-                        <Button
-                          type="button"
-                          onClick={salvarEdicaoNome}
-                          disabled={salvandoNome}
-                          className="bg-[#5C4A32] hover:bg-[#473926] text-white text-xs h-10 px-3.5 rounded-xl flex items-center gap-1"
-                        >
-                          <Check size={14} />
-                          {salvandoNome ? 'Salvando...' : 'Salvar no cliente'}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setEditandoNome(false)
-                            setErroNome('')
-                          }}
-                          className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs h-10 px-3 rounded-xl"
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-                    </div>
-                    {erroNome && <p className="text-xs text-[#7A2E2E]">{erroNome}</p>}
-                  </div>
-                )}
+                    {clienteSelecionado.cpf_cnpj && (
+                      <span>· CPF/CNPJ: {clienteSelecionado.cpf_cnpj}</span>
+                    )}
+                    {clienteSelecionado.email && <span>· E-mail: {clienteSelecionado.email}</span>}
+                    {clienteSelecionado.natureza_cadastral && (
+                      <span>
+                        · Natureza:{' '}
+                        {clienteSelecionado.natureza_cadastral === 'pessoa_juridica'
+                          ? 'Pessoa Jurídica'
+                          : 'Pessoa Física'}
+                      </span>
+                    )}
+                    {clienteSelecionado.classificacao_comercial && (
+                      <span>
+                        · Classificação:{' '}
+                        {clienteSelecionado.classificacao_comercial === 'cerimonialista'
+                          ? 'Cerimonialista'
+                          : clienteSelecionado.classificacao_comercial === 'revendedor'
+                            ? 'Revendedor'
+                            : clienteSelecionado.classificacao_comercial === 'parceiro_comercial'
+                              ? 'Parceiro Comercial'
+                              : 'Cliente padrão'}
+                      </span>
+                    )}
+                  </p>
+                  {!isNomeCompleto(clienteSelecionado.nome) && (
+                    <p className="text-xs text-[#8D6B29] pt-1">
+                      ℹ O orçamento formal requer nome e sobrenome completo. Clique em{' '}
+                      <strong>Complementar cadastro</strong> para atualizar os dados deste cliente
+                      antes de emitir a proposta.
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </CardContent>
@@ -980,6 +1038,247 @@ export default function NovaProposta() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal para complementar / editar o cadastro completo do cliente selecionado */}
+      <Dialog open={showEditarCadastroModal} onOpenChange={setShowEditarCadastroModal}>
+        <DialogContent className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl max-w-lg p-6 text-[#5C4A32] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl font-semibold text-[#5C4A32] flex items-center gap-2">
+              <Edit2 className="text-[#B08A3E]" size={20} />
+              Complementar Cadastro do Cliente
+            </DialogTitle>
+            <DialogDescription className="text-sm text-[#8A7A66]">
+              Atualize ou complete as informações cadastrais do cliente selecionado. As alterações
+              serão salvas imediatamente.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={salvarEditarCadastro} className="space-y-4 pt-2">
+            {erroEditarCadastro && (
+              <div
+                role="alert"
+                className="p-3 text-sm text-[#7A2E2E] bg-[#FAF1F1] border border-[#7A2E2E]/30 rounded-xl"
+              >
+                {erroEditarCadastro}
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="edit_cliente_nome"
+                className="text-[15px] font-semibold text-[#5C4A32]"
+              >
+                Nome completo (nome + sobrenome) *
+              </Label>
+              <Input
+                id="edit_cliente_nome"
+                value={editClienteNome}
+                onChange={(e) => setEditClienteNome(e.target.value)}
+                placeholder="Ex.: Carolina Prado Ferreira"
+                required
+                className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+              />
+              <p className="text-xs text-[#8A7A66]">
+                Para orçamentos formais, é necessário ao menos o primeiro nome e sobrenome.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="edit_cliente_tel"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Telefone principal
+                </Label>
+                <Input
+                  id="edit_cliente_tel"
+                  type="tel"
+                  value={editClienteTelefone}
+                  onChange={(e) => setEditClienteTelefone(e.target.value)}
+                  placeholder="Ex.: (11) 98765-4321"
+                  className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="edit_cliente_cpf"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  CPF ou CNPJ
+                </Label>
+                <Input
+                  id="edit_cliente_cpf"
+                  value={editClienteCpf}
+                  onChange={(e) => setEditClienteCpf(e.target.value)}
+                  placeholder="000.000.000-00"
+                  className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="edit_cliente_email"
+                className="text-[15px] font-semibold text-[#5C4A32]"
+              >
+                E-mail (opcional)
+              </Label>
+              <Input
+                id="edit_cliente_email"
+                type="email"
+                value={editClienteEmail}
+                onChange={(e) => setEditClienteEmail(e.target.value)}
+                placeholder="cliente@exemplo.com.br"
+                className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="edit_cliente_natureza"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Natureza cadastral *
+                </Label>
+                <select
+                  id="edit_cliente_natureza"
+                  value={editClienteNatureza}
+                  onChange={(e) => setEditClienteNatureza(e.target.value)}
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+                >
+                  <option value="pessoa_fisica">Pessoa Física</option>
+                  <option value="pessoa_juridica">Pessoa Jurídica</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="edit_cliente_classificacao"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Classificação comercial *
+                </Label>
+                <select
+                  id="edit_cliente_classificacao"
+                  value={editClienteClassificacao}
+                  onChange={(e) => setEditClienteClassificacao(e.target.value)}
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+                >
+                  <option value="cliente_padrao">Cliente padrão</option>
+                  <option value="cerimonialista">Cerimonialista</option>
+                  <option value="revendedor">Revendedor</option>
+                  <option value="parceiro_comercial">Parceiro Comercial</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="edit_cliente_origem"
+                className="text-[15px] font-semibold text-[#5C4A32]"
+              >
+                Origem do cliente
+              </Label>
+              <select
+                id="edit_cliente_origem"
+                value={editClienteOrigem}
+                onChange={(e) => setEditClienteOrigem(e.target.value)}
+                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+              >
+                <option value="">Selecione a origem, se souber</option>
+                <option value="instagram">Instagram</option>
+                <option value="google">Google</option>
+                <option value="tiktok">TikTok</option>
+                <option value="indicacao">Indicação</option>
+                <option value="cerimonialista">Cerimonialista</option>
+                <option value="parceiro_comercial">Parceiro Comercial</option>
+                <option value="ifood">iFood</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+
+            {editClienteOrigem === 'indicacao' && (
+              <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3 space-y-3">
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="edit_cliente_cat_indicacao"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
+                  >
+                    Categoria da indicação *
+                  </Label>
+                  <select
+                    id="edit_cliente_cat_indicacao"
+                    value={editClienteCategoriaIndicacao}
+                    onChange={(e) => setEditClienteCategoriaIndicacao(e.target.value)}
+                    className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+                  >
+                    <option value="">Selecione a categoria</option>
+                    <option value="profissional_mercado">Profissional do mercado</option>
+                    <option value="outra_noiva_cliente">Outra noiva/cliente</option>
+                    <option value="parente">Parente</option>
+                    <option value="amigo_conhecido">Amigo/conhecido</option>
+                    <option value="outro">Outro</option>
+                    <option value="nao_informado">Não informado</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="edit_cliente_ref"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
+                  >
+                    Referência da indicação
+                  </Label>
+                  <Input
+                    id="edit_cliente_ref"
+                    value={editClienteReferencia}
+                    onChange={(e) => setEditClienteReferencia(e.target.value)}
+                    placeholder="Ex.: indicação da noiva Mariana"
+                    className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="edit_cliente_obs"
+                className="text-[15px] font-semibold text-[#5C4A32]"
+              >
+                Observações do cliente
+              </Label>
+              <Input
+                id="edit_cliente_obs"
+                value={editClienteObservacoes}
+                onChange={(e) => setEditClienteObservacoes(e.target.value)}
+                placeholder="Preferências, anotações de atendimento..."
+                className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+              />
+            </div>
+
+            <DialogFooter className="pt-4 border-t border-[#E8DEC8]/60 flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowEditarCadastroModal(false)}
+                className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm rounded-xl px-4 py-2"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={salvandoCadastroCliente}
+                className="bg-[#5C4A32] hover:bg-[#473926] text-white text-sm rounded-xl px-5 py-2 flex items-center gap-1.5"
+              >
+                <Check size={16} />
+                {salvandoCadastroCliente ? 'Salvando...' : 'Salvar Alterações'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal para cadastrar novo cliente diretamente da busca */}
       <Dialog open={showNovoClienteModal} onOpenChange={setShowNovoClienteModal}>

@@ -1,13 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import pb from '@/lib/pocketbase/client'
 import AppShell from '@/components/AppShell'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Check, Edit2, Plus, Search, UserPlus, X, AlertCircle } from 'lucide-react'
 
 const tipos = [
   ['cumulativo', 'Cumulativo'],
@@ -26,11 +34,11 @@ const emptyItem = {
 
 export default function NovaProposta() {
   const navigate = useNavigate()
-  const [clientes, setClientes] = useState([])
   const [oportunidades, setOportunidades] = useState([])
   const [catalogo, setCatalogo] = useState([])
   const [politicas, setPoliticas] = useState([])
   const [clienteId, setClienteId] = useState('')
+  const [clienteSelecionado, setClienteSelecionado] = useState<any>(null)
   const [oportunidadeId, setOportunidadeId] = useState('')
   const [itens, setItens] = useState([])
   const [novoItem, setNovoItem] = useState(emptyItem)
@@ -40,9 +48,49 @@ export default function NovaProposta() {
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(null)
 
+  // Estados de busca de cliente
+  const [clienteBusca, setClienteBusca] = useState('')
+  const [clientesFiltrados, setClientesFiltrados] = useState<any[]>([])
+  const [buscandoClientes, setBuscandoClientes] = useState(false)
+  const [dropdownAberto, setDropdownAberto] = useState(false)
+  const buscaTimer = useRef<number | null>(null)
+  const buscaClienteRef = useRef(0)
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+
+  // Estados para modal/inline de criação de novo cliente
+  const [showNovoClienteModal, setShowNovoClienteModal] = useState(false)
+  const [novoClienteNome, setNovoClienteNome] = useState('')
+  const [novoClienteTelefone, setNovoClienteTelefone] = useState('')
+  const [novoClienteCpf, setNovoClienteCpf] = useState('')
+  const [novoClienteEmail, setNovoClienteEmail] = useState('')
+  const [novoClienteNatureza, setNovoClienteNatureza] = useState('pessoa_fisica')
+  const [novoClienteClassificacao, setNovoClienteClassificacao] = useState('cliente_padrao')
+  const [novoClienteCriarOportunidade, setNovoClienteCriarOportunidade] = useState(true)
+  const [salvandoNovoCliente, setSalvandoNovoCliente] = useState(false)
+  const [modalClienteErro, setModalClienteErro] = useState('')
+
+  // Estados para complementação / edição do nome do cliente selecionado
+  const [editandoNome, setEditandoNome] = useState(false)
+  const [nomeEditado, setNomeEditado] = useState('')
+  const [salvandoNome, setSalvandoNome] = useState(false)
+  const [erroNome, setErroNome] = useState('')
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setDropdownAberto(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      if (buscaTimer.current) window.clearTimeout(buscaTimer.current)
+    }
+  }, [])
+
   useEffect(() => {
     Promise.all([
-      pb.collection('clientes').getList(1, 200, { sort: 'nome' }),
       pb.collection('oportunidades').getList(1, 200, { sort: '-created', expand: 'cliente_id' }),
       pb
         .collection('catalogo_itens')
@@ -51,9 +99,8 @@ export default function NovaProposta() {
         .collection('politicas_comerciais')
         .getList(1, 200, { filter: 'estado = "aprovada"', sort: '-created' }),
     ])
-      .then(([c, o, cat, pol]) => {
+      .then(([o, cat, pol]) => {
         const agora = Date.now()
-        setClientes(c.items)
         setOportunidades(o.items)
         setCatalogo(cat.items)
         setPoliticas(
@@ -83,6 +130,227 @@ export default function NovaProposta() {
     () => (clienteId ? oportunidades.filter((o) => o.cliente_id === clienteId) : oportunidades),
     [clienteId, oportunidades],
   )
+
+  // Funções de busca de cliente (nome, telefone ou CPF)
+  const buscarClientes = async (termo: string) => {
+    const id = ++buscaClienteRef.current
+    const raw = termo.trim()
+    if (!raw) {
+      setClientesFiltrados([])
+      setBuscandoClientes(false)
+      return
+    }
+    setBuscandoClientes(true)
+    try {
+      const safeName = raw.replace(/"/g, '\\"')
+      const safeDigits = raw.replace(/\D/g, '')
+      const parts = [`nome ~ "${safeName}"`]
+      if (safeDigits.length >= 3) {
+        parts.push(`telefone_principal ~ "${safeDigits}"`)
+        parts.push(`cpf_cnpj ~ "${safeDigits}"`)
+      }
+      const r = await pb
+        .collection('clientes')
+        .getList(1, 10, { filter: `(${parts.join(' || ')})`, sort: 'nome' })
+      if (id === buscaClienteRef.current) {
+        setClientesFiltrados(r.items)
+        setDropdownAberto(true)
+      }
+    } catch (err) {
+      console.warn('Falha ao buscar clientes no orçamento', err)
+    } finally {
+      if (id === buscaClienteRef.current) setBuscandoClientes(false)
+    }
+  }
+
+  const handleClienteBuscaChange = (value: string) => {
+    setClienteBusca(value)
+    if (buscaTimer.current) window.clearTimeout(buscaTimer.current)
+    if (!value.trim()) {
+      setClientesFiltrados([])
+      setDropdownAberto(false)
+      return
+    }
+    setDropdownAberto(true)
+    buscaTimer.current = window.setTimeout(() => buscarClientes(value), 250)
+  }
+
+  const selecionarCliente = (cliente: any) => {
+    setClienteSelecionado(cliente)
+    setClienteId(cliente.id)
+    setClienteBusca(cliente.nome)
+    setNomeEditado(cliente.nome || '')
+    setEditandoNome(false)
+    setErroNome('')
+    setClientesFiltrados([])
+    setDropdownAberto(false)
+    setOportunidadeId('')
+  }
+
+  const limparClienteSelecionado = () => {
+    setClienteSelecionado(null)
+    setClienteId('')
+    setClienteBusca('')
+    setNomeEditado('')
+    setEditandoNome(false)
+    setErroNome('')
+    setOportunidadeId('')
+    setClientesFiltrados([])
+    setDropdownAberto(false)
+  }
+
+  const abrirModalNovoCliente = () => {
+    const digitado = clienteBusca.trim()
+    const safeDigits = digitado.replace(/\D/g, '')
+    const ehTelefoneOuCpf = /^[0-9\s()+-]+$/.test(digitado) && safeDigits.length >= 10
+
+    setNovoClienteNome(ehTelefoneOuCpf ? '' : digitado)
+    setNovoClienteTelefone(
+      ehTelefoneOuCpf && safeDigits.length <= 11 && !digitado.includes('.') ? digitado : '',
+    )
+    setNovoClienteCpf(
+      ehTelefoneOuCpf && (digitado.includes('.') || safeDigits.length === 11) ? digitado : '',
+    )
+    setNovoClienteEmail('')
+    setNovoClienteNatureza('pessoa_fisica')
+    setNovoClienteClassificacao('cliente_padrao')
+    setNovoClienteCriarOportunidade(true)
+    setModalClienteErro('')
+    setDropdownAberto(false)
+    setShowNovoClienteModal(true)
+  }
+
+  const salvarNovoCliente = async (e?: React.FormEvent) => {
+    e?.preventDefault()
+    setModalClienteErro('')
+    const nomeLimpo = novoClienteNome.trim()
+    const telLimpo = novoClienteTelefone.replace(/\D/g, '')
+
+    if (!nomeLimpo) {
+      return setModalClienteErro('Informe o nome do cliente.')
+    }
+    const partesNome = nomeLimpo.split(/\s+/).filter(Boolean)
+    if (partesNome.length < 2) {
+      return setModalClienteErro('Informe ao menos nome e sobrenome do cliente.')
+    }
+    if (telLimpo && telLimpo.length < 10) {
+      return setModalClienteErro('Telefone inválido (deve conter DDD + número).')
+    }
+
+    setSalvandoNovoCliente(true)
+    try {
+      const clienteData: Record<string, any> = {
+        nome: nomeLimpo,
+        situacao: 'ativo',
+        natureza_cadastral: novoClienteNatureza,
+        classificacao_comercial: novoClienteClassificacao,
+      }
+      if (telLimpo) clienteData.telefone_principal = telLimpo
+      if (novoClienteEmail.trim()) clienteData.email = novoClienteEmail.trim()
+      if (novoClienteCpf.trim()) clienteData.cpf_cnpj = novoClienteCpf.trim()
+
+      const clienteCriado = await pb.collection('clientes').create(clienteData)
+
+      // Se tiver telefone, cria/vincula pessoa auxiliar se cabível
+      if (telLimpo) {
+        try {
+          let pessoa: any = null
+          const buscaPessoa = await pb
+            .collection('pessoas')
+            .getList(1, 1, { filter: `telefone_principal = "${telLimpo}"` })
+          pessoa = buscaPessoa.items[0] || null
+          if (!pessoa) {
+            pessoa = await pb.collection('pessoas').create({
+              nome: nomeLimpo,
+              telefone_principal: telLimpo,
+              ...(novoClienteEmail.trim() ? { email: novoClienteEmail.trim() } : {}),
+              ...(novoClienteCpf.trim() ? { cpf: novoClienteCpf.trim() } : {}),
+            })
+          }
+          if (pessoa) {
+            await pb
+              .collection('clientes_pessoas')
+              .create({ cliente_id: clienteCriado.id, pessoa_id: pessoa.id, papel: 'titular' })
+          }
+        } catch (subErr) {
+          console.warn('Aviso: vínculo auxiliar de pessoa não concluído', subErr)
+        }
+      }
+
+      // Se marcado para criar oportunidade inicial, já cria e associa
+      let novaOportunidadeCriada: any = null
+      if (novoClienteCriarOportunidade) {
+        try {
+          novaOportunidadeCriada = await pb.collection('oportunidades').create({
+            cliente_id: clienteCriado.id,
+            tipo_pedido: 'outros',
+            tipo_evento: 'outros',
+            segmento: 'outros',
+            segmento_classificado: 'outros',
+            status: 'novo',
+            observacoes: 'Oportunidade gerada na criação do orçamento.',
+            responsavel_atual: pb.authStore.record?.id || '',
+          })
+          setOportunidades((curr) => [novaOportunidadeCriada, ...curr])
+        } catch (opErr) {
+          console.warn('Não foi possível auto-criar oportunidade', opErr)
+        }
+      }
+
+      // Vincula cliente criado ao orçamento em construção
+      setClienteSelecionado(clienteCriado)
+      setClienteId(clienteCriado.id)
+      setClienteBusca(clienteCriado.nome)
+      setNomeEditado(clienteCriado.nome)
+      setEditandoNome(false)
+      setErroNome('')
+      if (novaOportunidadeCriada) {
+        setOportunidadeId(novaOportunidadeCriada.id)
+      } else {
+        setOportunidadeId('')
+      }
+      setShowNovoClienteModal(false)
+    } catch (err: any) {
+      setModalClienteErro(err.message || 'Não foi possível cadastrar o cliente.')
+    } finally {
+      setSalvandoNovoCliente(false)
+    }
+  }
+
+  // Validação suave de nome completo (pelo menos duas palavras)
+  const isNomeCompleto = (name: string) => {
+    const parts = (name || '').trim().split(/\s+/).filter(Boolean)
+    return parts.length >= 2
+  }
+
+  // Complementar / salvar edição do nome do cliente
+  const salvarEdicaoNome = async () => {
+    setErroNome('')
+    const novoNome = nomeEditado.trim()
+    if (!novoNome) {
+      return setErroNome('O nome do cliente não pode ficar em branco.')
+    }
+    const partes = novoNome.split(/\s+/).filter(Boolean)
+    if (partes.length < 2) {
+      return setErroNome('Recomendado preencher nome e sobrenome completo antes de formalizar.')
+    }
+    if (!clienteSelecionado?.id) return
+
+    setSalvandoNome(true)
+    try {
+      const atualizado = await pb.collection('clientes').update(clienteSelecionado.id, {
+        nome: novoNome,
+      })
+      setClienteSelecionado(atualizado)
+      setClienteBusca(atualizado.nome)
+      setEditandoNome(false)
+      setError('')
+    } catch (err: any) {
+      setErroNome(err.message || 'Não foi possível atualizar o nome do cliente.')
+    } finally {
+      setSalvandoNome(false)
+    }
+  }
 
   const addItem = () => {
     const catalogoItem = catalogo.find((item) => item.id === novoItem.catalogo_item_id)
@@ -126,6 +394,12 @@ export default function NovaProposta() {
     setError('')
     if (!clienteId || !oportunidadeId) return setError('Selecione cliente e oportunidade.')
     if (!itens.length) return setError('Adicione pelo menos um item ao orçamento.')
+    const nomeAtual = clienteSelecionado?.nome || ''
+    if (!isNomeCompleto(nomeAtual)) {
+      return setError(
+        'Para formalizar o orçamento, o cliente deve possuir ao menos nome e sobrenome. Utilize a opção "Complementar nome" acima.',
+      )
+    }
     if (status !== 'rascunho' && !politicas.length) {
       return setError('Não é possível revisar: não há política comercial aprovada e vigente.')
     }
@@ -285,46 +559,246 @@ export default function NovaProposta() {
               1. Contexto do orçamento
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="cliente" className="text-[15px] font-semibold text-[#5C4A32]">
-                Cliente
-              </Label>
-              <select
-                id="cliente"
-                value={clienteId}
-                onChange={(e) => {
-                  setClienteId(e.target.value)
-                  setOportunidadeId('')
-                }}
-                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32]"
-              >
-                <option value="">Selecione</option>
-                {clientes.map((c: any) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nome}
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Seletor com busca autocomplete igual a NovaOportunidade */}
+              <div className="space-y-1.5 relative" ref={searchContainerRef}>
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="cliente_busca"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
+                  >
+                    Cliente *
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={abrirModalNovoCliente}
+                    className="text-xs font-semibold text-[#B08A3E] hover:text-[#8D6B29] flex items-center gap-1 transition-colors"
+                  >
+                    <Plus size={13} />
+                    Criar novo cliente
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <Input
+                    id="cliente_busca"
+                    value={clienteBusca}
+                    onChange={(e) => handleClienteBuscaChange(e.target.value)}
+                    onFocus={() => {
+                      if (clienteBusca.trim() && !clienteSelecionado) setDropdownAberto(true)
+                    }}
+                    placeholder="Digite nome, telefone ou CPF..."
+                    autoComplete="off"
+                    className="h-10 text-[15px] px-3.5 pr-9 bg-[#FDFAF5] border-[#E8DEC8] text-[#5C4A32] placeholder:text-muted-foreground placeholder:text-sm rounded-xl focus:border-[#B08A3E]"
+                  />
+                  {clienteSelecionado ? (
+                    <button
+                      type="button"
+                      onClick={limparClienteSelecionado}
+                      aria-label="Limpar cliente selecionado"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-[#5C4A32] p-1"
+                    >
+                      <X size={15} />
+                    </button>
+                  ) : (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                      <Search size={15} />
+                    </div>
+                  )}
+                </div>
+
+                {buscandoClientes && (
+                  <p className="text-xs text-[#8A7A66] pt-0.5">Buscando clientes...</p>
+                )}
+
+                {/* Dropdown com resultados filtrados e atalho de novo cadastro */}
+                {dropdownAberto && !clienteSelecionado && clienteBusca.trim() && (
+                  <div className="absolute z-20 left-0 right-0 mt-1 rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] shadow-lg max-h-60 overflow-y-auto divide-y divide-[#E8DEC8]/60">
+                    {clientesFiltrados.length > 0 ? (
+                      clientesFiltrados.map((cliente) => (
+                        <button
+                          key={cliente.id}
+                          type="button"
+                          onClick={() => selecionarCliente(cliente)}
+                          className="w-full text-left px-3.5 py-2.5 text-[15px] hover:bg-[#F5EEE7] transition-colors flex flex-col"
+                        >
+                          <span className="font-semibold text-[#5C4A32]">{cliente.nome}</span>
+                          <span className="text-xs text-[#8A7A66]">
+                            {cliente.telefone_principal
+                              ? `Tel: ${cliente.telefone_principal}`
+                              : 'Sem telefone'}
+                            {cliente.cpf_cnpj ? ` · CPF/CNPJ: ${cliente.cpf_cnpj}` : ''}
+                          </span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="p-3 text-center text-sm text-[#8A7A66]">
+                        Nenhum cliente encontrado para "{clienteBusca.trim()}"
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={abrirModalNovoCliente}
+                      className="w-full text-left px-3.5 py-2.5 text-sm font-semibold text-[#5C4A32] bg-[#F5EEE7] hover:bg-[#EBE2D5] transition-colors flex items-center gap-2"
+                    >
+                      <UserPlus size={15} className="text-[#B08A3E]" />
+                      <span>
+                        + Criar novo cliente{' '}
+                        {clienteBusca.trim() && (
+                          <span className="font-normal text-xs text-[#8A7A66]">
+                            (usar "{clienteBusca.trim()}")
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Seletor de Oportunidade */}
+              <div className="space-y-1.5">
+                <Label htmlFor="oportunidade" className="text-[15px] font-semibold text-[#5C4A32]">
+                  Oportunidade *
+                </Label>
+                <select
+                  id="oportunidade"
+                  value={oportunidadeId}
+                  onChange={(e) => setOportunidadeId(e.target.value)}
+                  disabled={!clienteId}
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32] disabled:opacity-50 disabled:bg-[#F5EFE6]"
+                >
+                  <option value="">
+                    {!clienteId
+                      ? 'Selecione um cliente primeiro'
+                      : oportunidadesVisiveis.length === 0
+                        ? 'Nenhuma oportunidade para este cliente'
+                        : 'Selecione a oportunidade'}
                   </option>
-                ))}
-              </select>
+                  {oportunidadesVisiveis.map((o: any) => (
+                    <option key={o.id} value={o.id}>
+                      {o.tipo_evento || o.tipo_pedido || 'Oportunidade'} · {o.status}
+                      {o.nome_noivos ? ` · ${o.nome_noivos}` : ''}
+                      {o.nome_aniversariante ? ` · ${o.nome_aniversariante}` : ''}
+                    </option>
+                  ))}
+                </select>
+                {clienteId && oportunidadesVisiveis.length === 0 && (
+                  <p className="text-xs text-[#8A7A66]">
+                    Nenhuma oportunidade vinculada a este cliente. É recomendado criar uma
+                    oportunidade antes ou usar o botão "Criar novo cliente" para gerá-la
+                    automaticamente.
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="oportunidade" className="text-[15px] font-semibold text-[#5C4A32]">
-                Oportunidade
-              </Label>
-              <select
-                id="oportunidade"
-                value={oportunidadeId}
-                onChange={(e) => setOportunidadeId(e.target.value)}
-                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-[#FDFAF5] px-3.5 py-2 text-[15px] text-[#5C4A32]"
-              >
-                <option value="">Selecione</option>
-                {oportunidadesVisiveis.map((o: any) => (
-                  <option key={o.id} value={o.id}>
-                    {o.tipo_evento || o.tipo_pedido || 'Oportunidade'} · {o.status}
-                  </option>
-                ))}
-              </select>
-            </div>
+
+            {/* Painel do cliente selecionado: detalhe e complementação/edição do nome */}
+            {clienteSelecionado && (
+              <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3.5 space-y-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs uppercase tracking-wider font-semibold text-[#8A7A66]">
+                      Cliente Selecionado
+                    </span>
+                    {isNomeCompleto(clienteSelecionado.nome) ? (
+                      <Badge
+                        variant="outline"
+                        className="border-[#658B58] text-[#3F6334] bg-[#EEF5EB] text-[11px] px-2 py-0.5 flex items-center gap-1 font-medium"
+                      >
+                        <Check size={11} /> Nome completo validado
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="border-[#D6BC7E] text-[#7A5B18] bg-[#FBF5E5] text-[11px] px-2 py-0.5 flex items-center gap-1 font-medium"
+                      >
+                        <AlertCircle size={11} /> Sobrenome pendente
+                      </Badge>
+                    )}
+                  </div>
+
+                  {!editandoNome && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setNomeEditado(clienteSelecionado.nome || '')
+                        setErroNome('')
+                        setEditandoNome(true)
+                      }}
+                      className="text-xs text-[#5C4A32] hover:text-[#3D2314] hover:bg-[#F0E6D6] h-8 px-2.5 rounded-lg flex items-center gap-1"
+                    >
+                      <Edit2 size={13} />
+                      {isNomeCompleto(clienteSelecionado.nome)
+                        ? 'Editar nome'
+                        : 'Complementar nome'}
+                    </Button>
+                  )}
+                </div>
+
+                {!editandoNome ? (
+                  <div className="space-y-1">
+                    <p className="text-base font-semibold text-[#5C4A32]">
+                      {clienteSelecionado.nome}
+                    </p>
+                    <p className="text-xs text-[#8A7A66]">
+                      {clienteSelecionado.telefone_principal &&
+                        `Telefone: ${clienteSelecionado.telefone_principal}`}
+                      {clienteSelecionado.cpf_cnpj && ` · CPF/CNPJ: ${clienteSelecionado.cpf_cnpj}`}
+                      {clienteSelecionado.email && ` · E-mail: ${clienteSelecionado.email}`}
+                    </p>
+                    {!isNomeCompleto(clienteSelecionado.nome) && (
+                      <p className="text-xs text-[#8D6B29] pt-1">
+                        ℹ O orçamento formal requer nome e sobrenome completo. Clique em{' '}
+                        <strong>Complementar nome</strong> para atualizar este cadastro antes de
+                        emitir a proposta.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2 pt-1 border-t border-[#E8DEC8]/60">
+                    <Label htmlFor="nome_editado" className="text-xs font-semibold text-[#5C4A32]">
+                      Nome completo do cliente (ao menos nome + sobrenome)
+                    </Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Input
+                        id="nome_editado"
+                        value={nomeEditado}
+                        onChange={(e) => setNomeEditado(e.target.value)}
+                        placeholder="Ex.: Maria Silva Santos"
+                        className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl flex-1"
+                      />
+                      <div className="flex gap-1.5">
+                        <Button
+                          type="button"
+                          onClick={salvarEdicaoNome}
+                          disabled={salvandoNome}
+                          className="bg-[#5C4A32] hover:bg-[#473926] text-white text-xs h-10 px-3.5 rounded-xl flex items-center gap-1"
+                        >
+                          <Check size={14} />
+                          {salvandoNome ? 'Salvando...' : 'Salvar no cliente'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setEditandoNome(false)
+                            setErroNome('')
+                          }}
+                          className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-xs h-10 px-3 rounded-xl"
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                    {erroNome && <p className="text-xs text-[#7A2E2E]">{erroNome}</p>}
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
@@ -506,6 +980,176 @@ export default function NovaProposta() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal para cadastrar novo cliente diretamente da busca */}
+      <Dialog open={showNovoClienteModal} onOpenChange={setShowNovoClienteModal}>
+        <DialogContent className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl max-w-lg p-6 text-[#5C4A32]">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl font-semibold text-[#5C4A32] flex items-center gap-2">
+              <UserPlus className="text-[#B08A3E]" size={20} />
+              Cadastrar Novo Cliente
+            </DialogTitle>
+            <DialogDescription className="text-sm text-[#8A7A66]">
+              Preencha os dados do cliente. Ele será selecionado automaticamente para este
+              orçamento.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={salvarNovoCliente} className="space-y-4 pt-2">
+            {modalClienteErro && (
+              <div
+                role="alert"
+                className="p-3 text-sm text-[#7A2E2E] bg-[#FAF1F1] border border-[#7A2E2E]/30 rounded-xl"
+              >
+                {modalClienteErro}
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="modal_cliente_nome"
+                className="text-[15px] font-semibold text-[#5C4A32]"
+              >
+                Nome completo (nome + sobrenome) *
+              </Label>
+              <Input
+                id="modal_cliente_nome"
+                value={novoClienteNome}
+                onChange={(e) => setNovoClienteNome(e.target.value)}
+                placeholder="Ex.: Carolina Prado Ferreira"
+                required
+                className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+              />
+              <p className="text-xs text-[#8A7A66]">
+                Para orçamentos formais, é necessário ao menos o primeiro nome e sobrenome.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="modal_cliente_tel"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Telefone principal
+                </Label>
+                <Input
+                  id="modal_cliente_tel"
+                  type="tel"
+                  value={novoClienteTelefone}
+                  onChange={(e) => setNovoClienteTelefone(e.target.value)}
+                  placeholder="Ex.: (11) 98765-4321"
+                  className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="modal_cliente_cpf"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  CPF ou CNPJ
+                </Label>
+                <Input
+                  id="modal_cliente_cpf"
+                  value={novoClienteCpf}
+                  onChange={(e) => setNovoClienteCpf(e.target.value)}
+                  placeholder="000.000.000-00"
+                  className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="modal_cliente_email"
+                className="text-[15px] font-semibold text-[#5C4A32]"
+              >
+                E-mail (opcional)
+              </Label>
+              <Input
+                id="modal_cliente_email"
+                type="email"
+                value={novoClienteEmail}
+                onChange={(e) => setNovoClienteEmail(e.target.value)}
+                placeholder="cliente@exemplo.com.br"
+                className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="modal_cliente_natureza"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Natureza
+                </Label>
+                <select
+                  id="modal_cliente_natureza"
+                  value={novoClienteNatureza}
+                  onChange={(e) => setNovoClienteNatureza(e.target.value)}
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+                >
+                  <option value="pessoa_fisica">Pessoa Física</option>
+                  <option value="pessoa_juridica">Pessoa Jurídica</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="modal_cliente_classificacao"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Classificação
+                </Label>
+                <select
+                  id="modal_cliente_classificacao"
+                  value={novoClienteClassificacao}
+                  onChange={(e) => setNovoClienteClassificacao(e.target.value)}
+                  className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+                >
+                  <option value="cliente_padrao">Cliente padrão</option>
+                  <option value="cerimonialista">Cerimonialista</option>
+                  <option value="revendedor">Revendedor</option>
+                  <option value="parceiro_comercial">Parceiro Comercial</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#5C4A32]">
+                <input
+                  type="checkbox"
+                  checked={novoClienteCriarOportunidade}
+                  onChange={(e) => setNovoClienteCriarOportunidade(e.target.checked)}
+                  className="h-4 w-4 rounded border-[#E8DEC8] text-[#5C4A32] focus:ring-[#B08A3E]"
+                />
+                <span>Criar e vincular uma oportunidade inicial automaticamente</span>
+              </label>
+            </div>
+
+            <DialogFooter className="pt-4 border-t border-[#E8DEC8]/60 flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowNovoClienteModal(false)}
+                className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] text-sm rounded-xl px-4 py-2"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={salvandoNovoCliente}
+                className="bg-[#5C4A32] hover:bg-[#473926] text-white text-sm rounded-xl px-5 py-2 flex items-center gap-1.5"
+              >
+                <Check size={16} />
+                {salvandoNovoCliente ? 'Cadastrando...' : 'Cadastrar e Vincular'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   )
 }

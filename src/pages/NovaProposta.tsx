@@ -65,6 +65,9 @@ export default function NovaProposta() {
   const [novoClienteEmail, setNovoClienteEmail] = useState('')
   const [novoClienteNatureza, setNovoClienteNatureza] = useState('pessoa_fisica')
   const [novoClienteClassificacao, setNovoClienteClassificacao] = useState('cliente_padrao')
+  const [novoClienteOrigem, setNovoClienteOrigem] = useState('')
+  const [novoClienteCategoriaIndicacao, setNovoClienteCategoriaIndicacao] = useState('')
+  const [novoClienteReferencia, setNovoClienteReferencia] = useState('')
   const [novoClienteCriarOportunidade, setNovoClienteCriarOportunidade] = useState(true)
   const [salvandoNovoCliente, setSalvandoNovoCliente] = useState(false)
   const [modalClienteErro, setModalClienteErro] = useState('')
@@ -219,6 +222,9 @@ export default function NovaProposta() {
     setNovoClienteEmail('')
     setNovoClienteNatureza('pessoa_fisica')
     setNovoClienteClassificacao('cliente_padrao')
+    setNovoClienteOrigem('')
+    setNovoClienteCategoriaIndicacao('')
+    setNovoClienteReferencia('')
     setNovoClienteCriarOportunidade(true)
     setModalClienteErro('')
     setDropdownAberto(false)
@@ -234,12 +240,26 @@ export default function NovaProposta() {
     if (!nomeLimpo) {
       return setModalClienteErro('Informe o nome do cliente.')
     }
+
+    const ehOrigemCerimonialistaModal =
+      novoClienteOrigem === 'cerimonialista' ||
+      novoClienteClassificacao === 'cerimonialista' ||
+      (novoClienteOrigem === 'indicacao' &&
+        (novoClienteCategoriaIndicacao === 'profissional_mercado' ||
+          novoClienteCategoriaIndicacao === 'outro' ||
+          novoClienteCategoriaIndicacao === 'outra_noiva_cliente')) ||
+      novoClienteReferencia.toLowerCase().includes('cerimonial') ||
+      novoClienteReferencia.toLowerCase().includes('assessoria')
+
     const partesNome = nomeLimpo.split(/\s+/).filter(Boolean)
-    if (partesNome.length < 2) {
+    if (!ehOrigemCerimonialistaModal && partesNome.length < 2) {
       return setModalClienteErro('Informe ao menos nome e sobrenome do cliente.')
     }
     if (telLimpo && telLimpo.length < 10) {
       return setModalClienteErro('Telefone inválido (deve conter DDD + número).')
+    }
+    if (novoClienteOrigem === 'indicacao' && !novoClienteCategoriaIndicacao) {
+      return setModalClienteErro('Informe a categoria da indicação.')
     }
 
     setSalvandoNovoCliente(true)
@@ -249,6 +269,9 @@ export default function NovaProposta() {
         situacao: 'ativo',
         natureza_cadastral: novoClienteNatureza,
         classificacao_comercial: novoClienteClassificacao,
+        origem_cliente: novoClienteOrigem || '',
+        categoria_indicacao: novoClienteOrigem === 'indicacao' ? novoClienteCategoriaIndicacao : '',
+        referencia_origem: novoClienteReferencia.trim() || '',
       }
       if (telLimpo) clienteData.telefone_principal = telLimpo
       if (novoClienteEmail.trim()) clienteData.email = novoClienteEmail.trim()
@@ -326,6 +349,42 @@ export default function NovaProposta() {
     return parts.length >= 2
   }
 
+  // Verifica se o cliente tem origem de indicação por cerimonialista/terceiro
+  const isClienteOrigemCerimonialista = (cliente: any) => {
+    if (!cliente) return false
+    const origem = String(cliente.origem_cliente || '').toLowerCase()
+    const cat = String(cliente.categoria_indicacao || '').toLowerCase()
+    const classComercial = String(cliente.classificacao_comercial || '').toLowerCase()
+    const tipo = String(cliente.tipo_cliente || '').toLowerCase()
+    const ref = String(cliente.referencia_origem || '').toLowerCase()
+
+    if (origem === 'cerimonialista') return true
+    if (classComercial === 'cerimonialista') return true
+    if (tipo === 'cerimonialista') return true
+    if (
+      origem === 'indicacao' &&
+      (cat === 'profissional_mercado' || cat === 'outro' || cat === 'outra_noiva_cliente')
+    )
+      return true
+    if (ref.includes('cerimonial') || ref.includes('assessoria')) return true
+    return false
+  }
+
+  // Obtém o nome do cerimonialista / indicador de referência se disponível
+  const getNomeIndicadorCerimonialista = (cliente: any) => {
+    if (!cliente) return ''
+    if (cliente.referencia_origem && cliente.referencia_origem.trim()) {
+      return cliente.referencia_origem.trim()
+    }
+    if (cliente.coordenador_origem_nome && cliente.coordenador_origem_nome.trim()) {
+      return cliente.coordenador_origem_nome.trim()
+    }
+    if (cliente.contato_nome && cliente.contato_nome.trim()) {
+      return cliente.contato_nome.trim()
+    }
+    return ''
+  }
+
   // Abrir modal de edição/complementação do cadastro completo do cliente
   const abrirModalEditarCadastro = () => {
     if (!clienteSelecionado) return
@@ -353,8 +412,19 @@ export default function NovaProposta() {
     if (!nomeLimpo) {
       return setErroEditarCadastro('Informe o nome do cliente.')
     }
+
+    const ehOrigemCerimonialistaEdit =
+      editClienteOrigem === 'cerimonialista' ||
+      editClienteClassificacao === 'cerimonialista' ||
+      (editClienteOrigem === 'indicacao' &&
+        (editClienteCategoriaIndicacao === 'profissional_mercado' ||
+          editClienteCategoriaIndicacao === 'outro' ||
+          editClienteCategoriaIndicacao === 'outra_noiva_cliente')) ||
+      editClienteReferencia.toLowerCase().includes('cerimonial') ||
+      editClienteReferencia.toLowerCase().includes('assessoria')
+
     const partesNome = nomeLimpo.split(/\s+/).filter(Boolean)
-    if (partesNome.length < 2) {
+    if (!ehOrigemCerimonialistaEdit && partesNome.length < 2) {
       return setErroEditarCadastro('Informe ao menos nome e sobrenome do cliente.')
     }
     if (telLimpo && telLimpo.length < 10) {
@@ -408,11 +478,9 @@ export default function NovaProposta() {
             })
           }
           if (pessoa) {
-            const vinculo = await pb
-              .collection('clientes_pessoas')
-              .getList(1, 1, {
-                filter: `cliente_id = "${atualizado.id}" && pessoa_id = "${pessoa.id}"`,
-              })
+            const vinculo = await pb.collection('clientes_pessoas').getList(1, 1, {
+              filter: `cliente_id = "${atualizado.id}" && pessoa_id = "${pessoa.id}"`,
+            })
             if (vinculo.items.length === 0) {
               await pb
                 .collection('clientes_pessoas')
@@ -478,7 +546,14 @@ export default function NovaProposta() {
     if (!clienteId || !oportunidadeId) return setError('Selecione cliente e oportunidade.')
     if (!itens.length) return setError('Adicione pelo menos um item ao orçamento.')
     const nomeAtual = clienteSelecionado?.nome || ''
-    if (!isNomeCompleto(nomeAtual)) {
+    const ehOrigemCerimonialista = isClienteOrigemCerimonialista(clienteSelecionado)
+
+    if (!nomeAtual.trim()) {
+      return setError('Selecione um cliente válido para o orçamento.')
+    }
+
+    // Regra: se NÃO for origem cerimonialista/terceiro, exige nome + sobrenome
+    if (!ehOrigemCerimonialista && !isNomeCompleto(nomeAtual)) {
       return setError(
         'Para formalizar o orçamento, o cliente deve possuir ao menos nome e sobrenome. Utilize a opção "Complementar cadastro" acima.',
       )
@@ -601,6 +676,26 @@ export default function NovaProposta() {
               <p className="text-base">
                 Orçamento {saved.id}, versão {saved.versao}. Nenhum preço foi calculado.
               </p>
+              {clienteSelecionado && (
+                <div className="text-sm text-[#5C4A32] flex flex-wrap items-center gap-2">
+                  <span>
+                    Cliente: <strong>{clienteSelecionado.nome}</strong>
+                  </span>
+                  {isClienteOrigemCerimonialista(clienteSelecionado) &&
+                    !clienteSelecionado.telefone_principal &&
+                    !clienteSelecionado.email && (
+                      <Badge
+                        variant="outline"
+                        className="border-[#D6BC7E] text-[#5C4A32] bg-[#F4EEDA] text-xs font-medium px-2 py-0.5"
+                      >
+                        Contato via cerimonialista
+                        {getNomeIndicadorCerimonialista(clienteSelecionado)
+                          ? `: ${getNomeIndicadorCerimonialista(clienteSelecionado)}`
+                          : ''}
+                      </Badge>
+                    )}
+                </div>
+              )}
               <p className="text-base">
                 Status comercial: <strong>{saved.status}</strong>
                 {saved.pedido_id ? ` · Pedido: ${saved.pedido_id}` : ''}
@@ -778,85 +873,131 @@ export default function NovaProposta() {
             </div>
 
             {/* Painel do cliente selecionado: detalhe e botão único para complementar cadastro completo */}
-            {clienteSelecionado && (
-              <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3.5 space-y-2.5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase tracking-wider font-semibold text-[#8A7A66]">
-                      Cliente Selecionado
-                    </span>
-                    {isNomeCompleto(clienteSelecionado.nome) ? (
-                      <Badge
-                        variant="outline"
-                        className="border-[#658B58] text-[#3F6334] bg-[#EEF5EB] text-[11px] px-2 py-0.5 flex items-center gap-1 font-medium"
+            {clienteSelecionado &&
+              (() => {
+                const ehOrigemCerim = isClienteOrigemCerimonialista(clienteSelecionado)
+                const nomeCerim = getNomeIndicadorCerimonialista(clienteSelecionado)
+                const temContatoDireto = Boolean(
+                  clienteSelecionado.telefone_principal || clienteSelecionado.email,
+                )
+
+                return (
+                  <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3.5 space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs uppercase tracking-wider font-semibold text-[#8A7A66]">
+                          Cliente Selecionado
+                        </span>
+                        {isNomeCompleto(clienteSelecionado.nome) ? (
+                          <Badge
+                            variant="outline"
+                            className="border-[#658B58] text-[#3F6334] bg-[#EEF5EB] text-[11px] px-2 py-0.5 flex items-center gap-1 font-medium"
+                          >
+                            <Check size={11} /> Nome completo validado
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className="border-[#D6BC7E] text-[#7A5B18] bg-[#FBF5E5] text-[11px] px-2 py-0.5 flex items-center gap-1 font-medium"
+                          >
+                            <AlertCircle size={11} /> Sobrenome pendente
+                          </Badge>
+                        )}
+                        {ehOrigemCerim && (
+                          <Badge
+                            variant="outline"
+                            className="border-[#5C4A32]/30 text-[#5C4A32] bg-[#FDFAF5] text-[11px] px-2 py-0.5 flex items-center gap-1 font-medium"
+                          >
+                            Indicação Cerimonialista
+                          </Badge>
+                        )}
+                        {ehOrigemCerim && !temContatoDireto && (
+                          <Badge
+                            variant="outline"
+                            className="border-[#D6BC7E] text-[#5C4A32] bg-[#F4EEDA] text-[11px] px-2 py-0.5 flex items-center gap-1 font-semibold"
+                          >
+                            Via cerimonialista{nomeCerim ? `: ${nomeCerim}` : ''}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={abrirModalEditarCadastro}
+                        className="text-xs text-[#5C4A32] hover:text-[#3D2314] hover:bg-[#F0E6D6] h-8 px-2.5 rounded-lg flex items-center gap-1.5 font-medium"
                       >
-                        <Check size={11} /> Nome completo validado
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="border-[#D6BC7E] text-[#7A5B18] bg-[#FBF5E5] text-[11px] px-2 py-0.5 flex items-center gap-1 font-medium"
-                      >
-                        <AlertCircle size={11} /> Sobrenome pendente
-                      </Badge>
-                    )}
+                        <Edit2 size={13} />
+                        Complementar cadastro
+                      </Button>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-base font-semibold text-[#5C4A32]">
+                        {clienteSelecionado.nome}
+                      </p>
+                      <div className="text-xs text-[#8A7A66] flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {ehOrigemCerim && !temContatoDireto ? (
+                          <span className="inline-flex items-center gap-1 font-medium text-[#5C4A32] bg-[#FDFAF5] px-2 py-0.5 rounded-md border border-[#E8DEC8]">
+                            Contato:{' '}
+                            <strong>Via cerimonialista{nomeCerim ? ` (${nomeCerim})` : ''}</strong>
+                          </span>
+                        ) : (
+                          <>
+                            {clienteSelecionado.telefone_principal && (
+                              <span>Telefone: {clienteSelecionado.telefone_principal}</span>
+                            )}
+                            {clienteSelecionado.email && (
+                              <span>· E-mail: {clienteSelecionado.email}</span>
+                            )}
+                          </>
+                        )}
+                        {clienteSelecionado.cpf_cnpj && (
+                          <span>· CPF/CNPJ: {clienteSelecionado.cpf_cnpj}</span>
+                        )}
+                        {clienteSelecionado.natureza_cadastral && (
+                          <span>
+                            · Natureza:{' '}
+                            {clienteSelecionado.natureza_cadastral === 'pessoa_juridica'
+                              ? 'Pessoa Jurídica'
+                              : 'Pessoa Física'}
+                          </span>
+                        )}
+                        {clienteSelecionado.classificacao_comercial && (
+                          <span>
+                            · Classificação:{' '}
+                            {clienteSelecionado.classificacao_comercial === 'cerimonialista'
+                              ? 'Cerimonialista'
+                              : clienteSelecionado.classificacao_comercial === 'revendedor'
+                                ? 'Revendedor'
+                                : clienteSelecionado.classificacao_comercial ===
+                                    'parceiro_comercial'
+                                  ? 'Parceiro Comercial'
+                                  : 'Cliente padrão'}
+                          </span>
+                        )}
+                        {nomeCerim && temContatoDireto && <span>· Indicado por: {nomeCerim}</span>}
+                      </div>
+
+                      {!isNomeCompleto(clienteSelecionado.nome) &&
+                        (ehOrigemCerim ? (
+                          <p className="text-xs text-[#5C4A32] bg-[#FDFAF5] p-2 rounded-lg border border-[#E8DEC8] mt-1.5">
+                            ✓ <strong>Formalização liberada por origem:</strong> cliente indicado
+                            por cerimonialista/terceiro. O sobrenome e dados diretos poderão ser
+                            complementados no momento do fechamento do pedido.
+                          </p>
+                        ) : (
+                          <p className="text-xs text-[#8D6B29] pt-1">
+                            ℹ O orçamento formal requer nome e sobrenome completo. Clique em{' '}
+                            <strong>Complementar cadastro</strong> para atualizar os dados deste
+                            cliente antes de emitir a proposta.
+                          </p>
+                        ))}
+                    </div>
                   </div>
-
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={abrirModalEditarCadastro}
-                    className="text-xs text-[#5C4A32] hover:text-[#3D2314] hover:bg-[#F0E6D6] h-8 px-2.5 rounded-lg flex items-center gap-1.5 font-medium"
-                  >
-                    <Edit2 size={13} />
-                    Complementar cadastro
-                  </Button>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-base font-semibold text-[#5C4A32]">
-                    {clienteSelecionado.nome}
-                  </p>
-                  <p className="text-xs text-[#8A7A66] flex flex-wrap gap-x-2 gap-y-0.5">
-                    {clienteSelecionado.telefone_principal && (
-                      <span>Telefone: {clienteSelecionado.telefone_principal}</span>
-                    )}
-                    {clienteSelecionado.cpf_cnpj && (
-                      <span>· CPF/CNPJ: {clienteSelecionado.cpf_cnpj}</span>
-                    )}
-                    {clienteSelecionado.email && <span>· E-mail: {clienteSelecionado.email}</span>}
-                    {clienteSelecionado.natureza_cadastral && (
-                      <span>
-                        · Natureza:{' '}
-                        {clienteSelecionado.natureza_cadastral === 'pessoa_juridica'
-                          ? 'Pessoa Jurídica'
-                          : 'Pessoa Física'}
-                      </span>
-                    )}
-                    {clienteSelecionado.classificacao_comercial && (
-                      <span>
-                        · Classificação:{' '}
-                        {clienteSelecionado.classificacao_comercial === 'cerimonialista'
-                          ? 'Cerimonialista'
-                          : clienteSelecionado.classificacao_comercial === 'revendedor'
-                            ? 'Revendedor'
-                            : clienteSelecionado.classificacao_comercial === 'parceiro_comercial'
-                              ? 'Parceiro Comercial'
-                              : 'Cliente padrão'}
-                      </span>
-                    )}
-                  </p>
-                  {!isNomeCompleto(clienteSelecionado.nome) && (
-                    <p className="text-xs text-[#8D6B29] pt-1">
-                      ℹ O orçamento formal requer nome e sobrenome completo. Clique em{' '}
-                      <strong>Complementar cadastro</strong> para atualizar os dados deste cliente
-                      antes de emitir a proposta.
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
+                )
+              })()}
           </CardContent>
         </Card>
         <Card className="bg-[#FDFAF5] border-[#E8DEC8] rounded-2xl shadow-card">
@@ -1068,18 +1209,19 @@ export default function NovaProposta() {
                 htmlFor="edit_cliente_nome"
                 className="text-[15px] font-semibold text-[#5C4A32]"
               >
-                Nome completo (nome + sobrenome) *
+                Nome do cliente *
               </Label>
               <Input
                 id="edit_cliente_nome"
                 value={editClienteNome}
                 onChange={(e) => setEditClienteNome(e.target.value)}
-                placeholder="Ex.: Carolina Prado Ferreira"
+                placeholder="Ex.: Carolina Prado Ferreira ou Marlene e João"
                 required
                 className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
               />
               <p className="text-xs text-[#8A7A66]">
-                Para orçamentos formais, é necessário ao menos o primeiro nome e sobrenome.
+                Clientes indicados por cerimonialista podem ser formalizados apenas com o primeiro
+                nome (ex.: "Marlene e João"). Clientes diretos exigem nome e sobrenome.
               </p>
             </div>
 
@@ -1189,11 +1331,11 @@ export default function NovaProposta() {
                 className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
               >
                 <option value="">Selecione a origem, se souber</option>
+                <option value="cerimonialista">Cerimonialista / Terceiro</option>
+                <option value="indicacao">Indicação</option>
                 <option value="instagram">Instagram</option>
                 <option value="google">Google</option>
                 <option value="tiktok">TikTok</option>
-                <option value="indicacao">Indicação</option>
-                <option value="cerimonialista">Cerimonialista</option>
                 <option value="parceiro_comercial">Parceiro Comercial</option>
                 <option value="ifood">iFood</option>
                 <option value="outro">Outro</option>
@@ -1216,11 +1358,13 @@ export default function NovaProposta() {
                     className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
                   >
                     <option value="">Selecione a categoria</option>
-                    <option value="profissional_mercado">Profissional do mercado</option>
+                    <option value="profissional_mercado">
+                      Profissional do mercado (Cerimonialista/Assessor)
+                    </option>
                     <option value="outra_noiva_cliente">Outra noiva/cliente</option>
                     <option value="parente">Parente</option>
                     <option value="amigo_conhecido">Amigo/conhecido</option>
-                    <option value="outro">Outro</option>
+                    <option value="outro">Outro terceiro</option>
                     <option value="nao_informado">Não informado</option>
                   </select>
                 </div>
@@ -1229,16 +1373,34 @@ export default function NovaProposta() {
                     htmlFor="edit_cliente_ref"
                     className="text-[15px] font-semibold text-[#5C4A32]"
                   >
-                    Referência da indicação
+                    Nome da cerimonialista / indicador
                   </Label>
                   <Input
                     id="edit_cliente_ref"
                     value={editClienteReferencia}
                     onChange={(e) => setEditClienteReferencia(e.target.value)}
-                    placeholder="Ex.: indicação da noiva Mariana"
+                    placeholder="Ex.: Cerimonialista Romy Godoy"
                     className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
                   />
                 </div>
+              </div>
+            )}
+
+            {editClienteOrigem === 'cerimonialista' && (
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="edit_cliente_ref_cerim"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Nome da cerimonialista / terceiro indicador
+                </Label>
+                <Input
+                  id="edit_cliente_ref_cerim"
+                  value={editClienteReferencia}
+                  onChange={(e) => setEditClienteReferencia(e.target.value)}
+                  placeholder="Ex.: Romy Godoy"
+                  className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                />
               </div>
             )}
 
@@ -1309,18 +1471,19 @@ export default function NovaProposta() {
                 htmlFor="modal_cliente_nome"
                 className="text-[15px] font-semibold text-[#5C4A32]"
               >
-                Nome completo (nome + sobrenome) *
+                Nome do cliente *
               </Label>
               <Input
                 id="modal_cliente_nome"
                 value={novoClienteNome}
                 onChange={(e) => setNovoClienteNome(e.target.value)}
-                placeholder="Ex.: Carolina Prado Ferreira"
+                placeholder="Ex.: Carolina Prado Ferreira ou Marlene e João"
                 required
                 className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
               />
               <p className="text-xs text-[#8A7A66]">
-                Para orçamentos formais, é necessário ao menos o primeiro nome e sobrenome.
+                Clientes indicados por cerimonialista podem ser formalizados apenas com o primeiro
+                nome (ex.: "Marlene e João"). Clientes diretos exigem nome e sobrenome.
               </p>
             </div>
 
@@ -1415,6 +1578,93 @@ export default function NovaProposta() {
                 </select>
               </div>
             </div>
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="modal_cliente_origem"
+                className="text-[15px] font-semibold text-[#5C4A32]"
+              >
+                Origem do cliente
+              </Label>
+              <select
+                id="modal_cliente_origem"
+                value={novoClienteOrigem}
+                onChange={(e) => setNovoClienteOrigem(e.target.value)}
+                className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+              >
+                <option value="">Selecione a origem, se souber</option>
+                <option value="cerimonialista">Cerimonialista / Terceiro</option>
+                <option value="indicacao">Indicação</option>
+                <option value="instagram">Instagram</option>
+                <option value="google">Google</option>
+                <option value="tiktok">TikTok</option>
+                <option value="parceiro_comercial">Parceiro Comercial</option>
+                <option value="ifood">iFood</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+
+            {novoClienteOrigem === 'indicacao' && (
+              <div className="rounded-xl border border-[#E8DEC8] bg-[#FBF7F0] p-3 space-y-3">
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="modal_cliente_cat_indicacao"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
+                  >
+                    Categoria da indicação *
+                  </Label>
+                  <select
+                    id="modal_cliente_cat_indicacao"
+                    value={novoClienteCategoriaIndicacao}
+                    onChange={(e) => setNovoClienteCategoriaIndicacao(e.target.value)}
+                    className="flex h-10 w-full rounded-xl border border-[#E8DEC8] bg-white px-3.5 py-2 text-[15px] text-[#5C4A32]"
+                  >
+                    <option value="">Selecione a categoria</option>
+                    <option value="profissional_mercado">
+                      Profissional do mercado (Cerimonialista/Assessor)
+                    </option>
+                    <option value="outra_noiva_cliente">Outra noiva/cliente</option>
+                    <option value="parente">Parente</option>
+                    <option value="amigo_conhecido">Amigo/conhecido</option>
+                    <option value="outro">Outro terceiro</option>
+                    <option value="nao_informado">Não informado</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="modal_cliente_ref"
+                    className="text-[15px] font-semibold text-[#5C4A32]"
+                  >
+                    Nome da cerimonialista / indicador
+                  </Label>
+                  <Input
+                    id="modal_cliente_ref"
+                    value={novoClienteReferencia}
+                    onChange={(e) => setNovoClienteReferencia(e.target.value)}
+                    placeholder="Ex.: Cerimonialista Romy Godoy"
+                    className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {novoClienteOrigem === 'cerimonialista' && (
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="modal_cliente_ref_cerim"
+                  className="text-[15px] font-semibold text-[#5C4A32]"
+                >
+                  Nome da cerimonialista / terceiro indicador
+                </Label>
+                <Input
+                  id="modal_cliente_ref_cerim"
+                  value={novoClienteReferencia}
+                  onChange={(e) => setNovoClienteReferencia(e.target.value)}
+                  placeholder="Ex.: Romy Godoy"
+                  className="h-10 text-[15px] px-3.5 bg-white border-[#E8DEC8] text-[#5C4A32] rounded-xl focus:border-[#B08A3E]"
+                />
+              </div>
+            )}
 
             <div className="pt-2">
               <label className="flex items-center gap-2 cursor-pointer text-sm text-[#5C4A32]">

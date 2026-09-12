@@ -146,11 +146,10 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
 
             <div className="hidden lg:flex items-center border-l border-[#E8DEC8] pl-5">
               <span
-                className="font-brand-accent text-[40px] leading-none select-none tracking-normal whitespace-nowrap"
-                style={{ color: '#B08A3E' }}
-                title="Tradição que celebra histórias"
+                className="text-xs tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-semibold whitespace-nowrap select-none"
+                title="TRADIÇÃO QUE CELEBRA HISTÓRIAS"
               >
-                Tradição que celebra histórias
+                TRADIÇÃO QUE CELEBRA HISTÓRIAS
               </span>
             </div>
           </div>

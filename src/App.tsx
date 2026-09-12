@@ -11,6 +11,7 @@ import Catalogo from './pages/Catalogo'
 import Historico from './pages/Historico'
 import Usuarios from './pages/Usuarios'
 import IntegrationHarness from './pages/IntegrationHarness'
+import F2T010Regression from './pages/F2T010Regression'
 import FilaFinanceira from './pages/FilaFinanceira'
 import pb from '@/lib/pocketbase/client'
 
@@ -120,6 +121,14 @@ const App = () => (
           element={
             <ProtectedRoute roles={['administrador']}>
               <IntegrationHarness />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/regressao/f2-t010"
+          element={
+            <ProtectedRoute roles={['administrador']}>
+              <F2T010Regression />
             </ProtectedRoute>
           }
         />

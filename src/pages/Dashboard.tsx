@@ -233,6 +233,13 @@ const Dashboard = () => {
                   >
                     Harness de integração
                   </Button>
+                  <Button
+                    variant="outline"
+                    className="border-[#E8DEC8] text-[#5C4A32] hover:bg-[#F5EFE6] font-medium text-sm px-4 py-2.5 rounded-xl transition-colors"
+                    onClick={() => navigate('/regressao/f2-t010')}
+                  >
+                    Regressão F2-T010
+                  </Button>
                 </>
               )}
             </>

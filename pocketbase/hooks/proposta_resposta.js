@@ -173,6 +173,43 @@ routerAdd(
       })
     }
 
+    let pedidoExistenteAntesDaPolitica = null
+    try {
+      pedidoExistenteAntesDaPolitica = $app.findFirstRecordByData(
+        'pedidos',
+        'proposta_id',
+        propostaId,
+      )
+    } catch (err) {}
+
+    if (pedidoExistenteAntesDaPolitica) {
+      const auditoriaRepeticao = new Record($app.findCollectionByNameOrId('auditoria_pedidos'))
+      auditoriaRepeticao.set('pedido_id', pedidoExistenteAntesDaPolitica.id)
+      auditoriaRepeticao.set('proposta_id', propostaId)
+      auditoriaRepeticao.set('tipo_evento', 'tentativa_conversao')
+      auditoriaRepeticao.set('autor', auth.id)
+      auditoriaRepeticao.set('versao_proposta', proposta.getInt('versao'))
+      auditoriaRepeticao.set(
+        'resumo',
+        'Tentativa repetida de conversão; pedido existente reutilizado.',
+      )
+      auditoriaRepeticao.set('motivo', String(body.motivo || 'Conversão repetida').slice(0, 500))
+      auditoriaRepeticao.set('snapshot', {
+        pedido_id: pedidoExistenteAntesDaPolitica.id,
+        proposta_id: propostaId,
+      })
+      $app.save(auditoriaRepeticao)
+      return e.json(200, {
+        ok: true,
+        idempotente: true,
+        proposta_id: propostaId,
+        pedido_id: pedidoExistenteAntesDaPolitica.id,
+        status: 'aprovada',
+        status_operacional: pedidoExistenteAntesDaPolitica.getString('status_operacional'),
+        status_financeiro: pedidoExistenteAntesDaPolitica.getString('status_financeiro'),
+      })
+    }
+
     const politicaId = proposta.getString('politica_id')
     if (!politicaId) {
       throw e.badRequestError('A proposta não pode ser aprovada sem política comercial aprovada.')

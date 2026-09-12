@@ -2,6 +2,14 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Great+Vibes&family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
+@font-face {
+  font-family: 'High Spirited';
+  src: url('/fonts/High-Spirited.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -134,6 +142,11 @@
 
   .font-script {
     font-family: 'Great Vibes', cursive;
+  }
+
+  /* Fonte de marca: High Spirited — acento. Irmã do logo. Mínimo 40px */
+  .font-brand-accent {
+    font-family: 'High Spirited', 'Great Vibes', cursive;
   }
 
   /* NEVER REMOVE THIS */

@@ -312,39 +312,58 @@ migrate(
     app.save(dadosEntrega)
 
     // ========== SEED: usuarios de teste ==========
+    // F3-T001 (SPEC-3-001): senha vem do secret EMILIA_*_PASSWORD; sem secret,
+    // a conta nasce com senha aleatória não registrada e desativada (RN-3-002).
+    function senhaPorSecret(email) {
+      var mapa = {
+        'fernanda@emiliabemcasados.local': 'EMILIA_FERNANDA_PASSWORD',
+        'mara@emiliabemcasados.local': 'EMILIA_MARA_PASSWORD',
+        'anie@emiliabemcasados.local': 'EMILIA_ANIE_PASSWORD',
+      }
+      var s = $os.getenv(mapa[email]) || ''
+      if (s !== '') return { senha: s, ativa: true }
+      return { senha: $security.randomString(24), ativa: false }
+    }
+
     var users = app.findCollectionByNameOrId('_pb_users_auth_')
 
     try {
+      var cred = senhaPorSecret('fernanda@emiliabemcasados.local')
       var fernanda = new Record(users, {
         email: 'fernanda@emiliabemcasados.local',
         name: 'Fernanda',
-        password: 'Emilia@2026',
-        passwordConfirm: 'Emilia@2026',
+        password: cred.senha,
+        passwordConfirm: cred.senha,
       })
+      fernanda.set('ativo', cred.ativa)
       app.save(fernanda)
     } catch (e) {
       console.log('fernanda already exists')
     }
 
     try {
+      var cred = senhaPorSecret('mara@emiliabemcasados.local')
       var mara = new Record(users, {
         email: 'mara@emiliabemcasados.local',
         name: 'Mara',
-        password: 'Emilia@2026',
-        passwordConfirm: 'Emilia@2026',
+        password: cred.senha,
+        passwordConfirm: cred.senha,
       })
+      mara.set('ativo', cred.ativa)
       app.save(mara)
     } catch (e) {
       console.log('mara already exists')
     }
 
     try {
+      var cred = senhaPorSecret('anie@emiliabemcasados.local')
       var anie = new Record(users, {
         email: 'anie@emiliabemcasados.local',
         name: 'Anie',
-        password: 'Emilia@2026',
-        passwordConfirm: 'Emilia@2026',
+        password: cred.senha,
+        passwordConfirm: cred.senha,
       })
+      anie.set('ativo', cred.ativa)
       app.save(anie)
     } catch (e) {
       console.log('anie already exists')

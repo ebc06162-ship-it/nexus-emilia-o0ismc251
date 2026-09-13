@@ -14,8 +14,8 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "preview": "vite preview",
-    "test": "echo \"there are no tests for this project\" && exit 0",
-    "test:watch": "echo \"there are no tests for this project\" && exit 0"
+    "test": "node tests/invariantes.test.mjs",
+    "test:watch": "node --watch tests/invariantes.test.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -29,7 +29,7 @@
     "@radix-ui/react-dialog": "^1.1.17",
     "@radix-ui/react-dropdown-menu": "^2.1.18",
     "@radix-ui/react-hover-card": "^1.1.17",
-    "@radix-ui/react-label": "^2.1.10",
+    "@radix-ui/react-label": "^1.1.10",
     "@radix-ui/react-menubar": "^1.1.18",
     "@radix-ui/react-navigation-menu": "^1.2.16",
     "@radix-ui/react-popover": "^1.1.17",
@@ -71,6 +71,10 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@oxc-parser/binding-linux-arm64-musl": "0.137.0",
+    "@oxfmt/binding-linux-arm64-musl": "0.56.0",
+    "@oxlint/binding-linux-arm64-musl": "1.71.0",
+    "@rolldown/binding-linux-arm64-musl": "1.0.3",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^26.0.0",
     "@types/react": "^19.2.17",
@@ -86,5 +90,12 @@
     "tailwindcss": "^3.4.19",
     "typescript": "^6.0.3",
     "vite": "8.0.16"
+  },
+  "pnpm": {
+    "overrides": {
+      "react-router": ">=7.18.2",
+      "postcss": ">=8.5.23",
+      "nanoid": "3.3.18"
+    }
   }
 }

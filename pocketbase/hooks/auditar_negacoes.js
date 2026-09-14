@@ -12,6 +12,7 @@ routerAdd(
       oportunidades: 'Registro de oportunidade/pedido',
       historico_eventos: 'Histórico de eventos',
       auditoria: 'Auditoria',
+      config_jornadas: 'Configuração de jornadas',
       users: 'Usuário',
     }
     const objectLabel = labels[body.objeto_tipo] || String(body.objeto_tipo || 'desconhecido')

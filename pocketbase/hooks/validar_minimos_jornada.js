@@ -51,6 +51,7 @@ routerAdd(
       if (solicitouDegustacaoFlag) {
         const modN = String(oportunidade.getString('modalidade_entrega') || '').toLowerCase()
         const precisaFrete =
+          modN.includes('entrega') ||
           modN.includes('envi') ||
           modN.includes('sedex') ||
           modN.includes('motoboy') ||
@@ -72,7 +73,10 @@ routerAdd(
           pendN.set('campo', 'frete_valor')
           pendN.set('valor_atual', '')
           pendN.set('origem', 'jornada_degustacao')
-          pendN.set('motivo', 'Degustação enviada exige valor de frete (RN-3-101); cotação pendente')
+          pendN.set(
+            'motivo',
+            'Degustação enviada exige valor de frete (RN-3-101); cotação pendente',
+          )
           pendN.set('responsavel', adminN ? adminN.id : auth.id)
           pendN.set('proxima_acao', 'Cotar frete (Lalamove/Sedex) e registrar o valor')
           pendN.set('prazo', prazoN)
@@ -129,6 +133,7 @@ routerAdd(
       // (marcador vale para qualquer tipo de evento; degustacao como tipo é legado das fixtures)
       const modalidade = String(oportunidade.getString('modalidade_entrega') || '').toLowerCase()
       if (
+        modalidade.includes('entrega') ||
         modalidade.includes('envi') ||
         modalidade.includes('sedex') ||
         modalidade.includes('motoboy') ||

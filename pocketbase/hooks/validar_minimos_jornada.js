@@ -43,8 +43,67 @@ routerAdd(
     } catch (err) {
       config = null
     }
+    const solicitouDegustacaoFlag =
+      tipo === 'degustacao' || oportunidade.getBool('solicitou_degustacao')
+
     if (!config || !config.getBool('ativo')) {
-      // jornada sem configuração: segue o fluxo do núcleo (casamento etc.)
+      // jornada sem configuração (casamento etc.): ainda valida o marcador de degustação
+      if (solicitouDegustacaoFlag) {
+        const modN = String(oportunidade.getString('modalidade_entrega') || '').toLowerCase()
+        const precisaFrete =
+          modN.includes('envi') ||
+          modN.includes('sedex') ||
+          modN.includes('motoboy') ||
+          modN.includes('lalamove')
+        const freteN = oportunidade.getInt('frete_valor')
+        if (precisaFrete && (!freteN || freteN <= 0)) {
+          var adminN = null
+          try {
+            adminN = $app.findFirstRecordByFilter(
+              '_pb_users_auth_',
+              'papel = "administrador" && ativo = true',
+            )
+          } catch (eAdmN) {
+            adminN = null
+          }
+          const prazoN = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
+          const pendN = new Record($app.findCollectionByNameOrId('pendencias'))
+          pendN.set('oportunidade_id', oportunidade.id)
+          pendN.set('campo', 'frete_valor')
+          pendN.set('valor_atual', '')
+          pendN.set('origem', 'jornada_degustacao')
+          pendN.set('motivo', 'Degustação enviada exige valor de frete (RN-3-101); cotação pendente')
+          pendN.set('responsavel', adminN ? adminN.id : auth.id)
+          pendN.set('proxima_acao', 'Cotar frete (Lalamove/Sedex) e registrar o valor')
+          pendN.set('prazo', prazoN)
+          pendN.set('pending_type', 'campo_ausente')
+          pendN.set('status', 'aberta')
+          $app.save(pendN)
+          const histN = new Record($app.findCollectionByNameOrId('historico_eventos'))
+          histN.set('oportunidade_id', oportunidade.id)
+          histN.set('descricao', 'Pendência registrada: frete da degustação enviada (RN-3-101)')
+          histN.set('tipo_evento', 'atualizacao')
+          histN.set('autor', auth.id)
+          histN.set('campo', 'frete_valor')
+          histN.set('origem', 'jornada_degustacao')
+          histN.set('valor_novo', '')
+          $app.save(histN)
+          oportunidade.set('status', 'aguardando_dados')
+          $app.save(oportunidade)
+          return e.json(200, {
+            ok: false,
+            jornada: tipo || 'nucleo',
+            status: 'aguardando_dados',
+            pendencias_criadas: 1,
+            pendencias: [
+              {
+                campo: 'frete_valor',
+                motivo: 'Degustação enviada exige valor de frete (RN-3-101); cotação pendente',
+              },
+            ],
+          })
+        }
+      }
       oportunidade.set('status', novoStatus)
       $app.save(oportunidade)
       return e.json(200, { ok: true, jornada: tipo || 'nucleo', pendencias_criadas: 0 })
@@ -63,8 +122,11 @@ routerAdd(
     // ---------- regras específicas por jornada ----------
     const extras = []
 
-    if (tipo === 'degustacao') {
+    const solicitouDegustacao =
+      tipo === 'degustacao' || oportunidade.getBool('solicitou_degustacao')
+    if (solicitouDegustacao) {
       // RN-3-101: cortesia presencial/retirada; frete no envio; adicional cobrado no mesmo registro
+      // (marcador vale para qualquer tipo de evento; degustacao como tipo é legado das fixtures)
       const modalidade = String(oportunidade.getString('modalidade_entrega') || '').toLowerCase()
       if (
         modalidade.includes('envi') ||
@@ -170,6 +232,7 @@ routerAdd(
         admin = null
       }
       const responsavel = admin ? admin.id : auth.id
+      const hoje = new Date().toISOString().slice(0, 10)
       const prazo = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
 
       for (const campo of faltando) {

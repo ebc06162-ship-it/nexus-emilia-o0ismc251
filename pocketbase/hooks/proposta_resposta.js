@@ -256,12 +256,6 @@ routerAdd(
     if (fimDia < hoje) {
       throw e.badRequestError('A política comercial está expirada.')
     }
-    if (inicio && Date.parse(inicio) > hoje) {
-      throw e.badRequestError('A política comercial ainda não está vigente.')
-    }
-    if (fim && Date.parse(fim) < hoje) {
-      throw e.badRequestError('A política comercial está expirada.')
-    }
 
     let resposta = null
     $app.runInTransaction((txApp) => {
@@ -280,9 +274,16 @@ routerAdd(
         auditoria.set('versao_proposta', propostaTx.getInt('versao'))
         auditoria.set('resumo', 'Tentativa repetida de conversão; pedido existente reutilizado.')
         auditoria.set('motivo', String(body.motivo || 'Conversão repetida').slice(0, 500))
-        auditoria.set('snapshot', { pedido_id: pedidoExistente.id, proposta_id: propostaId })
+        auditoria.set('snapshot', {
+          pedido_id: pedidoExistente.id,
+          proposta_id: propostaId,
+        })
         txApp.save(auditoria)
-        resposta = { pedido: pedidoExistente, idempotente: true, status: 'aprovada' }
+        resposta = {
+          pedido: pedidoExistente,
+          idempotente: true,
+          status: 'aprovada',
+        }
         return
       }
 
@@ -315,6 +316,17 @@ routerAdd(
       pedido.set('proposta_id', propostaTx.id)
       pedido.set('cliente_id', propostaTx.getString('cliente_id'))
       pedido.set('oportunidade_id', propostaTx.getString('oportunidade_id'))
+      // F3-T006: copiar data_evento da oportunidade para o gate de prazo da fila de produção
+      try {
+        const oppDaProposta = $app.findRecordById(
+          'oportunidades',
+          propostaTx.getString('oportunidade_id'),
+        )
+        const de = oppDaProposta.getString('data_evento')
+        if (de) pedido.set('data_evento', de)
+      } catch (eOpp) {
+        console.log('proposta_resposta: data_evento da oportunidade não lida: ' + eOpp.message)
+      }
       pedido.set('status_comercial', 'aprovado')
       pedido.set('status_operacional', 'entrega')
       pedido.set('status_financeiro', 'aguardando_pagamento')
@@ -345,7 +357,10 @@ routerAdd(
       auditoriaProposta.set('autor', auth.id)
       auditoriaProposta.set('versao', propostaTx.getInt('versao'))
       auditoriaProposta.set('resumo', 'Proposta aprovada e convertida em pedido.')
-      auditoriaProposta.set('depois_snapshot', { proposta_id: propostaTx.id, pedido_id: pedido.id })
+      auditoriaProposta.set('depois_snapshot', {
+        proposta_id: propostaTx.id,
+        pedido_id: pedido.id,
+      })
       txApp.save(auditoriaProposta)
 
       const auditoria = new Record(txApp.findCollectionByNameOrId('auditoria_pedidos'))

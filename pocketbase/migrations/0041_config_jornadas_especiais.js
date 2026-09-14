@@ -1,5 +1,7 @@
 // F3-T004 (SPEC-3-002): configuração das jornadas especiais.
 // RN-3-101..105 e CA-3-009/010/031. Parâmetros aprovados pela Champion em 14/09/2026.
+// NOTA: no Skip esta migration é aplicada como 0042 (offset de ordinais da instância,
+// mesmo padrão documentado na T002); no repo mantém 0041 para a sequência local.
 migrate(
   (app) => {
     const auth = app.findCollectionByNameOrId('_pb_users_auth_')
@@ -66,10 +68,15 @@ migrate(
     }
 
     // ---------- seed: parâmetros aprovados pela Champion (14/09/2026) ----------
-    const admin = app.findFirstRecordByFilter(
-      '_pb_users_auth_',
-      'papel = "administrador" && ativo = true',
-    )
+    var admin = null
+    try {
+      admin = app.findFirstRecordByFilter(
+        '_pb_users_auth_',
+        'papel = "administrador" && ativo = true',
+      )
+    } catch (eAdmin) {
+      admin = null
+    }
     const seeds = [
       {
         jornada: 'degustacao',
@@ -126,10 +133,15 @@ migrate(
       },
     ]
     for (const s of seeds) {
-      const existente = app.findFirstRecordByFilter(
-        'config_jornadas',
-        'jornada = "' + s.jornada + '"',
-      )
+      var existente = null
+      try {
+        existente = app.findFirstRecordByFilter(
+          'config_jornadas',
+          'jornada = "' + s.jornada + '"',
+        )
+      } catch (eSeed) {
+        existente = null
+      }
       if (existente) continue
       const rec = new Record(config)
       rec.set('jornada', s.jornada)

@@ -22,9 +22,24 @@ routerAdd(
     if (!novoStatus) throw e.badRequestError('Informe o novo status.')
 
     // carregar configuração da jornada (fonte única de mínimos)
+    // tipos de evento sociais/corporativos usam a configuração "evento" (RN-3-102)
+    let jornadaKey = tipo
+    if (
+      tipo === 'aniversario' ||
+      tipo === 'batizado' ||
+      tipo === 'bodas' ||
+      tipo === 'formatura' ||
+      tipo === 'corporativo' ||
+      tipo === 'cha_bebe' ||
+      tipo === 'revelacao' ||
+      tipo === 'presente' ||
+      tipo === 'outros'
+    ) {
+      jornadaKey = 'evento'
+    }
     let config = null
     try {
-      config = $app.findFirstRecordByFilter('config_jornadas', 'jornada = {:j}', { j: tipo })
+      config = $app.findFirstRecordByFilter('config_jornadas', 'jornada = {:j}', { j: jornadaKey })
     } catch (err) {
       config = null
     }
@@ -68,12 +83,11 @@ routerAdd(
       }
       // capacidade semanal sem limite definido: acompanhamento manual (parâmetro aprovado 14/09)
       if (!('capacidade_semanal' in regras) || regras.capacidade_semanal === null) {
-        // sem limite configurado: não bloqueia, mas registra nota na pendência se houver outra
+        // sem limite configurado: não bloqueia
       }
       const adicional = oportunidade.getInt('qtd_adicional')
       if (adicional > 0) {
-        // adicional cobrado no mesmo registro (decisão Champion 14/09) — nada a fazer aqui,
-        // a cobrança acompanha a própria degustação
+        // adicional cobrado no mesmo registro (decisão Champion 14/09) — a cobrança acompanha a própria degustação
       }
     }
 
@@ -146,12 +160,16 @@ routerAdd(
     // ---------- faltando + extras → pendências nomeadas + histórico (CA-3-014) ----------
     const pendenciasCriadas = []
     if (faltando.length > 0 || extras.length > 0) {
-      const admin = $app.findFirstRecordByFilter(
-        '_pb_users_auth_',
-        'papel = "administrador" && ativo = true',
-      )
+      var admin = null
+      try {
+        admin = $app.findFirstRecordByFilter(
+          '_pb_users_auth_',
+          'papel = "administrador" && ativo = true',
+        )
+      } catch (eAdmin) {
+        admin = null
+      }
       const responsavel = admin ? admin.id : auth.id
-      const hoje = new Date().toISOString().slice(0, 10)
       const prazo = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
 
       for (const campo of faltando) {

@@ -22,6 +22,31 @@ const statusLabels: Record<string, string> = {
 
 const formatData = (v: string) => (v ? new Date(v).toLocaleDateString('pt-BR') : 'Sem data')
 
+// Composição em linguagem da produção (não JSON): sabor/quantidade + papel/cor + fita/largura/cor
+const formatarComposicao = (comp: any): string => {
+  if (!comp || typeof comp !== 'object') return 'Composição não registrada'
+  const itens = Array.isArray(comp.itens) ? comp.itens : []
+  if (itens.length === 0) return 'Composição não registrada'
+  const partes: string[] = []
+  for (const it of itens) {
+    const c = it.composicao_snapshot || {}
+    const cat = c.categoria || it.tipo || ''
+    const qtd = it.quantidade ? `${it.quantidade} un. · ` : ''
+    if (cat === 'papel') {
+      partes.push(`${qtd}Papel ${c.tipo || 'crepom'} ${c.cor || ''}`.replace(/\s+/g, ' ').trim())
+    } else if (cat === 'fita') {
+      partes.push(
+        `${qtd}Fita ${c.tipo || 'cetim'} ${c.largura || ''} ${c.cor || ''}`.replace(/\s+/g, ' ').trim(),
+      )
+    } else if (cat === 'produto' || cat === 'sabor') {
+      partes.push(`${qtd}${it.label_snapshot || c.tipo || 'Bem-casado'}`.trim())
+    } else {
+      partes.push(`${qtd}${it.label_snapshot || it.codigo_snapshot || cat}`.trim())
+    }
+  }
+  return partes.join(' + ') || 'Composição não registrada'
+}
+
 export default function FilaProducao() {
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -135,25 +160,14 @@ export default function FilaProducao() {
   const imprimirFila = () => {
     const linhas = pedidos
       .map((p: any) => {
-        const comp =
-          typeof p.composicao_snapshot === 'string'
-            ? p.composicao_snapshot
-            : JSON.stringify(p.composicao_snapshot || {})
-        return [
-          `PEDIDO ${p.id} · v${p.versao_proposta}`,
-          `Cliente: ${p.expand?.cliente_id?.nome || p.cliente_id || '-'}`,
-          `Entrega: ${formatData(p.data_evento)}${p.urgente ? ' · URGENTE' : ''}`,
-          `Quantidade: ${p.quantidade_snapshot ?? '-'}`,
-          `Composição: ${comp}`,
-          `Status: ${statusLabels[p.status_operacional] || p.status_operacional || '-'}`,
-          '',
-        ].join('\n')
+        const comp = formatarComposicao(p.composicao_snapshot)
+        return `<tr><td><strong>${p.id}</strong> · v${p.versao_proposta ?? '-'}</td><td>${p.expand?.cliente_id?.nome || p.cliente_id || '-'}</td><td>${formatData(p.data_evento)}${p.urgente ? ' <strong>URGENTE</strong>' : ''}</td><td>${p.quantidade_snapshot ?? '-'}</td><td>${comp}</td><td>${statusLabels[p.status_operacional] || p.status_operacional || '-'}</td></tr>`
       })
-      .join('\n---\n')
+      .join('')
     const w = window.open('', '_blank')
     if (!w) return
     w.document.write(
-      `<html><head><title>Fila de produção — Emília Bem-Casados</title></head><body style="font-family: Georgia, serif; padding: 24px;"><h1 style="color:#5C4A32">Fila de produção</h1><p>Gerada em ${new Date().toLocaleString('pt-BR')} · ID e versão em cada item para reconciliação</p><pre style="font-size:13px; white-space:pre-wrap;">${linhas}</pre></body></html>`,
+      `<html><head><title>Fila de produção — Emília Bem-Casados</title><style>body{font-family:Georgia,serif;padding:24px;color:#5C4A32}h1{color:#5C4A32}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #D6BC7E;padding:6px 8px;text-align:left}th{background:#F4EEDA}tr{page-break-inside:avoid}</style></head><body><h1>Fila de produção</h1><p>Gerada em ${new Date().toLocaleString('pt-BR')} · ID e versão em cada linha para reconciliação papel × digital</p><table><tr><th>Pedido / versão</th><th>Cliente</th><th>Entrega</th><th>Qtd</th><th>Composição</th><th>Status</th></tr>${linhas}</table></body></html>`,
     )
     w.document.close()
     w.print()
@@ -243,11 +257,7 @@ export default function FilaProducao() {
                       </div>
                       <div className="md:col-span-2">
                         <span className="text-xs text-[#8A7A66] block">Composição</span>
-                        <span className="text-[#5C4A32]">
-                          {typeof p.composicao_snapshot === 'string'
-                            ? p.composicao_snapshot.slice(0, 120)
-                            : JSON.stringify(p.composicao_snapshot || {}).slice(0, 120)}
-                        </span>
+                        <span className="text-[#5C4A32]">{formatarComposicao(p.composicao_snapshot)}</span>
                       </div>
                     </div>
                     {pends.length > 0 && (

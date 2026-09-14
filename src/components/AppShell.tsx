@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  PackageCheck,
 } from 'lucide-react'
 import pb from '@/lib/pocketbase/client'
 import EmiliaLogo from './EmiliaLogo'
@@ -78,6 +79,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
       roles: ['*'],
     },
     {
+      to: '/producao/fila',
+      label: 'Fila de Produção',
+      icon: PackageCheck,
+      roles: ['administrador', 'gestao', 'producao', 'financeiro', 'atendimento'],
+    },
+    {
       to: '/financeiro/fila',
       label: 'Fila Financeira',
       icon: WalletCards,
@@ -114,7 +121,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
     return item.roles.includes(userRole)
   })
 
-  // Iniciais para o avatar estilo mock
   const userInitials = (user?.name || user?.email || 'FM')
     .split(' ')
     .filter(Boolean)
@@ -134,10 +140,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
 
   return (
     <div className="min-h-screen bg-[#F7F1E8] text-[#5C4A32] flex flex-col font-sans">
-      {/* Topbar unificada */}
       <header className="sticky top-0 z-30 bg-[#FBF7F0]/95 backdrop-blur-md border-b border-[#E8DEC8] px-3 sm:px-4 md:px-6 py-3 transition-all">
         <div className="w-full mx-auto flex items-center justify-between gap-4">
-          {/* Logo & tag da marca */}
           <div className="flex items-center gap-6">
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -161,7 +165,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
             </div>
           </div>
 
-          {/* Campo de busca arredondado da referência */}
           <div className="hidden md:flex flex-1 max-w-lg mx-4">
             <div className="relative w-full">
               <Search
@@ -178,7 +181,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
             </div>
           </div>
 
-          {/* Notificações & Perfil */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -245,9 +247,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
         </div>
       </header>
 
-      {/* Container Principal: Sidebar + Conteúdo */}
       <div className="flex-1 flex w-full mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-6 gap-5">
-        {/* Sidebar desktop */}
         <aside className="hidden md:flex flex-col w-64 shrink-0 bg-[#FBF7F0] border border-[#E8DEC8] rounded-2xl p-3.5 shadow-subtle justify-between">
           <div className="space-y-1.5">
             <div className="px-3 py-2 mb-1">
@@ -281,7 +281,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
             })}
           </div>
 
-          {/* Bloco decorativo do rodapé da sidebar (fiel ao mockup: "MOMENTOS QUE ADOÇAM HISTÓRIAS") */}
           <div className="pt-6 border-t border-[#E8DEC8]/60 px-3 pb-2 flex flex-col items-center text-center">
             <EmiliaLogo size="sm" className="items-center" />
             <p className="text-[11px] tracking-[0.22em] uppercase font-sans text-[#8A7A66] font-medium mt-1.5">
@@ -290,7 +289,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
           </div>
         </aside>
 
-        {/* Sidebar mobile */}
         {mobileOpen && (
           <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs md:hidden flex">
             <div className="w-64 bg-[#FBF7F0] p-4 flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-200">
@@ -343,7 +341,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
           </div>
         )}
 
-        {/* Área central com título opcional e conteúdo da rota */}
         <main className="flex-1 min-w-0 space-y-6">
           {(title || subtitle) && (
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-2 border-b border-[#E8DEC8]/60">
@@ -361,7 +358,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, title, subtitle })
         </main>
       </div>
 
-      {/* Rodapé institucional discreto (estilo mockup) */}
       <footer className="mt-auto border-t border-[#E8DEC8] bg-[#FBF7F0]/60 py-3.5 px-4 text-center">
         <div className="w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs md:text-sm text-[#8A7A66]">
           <span>Emília Bem-Casados · ERP integrado para um negócio mais doce.</span>

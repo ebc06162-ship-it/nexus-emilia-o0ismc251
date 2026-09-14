@@ -51,6 +51,12 @@ const NovaOportunidade = () => {
     maternidade: '',
     tipo_parto: '',
     responsavel_acompanhamento: '',
+    qtd_adicional: '',
+    frete_valor: '',
+    data_pedido: '',
+    aviso_enviado_em: '',
+    confirmacao_recebida_em: '',
+    origem_parceiro: '',
   })
   const [loading, setLoading] = useState(false)
   const [duplicata, setDuplicata] = useState(null)
@@ -666,6 +672,41 @@ const NovaOportunidade = () => {
                       className="h-10 text-[15px] px-3.5"
                     />
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                        Bem-casados adicionais (além dos 4 de cortesia)
+                      </Label>
+                      <Input
+                        type="number"
+                        value={formData.qtd_adicional}
+                        onChange={(e) => handleChange('qtd_adicional', e.target.value)}
+                        className="h-10 text-[15px] px-3.5"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                        Valor do frete (só envio)
+                      </Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.frete_valor}
+                        onChange={(e) => handleChange('frete_valor', e.target.value)}
+                        className="h-10 text-[15px] px-3.5"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                      Parceiro de origem (se degustação de parceiro)
+                    </Label>
+                    <Input
+                      value={formData.origem_parceiro}
+                      onChange={(e) => handleChange('origem_parceiro', e.target.value)}
+                      className="h-10 text-[15px] px-3.5"
+                    />
+                  </div>
                 </div>
               )}
               {formData.tipo_evento === 'revendedor' && (
@@ -687,6 +728,17 @@ const NovaOportunidade = () => {
                     <Input
                       value={formData.tipo_cliente}
                       onChange={(e) => handleChange('tipo_cliente', e.target.value)}
+                      className="h-10 text-[15px] px-3.5"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                      Data do pedido (fixa o preço da tabela vigente)
+                    </Label>
+                    <Input
+                      type="date"
+                      value={formData.data_pedido}
+                      onChange={(e) => handleChange('data_pedido', e.target.value)}
                       className="h-10 text-[15px] px-3.5"
                     />
                   </div>
@@ -733,6 +785,34 @@ const NovaOportunidade = () => {
                       className="h-10 text-[15px] px-3.5"
                     />
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                        Aviso enviado em
+                      </Label>
+                      <Input
+                        type="date"
+                        value={formData.aviso_enviado_em}
+                        onChange={(e) => handleChange('aviso_enviado_em', e.target.value)}
+                        className="h-10 text-[15px] px-3.5"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[15px] font-semibold text-[#5C4A32]">
+                        Confirmação recebida em
+                      </Label>
+                      <Input
+                        type="date"
+                        value={formData.confirmacao_recebida_em}
+                        onChange={(e) => handleChange('confirmacao_recebida_em', e.target.value)}
+                        className="h-10 text-[15px] px-3.5"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-[#8A7A5C]">
+                    O aviso nunca libera produção automaticamente — o acompanhamento é manual pela
+                    equipe (SLA ainda não definido).
+                  </p>
                 </div>
               )}
               <div className="border-dashed border border-[#E8DEC8] rounded-xl p-3.5 space-y-2">

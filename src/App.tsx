@@ -13,6 +13,7 @@ import Usuarios from './pages/Usuarios'
 import IntegrationHarness from './pages/IntegrationHarness'
 import F2T010Regression from './pages/F2T010Regression'
 import FilaFinanceira from './pages/FilaFinanceira'
+import FilaProducao from './pages/FilaProducao'
 import pb from '@/lib/pocketbase/client'
 
 interface ProtectedRouteProps {
@@ -113,6 +114,14 @@ const App = () => (
           element={
             <ProtectedRoute roles={['administrador', 'gestao', 'financeiro', 'atendimento']}>
               <FilaFinanceira />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/producao/fila"
+          element={
+            <ProtectedRoute roles={['administrador', 'gestao', 'producao', 'financeiro', 'atendimento']}>
+              <FilaProducao />
             </ProtectedRoute>
           }
         />
